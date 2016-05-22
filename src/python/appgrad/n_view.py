@@ -13,8 +13,7 @@ class NViewAppGradCCA:
         k, num_views,
         online=False,
         etas=None,
-        epsilons=None,
-        min_r=0.1):
+        epsilons=None):
 
         self.k = k
 
@@ -34,23 +33,33 @@ class NViewAppGradCCA:
         else:
             self.epsilons = [10**(-4)] * (self.num_views + 1)
 
-        if min_r < 0:
-            raise ValueError(
-                'min_r must be non-negative.')
-        else:
-            self.min_r = min_r
-
-        self.num_updates = [0] * (self.num_views + 1)
         self.online = online
+
         self.has_been_fit = False
         self.basis_pairs = None
         self.Psi = None
+        self.history = None
+
+    def get_status(self):
+
+        return {
+            'k': self.k,
+            'num_views': self.num_views,
+            'online': self.online,
+            'etas': self.etas,
+            'epsilons': self.epsilons,
+            'has_been_fit': self.has_been_fit,
+            'basis_pairs': self.basis_pairs,
+            'Psi': self.Psi,
+            'history': self.history}
 
     def fit(self,
         ds_list, 
         gs_list=None,
         optimizers=None,
         verbose=False):
+
+        self.history = []
 
         if optimizers is not None:
             if not len(optimizers) == self.num_views + 1:
@@ -85,8 +94,12 @@ class NViewAppGradCCA:
 
         while not all(converged):
 
+            self.history.append({})
+
             # Update step sizes
             etas = [eta / i**0.5 for eta in self.etas]
+            
+            self.history[-1]['etas'] = list(etas)
 
             if verbose:
                 print "Iteration:", i
@@ -118,12 +131,13 @@ class NViewAppGradCCA:
                 print "\tObjective:", agu.get_objective(Xs, unn, Psi)
 
             # Check for convergence
-            converged = agu.is_converged(
-                [(basis_pairs_t[j][0], basis_pairs_t1[j][0])
-                 for j in range(self.num_views)],
-                self.epsilons,
-                verbose)
+            distances = [np.linalg.norm(
+                            basis_pairs_t[j][0] - basis_pairs_t1[j][0])
+                         for j in range(self.num_views)]
+            converged = [d < eps for (d, eps) in zip(distances, epsilons)]
 
+            self.history[-1]['distances'] = list(distances)
+                            
             # Update iterates
             basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
                              for unn_Phi, Phi in basis_pairs_t1]
@@ -178,10 +192,13 @@ class NViewAppGradCCA:
 
     def _get_Psi_gradient(self, Psi, Xs, Phis):
 
-        s = sum([np.dot(X, Phi)
-                 for (X, Phi) in zip(Xs, Phis)])
+        diffs = [np.dot(X, Phi) - Psi
+                 for (X, Phi) in zip(Xs, Phis)]
+        residuals = [np.linalg.norm(d) for d in diffs]
+        
+        self.history[-1]['residuals'] = list(residuals)
 
-        return (len(Phis) * Psi - 2 * s) / Psi.shape[0]
+        return (2.0 / Psi.shape[0]) * sum(diffs)
 
     def _init_data(self, ds_list, gs_list):
 

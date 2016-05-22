@@ -25,6 +25,7 @@ class AppGradCCA:
         self.unn_Phi = None
         self.Psi = None
         self.unn_Psi = None
+        self.history = []
 
     def fit(self, 
         X_ds, Y_ds, 
