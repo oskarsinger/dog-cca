@@ -158,4 +158,3 @@ class AppGradCCA:
                 Y = Y[:n,:]
 
         return (X, Sx, Y, Sy)
-
