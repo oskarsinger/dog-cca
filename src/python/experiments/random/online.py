@@ -7,11 +7,12 @@ import experiments.utils as aeu
 import numpy as np
 
 def run_online_appgrad_random_data_experiment(
-    p1, p2, k, exp=False, lower=None, verbose=False):
+    p1, p2, k, exp=False, verbose=False, 
+    lower=None, means=None):
 
     bs = k + icl(k)
-    X_loader = GL(10*p1, p1)
-    Y_loader = GL(10*p2, p2)
+    X_loader = GL(10*p1, p1, means=means)
+    Y_loader = GL(10*p2, p2, means=means)
     X_server = B2M(X_loader, bs)
     Y_server = B2M(Y_loader, bs)
 
@@ -20,10 +21,11 @@ def run_online_appgrad_random_data_experiment(
         exp=exp, lower=lower, verbose=verbose)
 
 def run_n_view_online_appgrad_random_data_experiment(
-    ps, k, exp=False, lower=None, verbose=False):
+    ps, k, exp=False, verbose=False, 
+    lower=None, means=None):
 
     bs = k + icl(k)
-    loaders = [GL(10*p, p) for p in ps]
+    loaders = [GL(10*p, p, means=means) for p in ps]
     servers = [B2M(loader, bs) for loader in loaders]
 
     return aeu.run_online_n_view_appgrad_experiment(
