@@ -12,22 +12,20 @@ def run_online_appgrad_experiment(
     if exp:
         X_gs = EGS()
         Y_gs = EGS()
+
+    X_optimizer = None
+    Y_optimizer = None
     
-    if lower is None:
-        model.fit(
-            X_server, Y_server, 
-            X_gs=X_gs, Y_gs=Y_gs,
-            verbose=verbose)
-    else:
+    if lower is not None:
         X_optimizer = MAG(lower=lower)
         Y_optimizer = MAG(lower=lower)
 
-        model.fit(
-            X_server, Y_server, 
-            X_gs=X_gs, Y_gs=Y_gs,
-            X_optimizer=X_optimizer,
-            Y_optimizer=Y_optimizer,
-            verbose=verbose)
+    model.fit(
+        X_server, Y_server, 
+        X_gs=X_gs, Y_gs=Y_gs,
+        X_optimizer=X_optimizer,
+        Y_optimizer=Y_optimizer,
+        verbose=verbose)
 
     return model
 
@@ -41,20 +39,17 @@ def run_online_n_view_appgrad_experiment(
     if exp:
         gram_servers = [EGS() for i in range(len(servers)+1)]
 
-    if lower is None:
-        model.fit(
-            servers, 
-            gs_list=gram_servers,
-            verbose=verbose)
-    else:
+    optims = None
+
+    if lower is not None:
         optims = [MAG(lower=lower)
                   for i in range(len(servers))] + \
                  [MAG()]
 
-        model.fit(
-            servers, 
-            gs_list=gram_servers,
-            optimizers=optims,
-            verbose=verbose)
+    model.fit(
+        servers, 
+        gs_list=gram_servers,
+        optimizers=optims,
+        verbose=verbose)
 
     return model

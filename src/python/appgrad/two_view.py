@@ -30,8 +30,14 @@ class AppGradCCA:
     def fit(self, 
         X_ds, Y_ds, 
         X_gs=None, Y_gs=None,
-        X_optimizer=MAG(), Y_optimizer=MAG(),
+        X_optimizer=None, Y_optimizer=None,
         verbose=False):
+
+        if X_optimizer is None:
+            X_optimizer = MAG()
+
+        if Y_optimizer is None:
+            Y_optimizer = MAG()
 
         if X_gs is None:
             X_gs = BCGS() if self.online else BGS()
