@@ -4,7 +4,6 @@ import numpy as np
 
 from math import log
 
-from data.smart_watch import get_data_summaries
 from lazyprojector import plot_matrix_heat, plot_lines
 from drrobert.file_io import get_timestamped as get_ts
 from drrobert.misc import unzip
@@ -14,7 +13,8 @@ from bokeh.palettes import GnBu9, YlOrRd9
 
 def plot_label_counts(data_dir, plot_path='.'):
 
-    labels = get_data_summaries(data_dir)['labels']
+    labels = None
+    raise Exception('Implement label extraction.')
     counts = {}
 
     for label in labels:
@@ -99,7 +99,8 @@ def plot_canonical_bases(Phis, Psi=None, plot_path='.'):
         raise ValueError(
             'Second dimension of each basis should be equal.')
 
-    Phis_features = [[str(i) for i in range(p)] for p ins ps]
+    Phis_features = [[str(i) for i in range(p)]
+                     for p in ps]
     Psi_features = [str(i) for i in range(p_Psi)]
     basis_elements = [str(i) for i in range(k)]
 
@@ -108,7 +109,7 @@ def plot_canonical_bases(Phis, Psi=None, plot_path='.'):
     Psi_p = _plot_basis(Psi, 'Psi', Psi_features, basis_elements)
     
     prefix = str(k) + '_k_' + \
-        '_'.join([str(p) for p in ps] + '_phis_'
+        '_'.join([str(p) for p in ps]) + '_phis_'
     filename = get_ts(prefix + 
         'mass_per_feature_over_bases_matrix_heat_plot') + '.html'
     filepath = os.path.join(plot_path, filename)

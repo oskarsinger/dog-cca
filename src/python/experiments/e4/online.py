@@ -1,10 +1,10 @@
-from cca.app_grad import AppGradCCA as AGCCA
-from cca.app_grad import NViewAppGradCCA as NVAGCCA
+from appgrad import AppGradCCA as AGCCA
+from appgrad import NViewAppGradCCA as NVAGCCA
 from data.loaders.e4 import FixedRateLoader as FRL
 from data.loaders.e4 import IBILoader as IBI
 from data.loaders import readers
 from data.servers.minibatch import Minibatch2Minibatch as M2M
-from global_utils.arithmetic import int_ceil_log as icl
+from drrobert.arithmetic import int_ceil_log as icl
 
 def test_online_appgrad(
     ds1, ds2, cca_k):

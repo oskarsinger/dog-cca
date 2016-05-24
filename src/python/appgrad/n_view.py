@@ -1,7 +1,7 @@
 import numpy as np
 import utils as agu
 
-from global_utils.misc import unzip
+from drrobert.misc import unzip
 from optimization.utils import get_gram
 from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
 from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
@@ -133,7 +133,7 @@ class NViewAppGradCCA:
             distances = [np.linalg.norm(
                             basis_pairs_t[j][0] - basis_pairs_t1[j][0])
                          for j in range(self.num_views)]
-            converged = [d < eps for (d, eps) in zip(distances, epsilons)]
+            converged = [d < eps for (d, eps) in zip(distances, self.epsilons)]
 
             self.history[-1]['distances'] = list(distances)
                             

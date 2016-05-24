@@ -1,5 +1,5 @@
-from cca.app_grad import AppGradCCA as AGCCA
-from cca.app_grad import NViewAppGradCCA as NVAGCCA
+from appgrad import AppGradCCA as AGCCA
+from appgrad import NViewAppGradCCA as NVAGCCA
 from data.loaders.e4 import FixedRateLoader as FRL
 from data.loaders.e4 import IBILoader as IBI
 from data.loaders import readers

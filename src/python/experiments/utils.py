@@ -13,7 +13,7 @@ def run_online_appgrad_experiment(
         X_gs = EGS()
         Y_gs = EGS()
     
-    if lower not None:
+    if lower is None:
         model.fit(
             X_server, Y_server, 
             X_gs=X_gs, Y_gs=Y_gs,

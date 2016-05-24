@@ -35,7 +35,7 @@ def run_n_view_online_appgrad_random_data_experiment(
 
     bs = k + icl(k)
     loaders = [GL(10*p, p) for p in ps]
-    servers = [B2M(loader) for loader in loaders]
+    servers = [B2M(loader, bs) for loader in loaders]
 
     print "Testing n-view CCA with boxcar-weighted Gram matrices"
     return aeu.run_online_n_view_appgrad_experiment(

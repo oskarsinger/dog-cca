@@ -1,4 +1,4 @@
-from cca.app_grad import AppGradCCA, NViewAppGradCCA
+from appgrad import AppGradCCA, NViewAppGradCCA
 from data.loaders.random import GaussianLoader as GL
 from data.servers.gram import BatchGramServer as BGS
 
