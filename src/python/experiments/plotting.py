@@ -7,6 +7,7 @@ from math import log
 from data.smart_watch import get_data_summaries
 from lazyprojector import plot_matrix_heat, plot_lines
 from drrobert.file_io import get_timestamped as get_ts
+from drrobert.misc import unzip
 
 from bokeh.plotting import figure, show, output_file, vplot
 from bokeh.palettes import GnBu9, YlOrRd9
@@ -86,26 +87,28 @@ def plot_cca_filtering(
         'CCA-filtered data points vs time step observed')
     show(vplot(X_plot, Y_plot))
 
-def plot_canonical_bases(Phi, Psi, plot_path='.'):
+def plot_canonical_bases(Phis, Psi=None, plot_path='.'):
 
-    (p1, k1) = Phi.shape
-    (p2, k2) = Psi.shape
+    (ps, ks) = unzip([Phi.shape for Phi in Phis])
+    (p_Psi, k_Psi) = Psi.shape
     k = None
     
-    if k1 == k2:
-        k = k1
+    if len(set(ks + [k_Psi])) == 1:
+        k = k_Psi
     else:
         raise ValueError(
             'Second dimension of each basis should be equal.')
 
-    Phi_features = [str(i) for i in range(p1)]
-    Psi_features = [str(i) for i in range(p2)]
+    Phis_features = [[str(i) for i in range(p)] for p ins ps]
+    Psi_features = [str(i) for i in range(p_Psi)]
     basis_elements = [str(i) for i in range(k)]
 
-    Phi_p = _plot_basis(Phi, 'Phi', Phi_features, basis_elements)
+    Phis_ps = [_plot_basis(Phi, 'Phi' + str(i), f, basis_elements)
+               for i, (Phi, f) in enumerate(zip(Phis, Phis_features))]
     Psi_p = _plot_basis(Psi, 'Psi', Psi_features, basis_elements)
     
-    prefix = str(k) + '_k_' + str(p1) + '_phi_' + str(p2) + '_phi_'
+    prefix = str(k) + '_k_' + \
+        '_'.join([str(p) for p in ps] + '_phis_'
     filename = get_ts(prefix + 
         'mass_per_feature_over_bases_matrix_heat_plot') + '.html'
     filepath = os.path.join(plot_path, filename)
@@ -113,7 +116,7 @@ def plot_canonical_bases(Phi, Psi, plot_path='.'):
     output_file(
         filepath, 
         'percent mass per feature over bases')
-    show(vplot(Phi_p, Psi_p))
+    show(vplot(Phis_ps + [Psi_p]))
 
 def _plot_basis(basis, name, features, basis_elements):
 
