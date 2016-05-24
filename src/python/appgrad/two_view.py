@@ -30,7 +30,7 @@ class AppGradCCA:
     def fit(self, 
         X_ds, Y_ds, 
         X_gs=None, Y_gs=None,
-        optimizer1=MAG(), optimizer2=MAG(),
+        X_optimizer=MAG(), Y_optimizer=MAG(),
         verbose=False):
 
         if X_gs is None:
@@ -85,9 +85,9 @@ class AppGradCCA:
                 Y, unn_Psi_t, np.dot(X, Phi_t))
 
             # Make updates to basis parameters
-            unn_Phi_t1 = optimizer1.get_update(
+            unn_Phi_t1 = X_optimizer.get_update(
                     unn_Phi_t, unn_Phi_grad, eta1)
-            unn_Psi_t1 = optimizer2.get_update(
+            unn_Psi_t1 = Y_optimizer.get_update(
                     unn_Psi_t, unn_Psi_grad, eta2)
 
             # Normalize updated bases

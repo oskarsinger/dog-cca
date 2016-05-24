@@ -1,2 +1,0 @@
-codebase: /home/oskar/GitRepos/OskarResearch/src/python/
-plots: /home/oskar/GitRepos/OnlineCCA/plots/

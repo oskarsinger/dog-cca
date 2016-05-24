@@ -6,7 +6,8 @@ import experiments.utils as aeu
 
 import numpy as np
 
-def run_two_view_experiment(p1, p2, k):
+def run_online_appgrad_random_data_experiment(
+    p1, p2, k, exp=False, lower=None):
 
     print "Parameters:\n\t", "\n\t".join([
         "batch_size: " + str(batch_size),
@@ -22,9 +23,10 @@ def run_two_view_experiment(p1, p2, k):
 
     print "Testing CCA with boxcar-weighted Gram matrices"
     return aeu.run_online_appgrad_experiment(
-        X_server, Y_server, k)
+        X_server, Y_server, k, exp=exp, lower=lower)
 
-def run_n_view_experiment(ps, k):
+def run_n_view_online_appgrad_random_data_experiment(
+    ps, k, exp=False, lower=None):
 
     print "Gaussian random data online AppGrad CCA tests"
     print "Parameters:\n\t", "\n\t".join([
@@ -33,8 +35,8 @@ def run_n_view_experiment(ps, k):
 
     bs = k + icl(k)
     loaders = [GL(10*p, p) for p in ps]
-    servers = [BGS(loader) for loader in loaders]
+    servers = [B2M(loader) for loader in loaders]
 
     print "Testing n-view CCA with boxcar-weighted Gram matrices"
     return aeu.run_online_n_view_appgrad_experiment(
-        servers, k)
+        servers, k, exp=exp, lower=lower)
