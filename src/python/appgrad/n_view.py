@@ -102,8 +102,8 @@ class NViewAppGradCCA:
 
             if verbose:
                 print "Iteration:", i
-                print "\t".join(["eta" + str(i) + " " + str(eta)
-                                 for eta in etas])
+                print "\t".join(["eta" + str(j) + " " + str(eta)
+                                 for j, eta in enumerate(etas)])
                 if self.online:
                     print "\tGetting updated minibatches and grams"
 
