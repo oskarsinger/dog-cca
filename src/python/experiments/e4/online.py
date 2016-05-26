@@ -44,7 +44,8 @@ def run_online_appgrad_e4_data_experiment(
 
 def run_n_view_online_appgrad_e4_data_experiment(
     dir_path, cca_k,
-    seconds=10, exp=False, lower=None, verbose=False):
+    seconds=10, exp=False, verbose=False,
+    etas=None, lower=None):
 
     bs = cca_k + icl(cca_k)
     mag = readers.get_magnitude
@@ -61,4 +62,4 @@ def run_n_view_online_appgrad_e4_data_experiment(
 
     return eu.run_online_n_view_appgrad_experiment(
         dss, cca_k,
-        exp=exp, lower=lower, verbose=verbose)
+        exp=exp, lower=lower, verbose=verbose, etas=etas)

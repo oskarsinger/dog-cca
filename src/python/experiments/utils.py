@@ -4,7 +4,8 @@ from data.servers.gram import ExpGramServer as EGS
 
 def run_online_appgrad_experiment(
     X_server, Y_server, k,
-    exp=False, lower=None, verbose=True, delta=10):
+    exp=False, verbose=True,
+    eta1=0.1, eta2=0.1, lower=None):
 
     model = AppGradCCA(k, online=True)
     (X_gs, Y_gs) = (None, None)
@@ -31,9 +32,11 @@ def run_online_appgrad_experiment(
 
 def run_online_n_view_appgrad_experiment(
     servers, k, 
-    exp=False, lower=None, verbose=True, delta=10):
+    exp=False, verbose=True,
+    etas=None, lower=None):
 
-    model = NViewAppGradCCA(k, len(servers), online=True)
+    model = NViewAppGradCCA(
+        k, len(servers), etas=etas, online=True)
     gram_servers = None
 
     if exp:
