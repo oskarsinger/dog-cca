@@ -40,7 +40,7 @@ def run_online_n_view_appgrad_experiment(
     gram_servers = None
 
     if exp:
-        gram_servers = [EGS() for i in range(len(servers)+1)]
+        gram_servers = [EGS() for i in range(len(servers))]
 
     optims = None
 
