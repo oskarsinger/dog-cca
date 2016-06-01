@@ -25,7 +25,8 @@ def run_n_view_online_appgrad_random_data_experiment(
     lower=None, means=None):
 
     bs = k + icl(k)
-    loaders = [GL(10*p, p, means=means) for p in ps]
+    loaders = [GL(10*p, p, means=mean)
+               for mean, p in zip(means, ps)]
     servers = [B2M(loader, bs) for loader in loaders]
 
     return aeu.run_online_n_view_appgrad_experiment(

@@ -113,11 +113,12 @@ def plot_canonical_bases(Phis, Psi=None, plot_path='.'):
     filename = get_ts(prefix + 
         'mass_per_feature_over_bases_matrix_heat_plot') + '.html'
     filepath = os.path.join(plot_path, filename)
+    plot_list = Phis_ps + [Psi_p]
 
     output_file(
         filepath, 
         'percent mass per feature over bases')
-    show(vplot(Phis_ps + [Psi_p]))
+    show(vplot(*plot_list))
 
 def _plot_basis(basis, name, features, basis_elements):
 

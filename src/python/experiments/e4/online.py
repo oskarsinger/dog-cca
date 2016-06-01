@@ -53,7 +53,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
     sca = readers.get_scalar 
     dls = [
         FRL(dir_path, 'ACC.csv', seconds, mag, 32.0, online=True),
-        IBI(dir_path, 'IBI.csv', seconds, vec, online=True),
+        #IBI(dir_path, 'IBI.csv', seconds, vec, online=True),
         FRL(dir_path, 'BVP.csv', seconds, sca, 64.0, online=True),
         FRL(dir_path, 'TEMP.csv', seconds, sca, 4.0, online=True),
         FRL(dir_path, 'HR.csv', seconds, sca, 1.0, online=True),

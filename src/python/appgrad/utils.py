@@ -1,9 +1,10 @@
 import numpy as np
 
-from numpy.random import randn, choice
+from numpy.random import choice
 from linal.utils import quadratic as quad
 from linal.svd_funcs import get_svd_power
 from optimization.utils import is_converged as is_conv
+from drrobert.random import normal
 
 def is_k_valid(ds_list, k):
 
@@ -55,7 +56,7 @@ def get_init_basis_pairs(Sxs, k):
 def get_init_basis_pair(Sx, k):
 
     # Initialize unnormalized Gaussian matrix
-    unn_Phi = randn(Sx.shape[0], k)
+    unn_Phi = normal(shape=(Sx.shape[0], k), scale=1000)
 
     # Normalize for initial normalized bases
     Phi = get_gram_normed(unn_Phi, Sx)
