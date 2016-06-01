@@ -9,7 +9,7 @@ from drrobert.file_io import get_timestamped as get_ts
 from drrobert.misc import unzip
 
 from bokeh.plotting import figure, show, output_file, vplot
-from bokeh.palettes import GnBu9, YlOrRd9
+from bokeh.palettes import GnBu9, YlOrRd9, BuPu9
 
 def plot_label_counts(data_dir, plot_path='.'):
 
@@ -129,4 +129,5 @@ def _plot_basis(basis, name, features, basis_elements):
         'Percent mass per feature over ' + name + ' basis elements',
         name + ' basis element',
         'feature',
-        'mass')
+        'mass',
+        color_scheme=list(reversed(BuPu9)))

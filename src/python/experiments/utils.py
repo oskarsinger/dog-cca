@@ -5,7 +5,8 @@ from data.servers.gram import ExpGramServer as EGS
 def run_online_appgrad_experiment(
     X_server, Y_server, k,
     exp=False, verbose=True,
-    eta1=0.1, eta2=0.1, lower=None):
+    eta1=0.1, eta2=0.1, 
+    lower1=None, lower2=None):
 
     model = AppGradCCA(k, online=True)
     (X_gs, Y_gs) = (None, None)
@@ -17,9 +18,11 @@ def run_online_appgrad_experiment(
     X_optimizer = None
     Y_optimizer = None
     
-    if lower is not None:
-        X_optimizer = MAG(lower=lower)
-        Y_optimizer = MAG(lower=lower)
+    if lower1 is not None:
+        X_optimizer = MAG(lower=lower1)
+
+    if lower2 is not None:
+        Y_optimizer = MAG(lower=lower2)
 
     model.fit(
         X_server, Y_server, 
@@ -33,10 +36,10 @@ def run_online_appgrad_experiment(
 def run_online_n_view_appgrad_experiment(
     servers, k, 
     exp=False, verbose=True,
-    etas=None, lower=None):
+    etas=None, lowers=None):
 
     model = NViewAppGradCCA(
-        k, len(servers), etas=etas, online=True)
+        k, len(servers), online=True)
     gram_servers = None
 
     if exp:
@@ -44,15 +47,16 @@ def run_online_n_view_appgrad_experiment(
 
     optims = None
 
-    if lower is not None:
+    if (lowers is not None) and (len(lowers) == len(servers)):
         optims = [MAG(lower=lower)
-                  for i in range(len(servers))] + \
+                  for lower in lowers] + \
                  [MAG()]
 
     model.fit(
         servers, 
         gs_list=gram_servers,
         optimizers=optims,
+        etas=etas,
         verbose=verbose)
 
     return model

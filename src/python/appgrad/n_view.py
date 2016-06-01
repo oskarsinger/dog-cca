@@ -11,7 +11,6 @@ class NViewAppGradCCA:
     def __init__(self,
         k, num_views,
         online=False,
-        etas=None,
         epsilons=None):
 
         self.k = k
@@ -21,11 +20,6 @@ class NViewAppGradCCA:
                 'You must provide at least 2 data servers.')
         else:
             self.num_views = num_views
-
-        if etas is not None:
-            self.etas = etas
-        else:
-            self.etas = [0.1] * (self.num_views + 1)
 
         if epsilons is not None:
             self.epsilons = epsilons
@@ -45,7 +39,6 @@ class NViewAppGradCCA:
             'k': self.k,
             'num_views': self.num_views,
             'online': self.online,
-            'etas': self.etas,
             'epsilons': self.epsilons,
             'has_been_fit': self.has_been_fit,
             'basis_pairs': self.basis_pairs,
@@ -56,9 +49,16 @@ class NViewAppGradCCA:
         ds_list, 
         gs_list=None,
         optimizers=None,
-        verbose=False):
+        etas=None,
+        verbose=False,
+        max_iter=100000):
 
         self.history = []
+
+        if etas is not None:
+            etas = etas
+        else:
+            etas = [0.00001] * (self.num_views + 1)
 
         if optimizers is not None:
             if not len(optimizers) == self.num_views + 1:
@@ -91,19 +91,23 @@ class NViewAppGradCCA:
 
         print "Starting optimization"
 
-        while not all(converged):
+        while (not all(converged)) and i < max_iter:
+
+            if verbose:
+                (unn, normed) = unzip(basis_pairs_t)
+                print "\tObjective:", agu.get_objective(Xs, normed, Psi)
 
             self.history.append({})
 
             # Update step sizes
-            etas = [eta / i**0.5 for eta in self.etas]
+            etas_i = [eta / i**0.5 for eta in etas]
             
-            self.history[-1]['etas'] = list(etas)
+            self.history[-1]['etas'] = list(etas_i)
 
             if verbose:
                 print "Iteration:", i
                 print "\t".join(["eta" + str(j) + " " + str(eta)
-                                 for j, eta in enumerate(etas)])
+                                 for j, eta in enumerate(etas_i)])
                 if self.online:
                     print "\tGetting updated minibatches and grams"
 
@@ -116,18 +120,14 @@ class NViewAppGradCCA:
 
             # Get updated canonical bases
             basis_pairs_t1 = self._get_basis_updates(
-                Xs, Sxs, basis_pairs_t, Psi, etas, optimizers)
+                Xs, Sxs, basis_pairs_t, Psi, etas_i, optimizers)
 
             if verbose:
                 print "\tGetting updated auxiliary variable estimate"
 
             # Get updated auxiliary variable
             Psi = self._get_Psi_update(
-                Xs, basis_pairs_t1, Psi, etas[-1], optimizers[-1])
-
-            if verbose:
-                (unn, normed) = unzip(basis_pairs_t1)
-                print "\tObjective:", agu.get_objective(Xs, unn, Psi)
+                Xs, basis_pairs_t1, Psi, etas_i[-1], optimizers[-1])
 
             # Check for convergence
             distances = [np.linalg.norm(

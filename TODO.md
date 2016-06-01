@@ -16,6 +16,7 @@
     * What kind of arguments will they need to take?
 * Implement that one from Yann LeCun's student.
 * Implement the probabilistic one.
+* Also try the cubic regularization technique maybe.
 
 ###Misc.
 * Allow maximum number of iterations for gradient-based algorithms.

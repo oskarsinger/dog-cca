@@ -10,13 +10,10 @@ class AppGradCCA:
     def __init__(self,
         k=1,
         online=False,
-        eta1=0.1, eta2=0.1,
         eps1=10**(-3), eps2=10**(-3)):
 
         self.k = k
         self.online = online
-        self.eta1 = eta1
-        self.eta2 = eta2
         self.eps1 = eps1
         self.eps2 = eps2
 
@@ -31,7 +28,9 @@ class AppGradCCA:
         X_ds, Y_ds, 
         X_gs=None, Y_gs=None,
         X_optimizer=None, Y_optimizer=None,
-        verbose=False):
+        eta1=0.001, eta2=0.001,
+        verbose=False,
+        max_iter=10000):
 
         if X_optimizer is None:
             X_optimizer = MAG()
@@ -60,16 +59,16 @@ class AppGradCCA:
         converged = [False] * 2
         i = 1
 
-        while not all(converged):
+        while (not all(converged)) and i <= max_iter:
 
             # Update step scales for gradient updates
-            eta1 = self.eta1 / i**0.5
-            eta2 = self.eta2 / i**0.5
+            eta1_i = eta1 / i**0.5
+            eta2_i = eta2 / i**0.5
             i = i + 1
 
             if verbose:
                 print "Iteration:", i
-                print "\teta1:", eta1, "\teta2:", eta2
+                print "\teta1:", eta1_i, "\teta2:", eta2_i
 
                 if self.online:
                     print "\tGetting updated minibatches and Sx and Sy"
@@ -92,9 +91,9 @@ class AppGradCCA:
 
             # Make updates to basis parameters
             unn_Phi_t1 = X_optimizer.get_update(
-                    unn_Phi_t, unn_Phi_grad, eta1)
+                    unn_Phi_t, unn_Phi_grad, eta1_i)
             unn_Psi_t1 = Y_optimizer.get_update(
-                    unn_Psi_t, unn_Psi_grad, eta2)
+                    unn_Psi_t, unn_Psi_grad, eta2_i)
 
             # Normalize updated bases
             Phi_t1 = agu.get_gram_normed(unn_Phi_t1, Sx)
