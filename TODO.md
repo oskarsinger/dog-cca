@@ -16,7 +16,17 @@
     * What kind of arguments will they need to take?
 * Implement that one from Yann LeCun's student.
 * Implement the probabilistic one.
-* Also try the cubic regularization technique maybe.
+* Implement the one that was mentioned in the optimization-online update.
+
+###Corrections and Regularization
+* Try the cubic regularization technique maybe.
+
+###Numerical Linear Algebra
+* See if block-diagonal structure can be leveraged in CCALin (and GenELinK) implementation(s).
 
 ###Misc.
 * Allow maximum number of iterations for gradient-based algorithms.
+
+##Collaboration
+* Mention your block diagonal observation to Sijian and Brandon.
+* Ask Brandon if he's looked at your codebase yet.

@@ -130,10 +130,8 @@ class NViewAppGradCCA:
                 Xs, basis_pairs_t1, Psi, etas_i[-1], optimizers[-1])
 
             # Check for convergence
-            distances = [np.linalg.norm(
-                            basis_pairs_t[j][0] - basis_pairs_t1[j][0])
-                         for j in range(self.num_views)]
-            converged = [d < eps for (d, eps) in zip(distances, self.epsilons)]
+            pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
+            converged = agu.is_converged(pairs, eps, verbose) 
 
             self.history[-1]['distances'] = list(distances)
                             
