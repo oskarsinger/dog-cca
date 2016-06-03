@@ -13,6 +13,10 @@ class CCALin:
         self.X_epsilon = X_epsilon
         self.Y_epsilon = Y_epsilon
 
+        self.has_been_fit = False
+        self.Phi = None
+        self.Psi = None
+
     def fit(self, 
         X_ds, Y_ds, k,
         X_gs=None, Y_gs=None,
@@ -39,12 +43,22 @@ class CCALin:
         U = np.random.randn(2k, k)
         pre_Wx = np.dot(pre_Wx, U)
         pre_Wy = np.dot(pre_Wy, U)
-        Wx = get_q(
+
+        self.Phi = get_q(
             pre_Wx, 
             inner_product=lambda x1, x2: multi_dot([x1, Sx, x2]))
-        Wy = get_q(
+        self.Psi = get_q(
             pre_Wy, 
             inner_product=lambda y1, y2: multi_dot([y1, Sy, y2]))
+        self.has_been_fit = True
+
+    def get_bases(self):
+
+        if not self.has_been_fit:
+            raise Exception(
+                'Has not yet been fit.')
+
+        return (np.copy(self.Phi), np.copy(self.Psi))
 
     def _get_A(self, X, Y):
 
