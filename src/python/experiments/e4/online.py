@@ -3,7 +3,7 @@ from appgrad import NViewAppGradCCA as NVAGCCA
 
 from data.loaders.e4 import FixedRateLoader as FRL
 from data.loaders.e4 import IBILoader as IBI
-from data.loaders import readers
+from data.loaders.readers import from_num as fn
 from data.servers.minibatch import Minibatch2Minibatch as M2M
 from drrobert.arithmetic import int_ceil_log as icl
 
@@ -13,8 +13,8 @@ def run_online_appgrad_e4_data_experiment(
     hdf5_path, cca_k, subject, 
     sensor1, sensor2, 
     seconds=10,
-    reader1=readers.get_scalar, 
-    reader2=readers.get_scalar,
+    reader1=fn.get_scalar_as_is, 
+    reader2=fn.get_scalar_as_is,
     exp=False, whiten=False, verbose=False,
     etas=None, lower1=None, lower2=None):
 
@@ -51,15 +51,15 @@ def run_online_appgrad_e4_data_experiment(
         verbose=verbose, etas=etas)
 
 def run_n_view_online_appgrad_e4_data_experiment(
-    dir_path, cca_k, subject,
+    hdf5_path, cca_k, subject,
     seconds=10, 
     exp=False, verbose=False, whiten=False,
     etas=None, lowers=None):
 
     bs = cca_k + icl(cca_k)
-    mag = readers.get_magnitude
-    vec = readers.get_vector
-    sca = readers.get_scalar 
+    mag = fn.get_magnitude
+    vec = fn.get_vec_as_list
+    sca = fn.get_scalar_as_is 
     dls = [
         FRL(hdf5_path, subject, 'ACC', seconds, mag, online=True),
         IBI(hdf5_path, subject, 'IBI', seconds, vec, online=True),

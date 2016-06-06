@@ -2,7 +2,7 @@ from appgrad import AppGradCCA as AGCCA
 from appgrad import NViewAppGradCCA as NVAGCCA
 from data.loaders.e4 import FixedRateLoader as FRL
 from data.loaders.e4 import IBILoader as IBI
-from data.loaders import readers
+from data.loaders.readers import from_num as fn
 from data.servers.batch import BatchServer as BS
 from linal.utils import quadratic as quad
 
@@ -31,14 +31,15 @@ def test_batch_n_view_appgrad(
     return model.get_bases()
 
 def test_two_fixed_rate_scalar(
-    dir_path, file1, file2, cca_k,
+    hdf5_path, cca_k, subject, 
+    sensor1, sensor2,
     seconds=1,
     reg1=0.1, reg2=0.1,
-    reader1=readers.get_scalar, 
-    reader2=readers.get_scalar):
+    reader1=fn.get_scalar_as_is, 
+    reader2=fn.get_scalar_as_is):
 
-    dl1 = FRL(dir_path, file1, seconds, reader1)
-    dl2 = FRL(dir_path, file2, seconds, reader2)
+    dl1 = FRL(hdf5_path, subject, sensor1, seconds, reader1)
+    dl2 = FRL(hdf5_path, subject, sensor2, seconds, reader2)
     ds1 = BS(dl1)
     ds2 = BS(dl2)
     (Phi, unn_Phi, Psi, unn_Psi) = test_batch_appgrad(
@@ -53,19 +54,19 @@ def test_two_fixed_rate_scalar(
     return (Phi, Psi)
 
 def test_n_fixed_rate_scalar(
-    dir_path, cca_k,
+    hdf5_path, cca_k,
     seconds=10):
 
-    mag = readers.get_magnitude
-    vec = readers.get_vector
-    sca = readers.get_scalar 
+    mag = fn.get_magnitude
+    vec = fn.get_vec_as_list
+    sca = fn.get_scalar_as_is
     dls = [
-        FRL(dir_path, 'ACC.csv', seconds, mag, 32.0),
-        IBI(dir_path, 'IBI.csv', seconds, vec),
-        FRL(dir_path, 'BVP.csv', seconds, sca, 64.0),
-        FRL(dir_path, 'TEMP.csv', seconds, sca, 4.0),
-        FRL(dir_path, 'HR.csv', seconds, sca, 1.0),
-        FRL(dir_path, 'EDA.csv', seconds, sca, 4.0)]
+        FRL(hdf5_path, subject, 'ACC', seconds, mag),
+        IBI(hdf5_path, subject, 'IBI', seconds, vec),
+        FRL(hdf5_path, subject, 'BVP', seconds, sca),
+        FRL(hdf5_path, subject, 'TEMP', seconds, sca),
+        FRL(hdf5_path, subject, 'HR', seconds, sca),
+        FRL(hdf5_path, subject, 'EDA', seconds, sca)]
     dss = [BS(dl) for dl in dls]
     (basis_pairs, Psi) = test_batch_n_view_appgrad(
         dss, cca_k)
