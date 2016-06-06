@@ -7,7 +7,6 @@
 
 ###E4
 * Clean up the data to get more 'regular' parts of the time series.
-* Figure out how to use the HD5 file type and the Python library.
 
 ##Implementation
 
@@ -25,11 +24,9 @@
 * See if block-diagonal structure can be leveraged in CCALin (and GenELinK) implementation(s).
 
 ###Misc.
-* Allow maximum number of iterations for gradient-based algorithms.
+* Allow for averaging across windows of coordinates in the minibatch server.
 
 ##Collaboration
-* Mention your block diagonal observation to Sijian and Brandon.
-* Ask Brandon if he's looked at your codebase yet.
 
 ##New Ideas
 * Try generalizing the current formulation to a broader class of dependency structure than just the pinwheel. How does this relate back to the auxiliary variable you used in the DD work? Can I use ADMM?

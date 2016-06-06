@@ -15,7 +15,8 @@ def run_online_appgrad_e4_data_experiment(
     seconds=10,
     reader1=fn.get_scalar_as_is, 
     reader2=fn.get_scalar_as_is,
-    exp=False, whiten=False, verbose=False,
+    whiten1=False, whiten2=False,
+    exp=False, verbose=False,
     etas=None, lower1=None, lower2=None):
 
     bs = cca_k + icl(cca_k)
@@ -41,8 +42,8 @@ def run_online_appgrad_e4_data_experiment(
             hdf5_path, subject, sensor2, seconds, reader2, 
             online=True)
 
-    ds1 = M2M(dl1, bs, whiten=whiten)
-    ds2 = M2M(dl2, bs, whiten=whiten)
+    ds1 = M2M(dl1, bs, whiten=whiten1)
+    ds2 = M2M(dl2, bs, whiten=whiten2)
 
     return eu.run_online_appgrad_experiment(
         ds1, ds2, cca_k,
@@ -53,7 +54,7 @@ def run_online_appgrad_e4_data_experiment(
 def run_n_view_online_appgrad_e4_data_experiment(
     hdf5_path, cca_k, subject,
     seconds=10, 
-    exp=False, verbose=False, whiten=False,
+    exp=False, verbose=False, whiten=[False]*6,
     etas=None, lowers=None):
 
     bs = cca_k + icl(cca_k)
@@ -67,7 +68,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
         FRL(hdf5_path, subject, 'TEMP', seconds, sca, online=True),
         FRL(hdf5_path, subject, 'HR', seconds, sca, online=True),
         FRL(hdf5_path, subject, 'EDA', seconds, sca, online=True)]
-    dss = [M2M(dl, bs, whiten=whiten) for dl in dls]
+    dss = [M2M(dl, bs, whiten=w) for (dl, w) in zip(dls, whiten)]
 
     return eu.run_online_n_view_appgrad_experiment(
         dss, cca_k,
