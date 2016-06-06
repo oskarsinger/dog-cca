@@ -30,3 +30,6 @@
 ##Collaboration
 * Mention your block diagonal observation to Sijian and Brandon.
 * Ask Brandon if he's looked at your codebase yet.
+
+##New Ideas
+* Try generalizing the current formulation to a broader class of dependency structure than just the pinwheel. How does this relate back to the auxiliary variable you used in the DD work? Can I use ADMM?

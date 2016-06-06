@@ -131,9 +131,9 @@ class NViewAppGradCCA:
 
             # Check for convergence
             pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
-            converged = agu.is_converged(pairs, eps, verbose) 
+            converged = agu.is_converged(pairs, self.epsilons, verbose) 
 
-            self.history[-1]['distances'] = list(distances)
+            #self.history[-1]['distances'] = list(distances)
                             
             # Update iterates
             basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
