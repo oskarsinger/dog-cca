@@ -1,4 +1,4 @@
-\input{../oskar_macros.tex}
+\input{../../hosinger/tex/oskar_macros.tex}
 
 \documentclass{article}
 
@@ -14,7 +14,50 @@
 \begin{document}
 
 \section{Intro} \label{sec:intro}
-\section{Model} \label{sec:model}
-\section{Algorithm} \label{sec:alg}
+\section{Optimization Problem} \label{sec:model}
+
+	\subsection{Classical Two-View CCA} \label{subsec:classicalcca}
+	
+	\begin{align*}
+		\tnb{minimize}&\ \ \norm{\mbX_1 \mbPhi_1 - \mbX_2 \mbPhi_2}_F^2\\
+		\tnb{subject to}&\ \  \mbPhi_1^{\top}\mbX_1^{\top}\mbX_1\mbPhi_1 = \mbI_k\\
+		&\ \ \mbPhi_2^{\top}\mbX_2^{\top}\mbX_2\mbPhi_2 = \mbI_k \tn{,}
+	\end{align*}
+	
+	\noindent where $\mbPhi_1$ and $\mbPhi_2$ are the optimization variables.
+	
+	\subsection{Fully Connected Multiview Graph} \label{subsec:fcgraph}
+	
+	\begin{align*}
+		\tnb{minimize}&\ \ \sum_{i=1}^m \sum_{j=i+1}^m \norm{\mbX_i \mbPhi_i - \mbX_j \mbPhi_j}_F^2\\
+		\tnb{subject to}&\ \  \mbPhi_i^{\top}\mbX_i^{\top}\mbX_i\mbPhi_i = \mbI_k\ \ i=1,\ldots,m \tn{,}
+	\end{align*}
+	
+	\noindent where $\mbPhi_i$ are the optimization variables.
+	
+	\subsection{(Mean Field Variational?) Approximation of Fully Connected Graph} \label{subsec:approxfcgraph}
+	
+	\begin{align*}
+		\tnb{minimize}&\ \ \sum_{i=1}^m \norm{\mbX_i \mbPhi_i - \mbPsi}_F^2\\
+		\tnb{subject to}&\ \  \mbPhi_i^{\top}\mbX_i^{\top}\mbX_i\mbPhi_i = \mbI_k\ \ i=1,\ldots,m \tn{,}
+	\end{align*}
+	
+	\noindent where $\mbPhi_i$ and $\mbPsi$ are the optimization variables.
+
+	\subsection{Arbitrary Dependency Graph} \label{subsec:arbdepgraph}
+	
+	\begin{align*}
+		\tnb{minimize}&\ \ \sum_{(i,j) \in E}\norm{\mbX_i \mbPhi_i - \mbX_j \mbPhi_j}_F^2\\
+		\tnb{subject to}&\ \  \mbPhi_i^{\top}\mbX_i^{\top}\mbX_i\mbPhi_i = \mbI_k\ \ i=1,\ldots,m \tn{,}
+	\end{align*}
+	
+	\noindent where $E$ is the set of edges in the dependency graph between the views, and $\mbPhi_i$ are the optimization variables.
+	
+\section{Algorithms} \label{sec:alg}
+
+	\subsection{AppGrad} \label{subsec:appgrad}
+	
+	
+	\subsection{GenELinK} \label{subsec:genelink}
 
 \end{document}
