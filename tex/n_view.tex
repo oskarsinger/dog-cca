@@ -14,9 +14,10 @@
 \begin{document}
 
 \section{Intro} \label{sec:intro}
-\section{Optimization Problem} \label{sec:model}
+\section{Optimization Problems} \label{sec:model}
 
-	\subsection{Classical Two-View CCA} \label{subsec:classicalcca}
+	\subsection{Objective Functions} \label{subsec:objective}
+	\subsubsection{Classical Two-View CCA} \label{subsubsec:classicalcca}
 	
 	\begin{align*}
 		\tnb{minimize}&\ \ \norm{\mbX_1 \mbPhi_1 - \mbX_2 \mbPhi_2}_F^2\\
@@ -26,7 +27,7 @@
 	
 	\noindent where $\mbPhi_1$ and $\mbPhi_2$ are the optimization variables.
 	
-	\subsection{Fully Connected Multiview Graph} \label{subsec:fcgraph}
+	\subsubsection{Fully Connected Multiview Graph} \label{subsubsec:fcgraph}
 	
 	\begin{align*}
 		\tnb{minimize}&\ \ \sum_{i=1}^m \sum_{j=i+1}^m \norm{\mbX_i \mbPhi_i - \mbX_j \mbPhi_j}_F^2\\
@@ -35,7 +36,7 @@
 	
 	\noindent where $\mbPhi_i$ are the optimization variables.
 	
-	\subsection{(Mean Field Variational?) Approximation of Fully Connected Graph} \label{subsec:approxfcgraph}
+	\subsubsection{(Mean Field Variational?) Approximation of Fully Connected Graph} \label{subsubsec:approxfcgraph}
 	
 	\begin{align*}
 		\tnb{minimize}&\ \ \sum_{i=1}^m \norm{\mbX_i \mbPhi_i - \mbPsi}_F^2\\
@@ -44,7 +45,7 @@
 	
 	\noindent where $\mbPhi_i$ and $\mbPsi$ are the optimization variables.
 
-	\subsection{Arbitrary Dependency Graph} \label{subsec:arbdepgraph}
+	\subsubsection{Arbitrary Dependency Graph} \label{subsubsec:arbdepgraph}
 	
 	\begin{align*}
 		\tnb{minimize}&\ \ \sum_{(i,j) \in E}\norm{\mbX_i \mbPhi_i - \mbX_j \mbPhi_j}_F^2\\
@@ -53,10 +54,23 @@
 	
 	\noindent where $E$ is the set of edges in the dependency graph between the views, and $\mbPhi_i$ are the optimization variables.
 	
+	\subsection{Constraints} \label{subsec:constraints}
+	The classical formulation of generalized eigenvalue problems including CCA is to have quadratic equality constraints $\mbX^{\top}\mbA\mbX = \mbI$ on the parameters $\mbX$ for some quadratic form $\mbA$. The purpose of these constraints is to force the parameters to counteract/reflect the scale of the data so that the model is robust to each view having dramatically different scale.
+	
+	\subsubsection{Issues with Equality Constraints} \label{subsubsec:issueswithequality}
+	For both the classical and projected gradient algorithms for estimating CCA parameters, to satisfy the equality constraints, we are forced to orthogonalize some basis either via Gram-Schmidt orthogonalization or matrix square-roots. For batch classical and projected gradient optimization techniques, this causes scaling issues for both computation and storage. For the stochastic projected gradient algorithm, the projections onto a non-convex feasible region (a quadratic surface) result in lack of convergence guarantees and very likely slower local convergence when this is attainable. Additionally, if we want to use the transformations as dimensionality reduction on unseen data, we might consider satisfaction of equality constraints to be overfitting.
+	
+	\subsubsection{Alternatives} \label{subsubsec:alternatives}
+	If we want to improve convergence guarantees and reduce computation, but still account for and be robust to differences in scale between the two data views, it may be benificial to penalized the parameters for straying from the equality constraints rather than requiring exact constraint satisfaction. In fact, when using the stochastic projected gradient algorithm, violating the equality constraints by a little bit is unavoidable because we use minibatches for projecting the parameters, but the feasible region is defined in terms of the full dataset.
+	
+	If we define some penality function $R(\mbX) = \norm{\mbX^{\top}\mbA\mbX - \mbI}_F^2$ and use this penalty function as a proximal function or regularizer, it may result in more efficient computation and better convergence properties for parameter estimation and better generalization ability for the dimensionality reduction defined in terms of the parameters.
+	
 \section{Algorithms} \label{sec:alg}
 
+	\subsection{Why gradients?} \label{subsec:whygradients}
+	Gradient-based updates allow us to easily derive stochastic and mini-batch algorithms and make incremental updates where we have complete control over the scale and influence of the incremental updates. These abilities facilitate a filter-like perspective of CCA and similar problems, and since we can control the scale/influence of each incremental update, we can control the rate of change of each parameter as a function of many quantities, including the update rates of other parameters. We can use tools from online learning and online optimization to approach these problems efficiently and with strong theoretical guarantees.
+
 	\subsection{AppGrad} \label{subsec:appgrad}
-	
 	
 	\subsection{GenELinK} \label{subsec:genelink}
 
