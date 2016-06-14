@@ -88,14 +88,19 @@ def run_all_subject_n_view_online_appgrad_e4_data_experiment(
     for subject in subjects:
         print 'Training model for subject', subject + '.'
 
-        model = run_n_view_online_appgrad_e4_data_experiment(
-            hdf5_path, cca_k, subject, 
-            seconds=seconds,
-            exp=exp, 
-            verbose=verbose, 
-            pca_ks=pca_ks, 
-            etas=etas, 
-            lowers=lowers)
+        model = None
+
+        try:
+            model = run_n_view_online_appgrad_e4_data_experiment(
+                hdf5_path, cca_k, subject, 
+                seconds=seconds,
+                exp=exp, 
+                verbose=verbose, 
+                pca_ks=pca_ks, 
+                etas=etas, 
+                lowers=lowers)
+        except KeyError:
+            print 'Subject', subject, 'was missing a view.'
 
         models.append(model)
 
