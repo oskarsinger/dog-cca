@@ -55,25 +55,21 @@ class NViewAppGradCCA:
 
         self.history = []
 
-        if etas is not None:
-            etas = etas
-        else:
+        if etas is None:
             etas = [0.00001] * (self.num_views + 1)
 
-        if optimizers is not None:
-            if not len(optimizers) == self.num_views + 1:
-                raise ValueError(
-                    'Length of optimizers and num_views + 1 must be the same.')
-        else:
-            optimizers = [MAG() for i in range(self.num_views + 1)]
-
-        if gs_list is not None:
-            if not len(gs_list) == self.num_views:
-                raise ValueError(
-                    'Length of gs_list and num_views must be the same.')
-        else:
+        if gs_list is None:
             gs_list = [BCGS() if self.online else BGS()
                        for i in range(self.num_views)]
+        elif not len(gs_list) == self.num_views:
+            raise ValueError(
+                'Parameter gs_list must be of length num_views.')
+            
+        if optimizers is None:
+            optimizers = [MAG() for i in range(self.num_views + 1)]
+        elif not len(optimizers) == self.num_views + 1:
+            raise ValueError(
+                'Parameter optimizers must be of length num_views+1.')
 
         (Xs, Sxs) = self._init_data(ds_list, gs_list)
 
