@@ -51,7 +51,7 @@ class NViewAppGradCCA:
         optimizers=None,
         etas=None,
         verbose=False,
-        max_iter=100000):
+        max_iter=10000):
 
         self.history = []
 

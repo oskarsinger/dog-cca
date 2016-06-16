@@ -48,7 +48,7 @@ def get_gradients(Xs, basis_pairs):
              (minus_term - X_transforms[i][1])
              for i in range(m)]
 
-    return [np.dot(X, diff) / X.shape[0]
+    return [np.dot(X.T, diff) / X.shape[0]
             for (X, diff) in zip(Xs, diffs)]
 
 def get_init_basis_pairs(Sxs, k):

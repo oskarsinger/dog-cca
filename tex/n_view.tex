@@ -17,6 +17,8 @@
 \section{Optimization Problems} \label{sec:model}
 
 	\subsection{Objective Functions} \label{subsec:objective}
+	I would like to develop rigorous probabilistic models for each of these objective functions below. The place to start is probably \cite{bach2005probabilistic}.
+	
 	\subsubsection{Classical Two-View CCA} \label{subsubsec:classicalcca}
 	
 	\begin{align*}
@@ -89,6 +91,8 @@
 	
 	\noindent \textbf{Minibatch Management:} It should be noted that the minibatches are managed by fixed-length queues to deal with different sampling rates for different views, so the pseudocode for Algorithm~\ref{alg:stochappgrad} is not entirely faithful to my implementation. I would like to eventually give more rigorous treatment of this later, possibly using some Markov chain theory.
 	
+	\noindent \textbf{Parameter Updates:} It should be noted that I am not making na\"{i}ve gradient updates. This is overlooked in the pseudocode for clarity and relevance reasons. I am actually applying AdaGrad scaling with optional dual averaging and shrinkage-and-thresholding to the singular values of the parameter matrix and gradient matrix.
+	
 	\subsubsection{Why gradients?} \label{subsubsec:whygradients}
 	Gradient-based updates allow us to easily derive stochastic and mini-batch algorithms and make incremental updates where we have complete control over the scale and influence of the incremental updates. These abilities facilitate a filter-like perspective of CCA and similar problems, and since we can control the scale/influence of each incremental update, we can control the rate of change of each parameter as a function of many quantities, including the update rates of other parameters. We can use tools from online learning and online optimization to approach these problems efficiently and with strong theoretical guarantees.
 	
@@ -115,4 +119,7 @@
 		\item Perform the full GenELinK subroutine on each minibatch and initialize each round's GenELinK with the previous round's canonical bases.
 		\item For each minibatch, perform only a single stochastic gradient step on the quadratic program inside the GenELinK subroutine before giving the output back to the CCA algorithm
 	\end{itemize}
+	
+	\bibliographystyle{apalike}
+	\bibliography{../../hosinger/tex/citations.bib}
 \end{document}
