@@ -84,10 +84,8 @@ class AppGradCCA:
                 print "\tGetting updated basis estimates"
 
             # Get unconstrained, unnormalized gradients
-            unn_Phi_grad = agu.get_gradient(
-                X, unn_Phi_t, np.dot(Y, Psi_t))
-            unn_Psi_grad = agu.get_gradient(
-                Y, unn_Psi_t, np.dot(X, Phi_t))
+            (unn_Phi_grad, unn_Psi_grad) = agu.get_gradients(
+                [X,Y], [(unn_Phi_t, Phi_t),(unn_Psi_t, Psi_t)])
 
             # Make updates to basis parameters
             unn_Phi_t1 = X_optimizer.get_update(
@@ -104,8 +102,8 @@ class AppGradCCA:
                 Psi_dist = np.linalg.norm(unn_Psi_t1 - unn_Psi_t)
                 print "\tDistance between unnormed Phi iterates:", Phi_dist
                 print "\tDistance between unnormed Psi iterates:", Psi_dist
-                print "\tObjective:", agu.get_2way_objective(
-                    X, Phi_t1, Y, Psi_t1)
+                print "\tObjective:", agu.get_objective(
+                    [X, Y], [Phi_t1, Psi_t1])
 
             # Check for convergence
             converged = agu.is_converged(

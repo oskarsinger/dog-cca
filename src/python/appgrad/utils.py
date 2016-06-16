@@ -5,6 +5,7 @@ from linal.utils import quadratic as quad
 from linal.svd_funcs import get_svd_power
 from optimization.utils import is_converged as is_conv
 from drrobert.random import normal
+from drrobert.misc import unzip
 
 def is_k_valid(ds_list, k):
 
@@ -22,13 +23,7 @@ def is_converged(
     return [is_conv(unn_Phi_t, unn_Phi_t1, eps, verbose)
             for (unn_Phi_t, unn_Phi_t1), eps in conv_info]
 
-def get_2way_objective(X, Phi, Y, Psi):
-
-    aux_Psi = np.dot(Y, Psi)
-
-    return get_objective([X], [Phi], aux_Psi)
-
-def get_objective(Xs, Phis, Psi):
+def get_objective(Xs, Phis):
 
     if not len(Xs) == len(Phis):
         raise ValueError(
@@ -36,17 +31,25 @@ def get_objective(Xs, Phis, Psi):
 
     X_transforms = [np.dot(X, Phi)
                     for X, Phi in zip(Xs, Phis)]
-    residuals = [np.linalg.norm(X_trans - Psi)
-                 for X_trans in X_transforms]
+    diffs = [X_transforms[i] - X_transforms[j]
+             for i in range(len(Xs)) 
+             for j in range(i+1,len(Xs))]
+    residuals = [np.linalg.norm(diff) for diff in diffs]
 
     return sum(residuals)
 
-def get_gradient(X, unnormed, Psi):
+def get_gradients(Xs, basis_pairs):
 
-    transformed_X = np.dot(X, unnormed)
-    diff = transformed_X - Psi
+    m = len(Xs)
+    X_transforms = [(np.dot(X, unnormed), np.dot(X, normed))
+                    for (X, (unnormed,normed)) in zip(Xs, basis_pairs)]
+    minus_term = sum(unzip(X_transforms)[1])
+    diffs = [(m-1)*X_transforms[i][0] - \
+             (minus_term - X_transforms[i][1])
+             for i in range(m)]
 
-    return np.dot(X.T, diff) / X.shape[0]
+    return [np.dot(X, diff) / X.shape[0]
+            for (X, diff) in zip(Xs, diffs)]
 
 def get_init_basis_pairs(Sxs, k):
 

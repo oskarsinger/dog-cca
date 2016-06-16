@@ -30,7 +30,7 @@ class NViewAppGradCCA:
 
         self.has_been_fit = False
         self.basis_pairs = None
-        self.Psi = None
+        #self.Psi = None
         self.history = None
 
     def get_status(self):
@@ -42,7 +42,7 @@ class NViewAppGradCCA:
             'epsilons': self.epsilons,
             'has_been_fit': self.has_been_fit,
             'basis_pairs': self.basis_pairs,
-            'Psi': self.Psi,
+            #'Psi': self.Psi,
             'history': self.history}
 
     def fit(self,
@@ -71,6 +71,8 @@ class NViewAppGradCCA:
             raise ValueError(
                 'Parameter optimizers must be of length num_views+1.')
 
+        print "Getting initial (mini)batches and Gram matrices"
+
         (Xs, Sxs) = self._init_data(ds_list, gs_list)
 
         print "Getting intial basis estimates"
@@ -79,7 +81,7 @@ class NViewAppGradCCA:
         basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
         basis_pairs_t1 = None
         bs = ds_list[0].get_status()['batch_size']
-        Psi = np.random.randn(bs, self.k)
+        #Psi = np.random.randn(bs, self.k)
 
         # Iteration variables
         converged = [False] * self.num_views
@@ -91,7 +93,7 @@ class NViewAppGradCCA:
 
             if verbose:
                 (unn, normed) = unzip(basis_pairs_t)
-                print "\tObjective:", agu.get_objective(Xs, normed, Psi)
+                print "\tObjective:", agu.get_objective(Xs, normed)
 
             self.history.append({})
 
@@ -116,14 +118,14 @@ class NViewAppGradCCA:
 
             # Get updated canonical bases
             basis_pairs_t1 = self._get_basis_updates(
-                Xs, Sxs, basis_pairs_t, Psi, etas_i, optimizers)
+                Xs, Sxs, basis_pairs_t, etas_i, optimizers)
 
             if verbose:
                 print "\tGetting updated auxiliary variable estimate"
 
             # Get updated auxiliary variable
-            Psi = self._get_Psi_update(
-                Xs, basis_pairs_t1, Psi, etas_i[-1], optimizers[-1])
+            #Psi = self._get_Psi_update(
+            #    Xs, basis_pairs_t1, Psi, etas_i[-1], optimizers[-1])
 
             # Check for convergence
             pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
@@ -139,7 +141,7 @@ class NViewAppGradCCA:
 
         self.has_been_fit = True
         self.basis_pairs = basis_pairs_t
-        self.Psi = Psi
+        #self.Psi = Psi
 
     def get_bases(self):
 
@@ -147,21 +149,20 @@ class NViewAppGradCCA:
             raise Exception(
                 'Model has not yet been fit.')
 
-        return (self.basis_pairs, self.Psi)
+        return (self.basis_pairs)#, self.Psi)
 
     def _get_basis_updates(self, 
-        Xs, Sxs, basis_pairs, Psi, etas, optimizers):
+        Xs, Sxs, basis_pairs, etas, optimizers):
 
         # Get gradients
-        gradients = [agu.get_gradient(Xs[i], basis_pairs[i][0], Psi)
-                     for i in range(self.num_views)]
+        gradients = agu.get_gradients(Xs, basis_pairs)
 
         # Get unnormalized updates
         updated_unn = [optimizers[i].get_update(
                         basis_pairs[i][0], gradients[i], etas[i])
                        for i in range(self.num_views)]
 
-        # Normalize with gram-parameterized Mahalanobis
+        # Normalize with Gram-parameterized Mahalanobis
         normed_pairs = [(unn, agu.get_gram_normed(unn, Sx))
                         for unn, Sx in zip(updated_unn, Sxs)]
 
