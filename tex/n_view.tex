@@ -27,7 +27,7 @@
 	
 	\noindent where $\mbPhi_1$ and $\mbPhi_2$ are the optimization variables.
 	
-	\subsubsection{Fully Connected Multiview Graph} \label{subsubsec:fcgraph}
+	\subsubsection{Complete Multiview Graph} \label{subsubsec:cgraph}
 	
 	\begin{align*}
 		\tnb{minimize}&\ \ \sum_{i=1}^m \sum_{j=i+1}^m \norm{\mbX_i \mbPhi_i - \mbX_j \mbPhi_j}_F^2\\
@@ -67,10 +67,28 @@
 	
 \section{Algorithms} \label{sec:alg}
 
-	\subsection{Why gradients?} \label{subsec:whygradients}
+	\subsection{Stochastic AppGrad} \label{subsec:appgrad}
+	
+	\begin{algorithm}
+	\caption{Stochastic $m$-View AppGrad} \label{stochappgrad}
+	\begin{algorithmic}[1]
+		\STATE \textbf{Input:} batch size $n$, step sizes $\eta_{1t},\ldots,\eta_{mt}$, max iter $T$, num components $k$
+		\STATE \textbf{Output:} Canonical bases $\fitp{\mbPhi_1, \ldots, \mbPhi_m}$
+		\STATE \textbf{Initialization:} $t=0$, $\tilde{\mbPhi}_1^{(0)} \in \mbbR^{p_1 \times k}, \ldots, \tilde{\mbPhi}_m^{(0)} \in \mbbR^{p_m \times k} \sim \mcN \fitp{\mbf{0}, \mbf{I}_k}$, $\mbPhi_j^{(0)} = \mbf{0}$ for $j = 1,\ldots,m$
+		\WHILE{$t < T$ \textbf{and} not converged}
+		\STATE Receive minibatch $\mbX_1^{(t)} \in \mbbR^{n \times p_1}, \ldots, \mbX_m^{(t)} \in \mbbR^{n \times p_m}$
+		\FOR{$i=1, \ldots, m$}
+		\STATE $\tilde{\mbPhi_j}^{(t+1)} = \tilde{\mbPhi_i}^{(t)} - \eta_{it}\fitp{\mbX_i^{(t)}}^{\top}\fitp{(m-1)\mbX_i^{(t)}\tilde{\mbPhi}_i^{(t)} - \sum_{j \neq i}\mbX_j^{(t)}\mbPhi_j^{(t)}}$
+		\STATE SVD: $\fitp{\tilde{\mbPhi_i}^{(t+1)}}^{\top} \fitp{\frac{1}{n} {\mbX_i}^{\top}\mbX_i}\tilde{\mbPhi_i}^{(t+1)} = \mbU_i^{\top}\mbD_i\mbU_i$
+		\STATE $\mbPhi_i^{(t+1)} = \tilde{\mbPhi}_i^{(t+1)}\mbU_i^{\top}\mbD_i^{-\frac{1}{2}}\mbU_i$
+		\ENDFOR
+		\STATE $t += 1$
+		\ENDWHILE
+	\end{algorithmic}
+	\end{algorithm}
+	
+	\subsubsection{Why gradients?} \label{subsubsec:whygradients}
 	Gradient-based updates allow us to easily derive stochastic and mini-batch algorithms and make incremental updates where we have complete control over the scale and influence of the incremental updates. These abilities facilitate a filter-like perspective of CCA and similar problems, and since we can control the scale/influence of each incremental update, we can control the rate of change of each parameter as a function of many quantities, including the update rates of other parameters. We can use tools from online learning and online optimization to approach these problems efficiently and with strong theoretical guarantees.
-
-	\subsection{AppGrad} \label{subsec:appgrad}
 	
 	\subsection{GenELinK} \label{subsec:genelink}
 
