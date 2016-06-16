@@ -70,26 +70,49 @@
 	\subsection{Stochastic AppGrad} \label{subsec:appgrad}
 	
 	\begin{algorithm}
-	\caption{Stochastic $m$-View AppGrad} \label{stochappgrad}
+	\caption{Stochastic $m$-View AppGrad} \label{alg:stochappgrad}
 	\begin{algorithmic}[1]
 		\STATE \textbf{Input:} batch size $n$, step sizes $\eta_{1t},\ldots,\eta_{mt}$, max iter $T$, num components $k$
 		\STATE \textbf{Output:} Canonical bases $\fitp{\mbPhi_1, \ldots, \mbPhi_m}$
-		\STATE \textbf{Initialization:} $t=0$, $\tilde{\mbPhi}_1^{(0)} \in \mbbR^{p_1 \times k}, \ldots, \tilde{\mbPhi}_m^{(0)} \in \mbbR^{p_m \times k} \sim \mcN \fitp{\mbf{0}, \mbf{I}_k}$, $\mbPhi_j^{(0)} = \mbf{0}$ for $j = 1,\ldots,m$
+		\STATE \textbf{Initialization:} $t=0$, $\tilde{\mbPhi}_1^{(0)} \in \mbbR^{p_1 \times k}, \ldots, \tilde{\mbPhi}_m^{(0)} \in \mbbR^{p_m \times k}$ each with entries sampled invidually from $\mcN \fitp{0,1}$, $\mbPhi_j^{(0)} = \mbf{0}$ for $j = 1,\ldots,m$
 		\WHILE{$t < T$ \textbf{and} not converged}
 		\STATE Receive minibatch $\mbX_1^{(t)} \in \mbbR^{n \times p_1}, \ldots, \mbX_m^{(t)} \in \mbbR^{n \times p_m}$
 		\FOR{$i=1, \ldots, m$}
-		\STATE $\tilde{\mbPhi_j}^{(t+1)} = \tilde{\mbPhi_i}^{(t)} - \eta_{it}\fitp{\mbX_i^{(t)}}^{\top}\fitp{(m-1)\mbX_i^{(t)}\tilde{\mbPhi}_i^{(t)} - \sum_{j \neq i}\mbX_j^{(t)}\mbPhi_j^{(t)}}$
+		\STATE $\tilde{\mbPhi_j}^{(t+1)} \leftarrow \tilde{\mbPhi_i}^{(t)} - \eta_{it}\fitp{\mbX_i^{(t)}}^{\top}\fitp{(m-1)\mbX_i^{(t)}\tilde{\mbPhi}_i^{(t)} - \sum_{j \neq i}\mbX_j^{(t)}\mbPhi_j^{(t)}}$
 		\STATE SVD: $\fitp{\tilde{\mbPhi_i}^{(t+1)}}^{\top} \fitp{\frac{1}{n} {\mbX_i}^{\top}\mbX_i}\tilde{\mbPhi_i}^{(t+1)} = \mbU_i^{\top}\mbD_i\mbU_i$
-		\STATE $\mbPhi_i^{(t+1)} = \tilde{\mbPhi}_i^{(t+1)}\mbU_i^{\top}\mbD_i^{-\frac{1}{2}}\mbU_i$
+		\STATE $\mbPhi_i^{(t+1)} \leftarrow \tilde{\mbPhi}_i^{(t+1)}\mbU_i^{\top}\mbD_i^{-\frac{1}{2}}\mbU_i$
 		\ENDFOR
-		\STATE $t += 1$
+		\STATE $t \leftarrow t+1$
 		\ENDWHILE
 	\end{algorithmic}
 	\end{algorithm}
 	
+	\noindent \textbf{Minibatch Management:} It should be noted that the minibatches are managed by fixed-length queues to deal with different sampling rates for different views, so the pseudocode for Algorithm~\ref{alg:stochappgrad} is not entirely faithful to my implementation. I would like to eventually give more rigorous treatment of this later, possibly using some Markov chain theory.
+	
 	\subsubsection{Why gradients?} \label{subsubsec:whygradients}
 	Gradient-based updates allow us to easily derive stochastic and mini-batch algorithms and make incremental updates where we have complete control over the scale and influence of the incremental updates. These abilities facilitate a filter-like perspective of CCA and similar problems, and since we can control the scale/influence of each incremental update, we can control the rate of change of each parameter as a function of many quantities, including the update rates of other parameters. We can use tools from online learning and online optimization to approach these problems efficiently and with strong theoretical guarantees.
 	
-	\subsection{GenELinK} \label{subsec:genelink}
-
+	\subsection{GenELinK and CCALin} \label{subsec:genelinkandccalin}
+	
+	\begin{algorithm}
+	\caption{GenELinK} \label{alg:genelink}
+	\begin{algorithmic}[1]
+	\STATE
+	\end{algorithmic}
+	\end{algorithm}
+	
+	\subsubsection{Stochastic GenELinK and CCALin}
+	For transforming the CCA algorithm with GenELinK subroutine into a stochastic minibatch algorithm, we need to ensure that two criteria are satisfied:
+	
+	\begin{itemize}
+		\item There is an updated set of canonical bases available for filtering unseen datapoints after each minibatch is processed.
+		\item State from previous parameter updates are maintained across minibatches.
+	\end{itemize}
+	
+	\noindent To satisfy these criteria, it will likely be necessary to make a call to the GenELinK subroutine or something like it for each minibatch. There are at least two clear options:
+	
+	\begin{itemize}
+		\item Perform the full GenELinK subroutine on each minibatch and initialize each round's GenELinK with the previous round's canonical bases.
+		\item For each minibatch, perform only a single stochastic gradient step on the quadratic program inside the GenELinK subroutine before giving the output back to the CCA algorithm
+	\end{itemize}
 \end{document}
