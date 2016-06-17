@@ -8,6 +8,12 @@
 ###E4
 * Clean up the data to get more 'regular' parts of the time series.
 
+##Plots
+
+* Simple line plots of the different data streams. Just time step and value.
+
+* Plots of the canonical bases under certain arrangements of tuning parameters and optional add-ons.
+
 ##Implementation
 
 ###Step Size
