@@ -9,19 +9,11 @@
 * Clean up the data to get more 'regular' parts of the time series.
 
 ##Plots
-
 * Simple line plots of the different data streams. Just time step and value.
 
 * Plots of the canonical bases under certain arrangements of tuning parameters and optional add-ons.
 
 ##Implementation
-
-###Step Size
-* Generalize my code to allow for an arbitrary step-size scheduler.
-    * What kind of arguments will they need to take?
-* Implement that one from Yann LeCun's student.
-* Implement the probabilistic one.
-* Implement the one that was mentioned in the optimization-online update.
 
 ###Corrections and Regularization
 * Try the cubic regularization technique maybe.
@@ -29,8 +21,8 @@
 ###Numerical Linear Algebra
 * See if block-diagonal structure can be leveraged in CCALin (and GenELinK) implementation(s).
 
-###Misc.
-* Allow for averaging across windows of coordinates in the minibatch server.
+##Model Serialization
+* Need to implement save and load functions for the CCA objects.
 
 ##Collaboration
 
