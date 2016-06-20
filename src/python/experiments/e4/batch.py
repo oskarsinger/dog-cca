@@ -35,8 +35,8 @@ def test_two_fixed_rate_scalar(
     sensor1, sensor2,
     seconds=1,
     reg1=0.1, reg2=0.1,
-    reader1=fn.get_scalar_as_is, 
-    reader2=fn.get_scalar_as_is):
+    reader1=fn.get_fields_as_columns, 
+    reader2=fn.get_fields_as_columns):
 
     dl1 = FRL(hdf5_path, subject, sensor1, seconds, reader1)
     dl2 = FRL(hdf5_path, subject, sensor2, seconds, reader2)
@@ -57,9 +57,9 @@ def test_n_fixed_rate_scalar(
     hdf5_path, cca_k,
     seconds=10):
 
-    mag = fn.get_magnitude
-    vec = fn.get_vec_as_list
-    sca = fn.get_scalar_as_is
+    mag = fn.get_row_magnitude
+    vec = fn.get_fields_as_columns
+    sca = fn.get_array_as_is
     dls = [
         FRL(hdf5_path, subject, 'ACC', seconds, mag),
         IBI(hdf5_path, subject, 'IBI', seconds, vec),
