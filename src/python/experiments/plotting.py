@@ -99,14 +99,13 @@ def plot_canonical_bases(Phis, Psi=None, plot_path='.'):
     k = None
     
     if len(set(ks)) == 1:
-        k = k_Psi
+        k = ks[0]
     else:
         raise ValueError(
             'Second dimension of each basis should be equal.')
 
     Phis_features = [[str(i) for i in range(p)]
                      for p in ps]
-    Psi_features = [str(i) for i in range(p_Psi)]
     basis_elements = [str(i) for i in range(k)]
 
     Phis_ps = [_plot_basis(Phi, 'Phi' + str(i), f, basis_elements)
@@ -114,6 +113,7 @@ def plot_canonical_bases(Phis, Psi=None, plot_path='.'):
     Psi_p = None
 
     if Psi is not None:
+        Psi_features = [str(i) for i in range(p_Psi)]
         Psi_p = _plot_basis(Psi, 'Psi', Psi_features, basis_elements)
     
     prefix = str(k) + '_k_' + \
