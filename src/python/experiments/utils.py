@@ -1,6 +1,7 @@
 from appgrad import AppGradCCA, NViewAppGradCCA
 from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
 from data.servers.gram import ExpGramServer as EGS
+from data.servers.gram import BoxcarGramServer as BGS
 
 def run_online_appgrad_experiment(
     X_server, Y_server, k,
@@ -35,15 +36,21 @@ def run_online_appgrad_experiment(
 
 def run_online_n_view_appgrad_experiment(
     servers, k, 
-    exp=False, verbose=True,
-    etas=None, lowers=None):
+    exps=None, windows=None,
+    etas=None, lowers=None,
+    verbose=True):
 
     model = NViewAppGradCCA(
         k, len(servers), online=True)
     gram_servers = None
 
-    if exp:
-        gram_servers = [EGS() for i in range(len(servers))]
+    if (exps is not None) and (windows is not None):
+        raise ValueError(
+            'Only one of exp and window can be set to non-None values.')
+    elif exps is not None:
+        gram_servers = [EGS(weight=w) for w in exps]
+    elif windows is not None:
+        gram_servers = [BGS(window=w) for w in windows]
 
     optims = None
 

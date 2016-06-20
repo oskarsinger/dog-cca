@@ -55,7 +55,8 @@ def run_online_appgrad_e4_data_experiment(
 def run_n_view_online_appgrad_e4_data_experiment(
     hdf5_path, cca_k, subject,
     seconds=10, 
-    exp=False, verbose=False, pca_ks=[None]*6,
+    exps=None, windows=None,
+    verbose=False, pca_ks=[None]*6,
     etas=None, lowers=None):
 
     bs = cca_k + icl(cca_k)
@@ -74,7 +75,9 @@ def run_n_view_online_appgrad_e4_data_experiment(
 
     return eu.run_online_n_view_appgrad_experiment(
         dss, cca_k,
-        exp=exp, lowers=lowers, verbose=verbose, etas=etas)
+        exps=exps, windows=windows,
+        lowers=lowers, etas=etas, 
+        verbose=verbose)
 
 def run_all_subject_n_view_online_appgrad_e4_data_experiment(
     hdf5_path, cca_k,

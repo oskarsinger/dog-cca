@@ -90,10 +90,15 @@ def plot_cca_filtering(
 def plot_canonical_bases(Phis, Psi=None, plot_path='.'):
 
     (ps, ks) = unzip([Phi.shape for Phi in Phis])
-    (p_Psi, k_Psi) = Psi.shape
+    (p_Psi, k_Psi) = (0, 0)
+
+    if Psi is not None:
+        p_Psi, k_Psi = Psi.shape
+        ks = ks + [k_Psi]
+
     k = None
     
-    if len(set(ks + [k_Psi])) == 1:
+    if len(set(ks)) == 1:
         k = k_Psi
     else:
         raise ValueError(
@@ -106,19 +111,24 @@ def plot_canonical_bases(Phis, Psi=None, plot_path='.'):
 
     Phis_ps = [_plot_basis(Phi, 'Phi' + str(i), f, basis_elements)
                for i, (Phi, f) in enumerate(zip(Phis, Phis_features))]
-    Psi_p = _plot_basis(Psi, 'Psi', Psi_features, basis_elements)
+    Psi_p = None
+
+    if Psi is not None:
+        Psi_p = _plot_basis(Psi, 'Psi', Psi_features, basis_elements)
     
     prefix = str(k) + '_k_' + \
         '_'.join([str(p) for p in ps]) + '_phis_'
     filename = get_ts(prefix + 
         'mass_per_feature_over_bases_matrix_heat_plot') + '.html'
     filepath = os.path.join(plot_path, filename)
-    plot_list = Phis_ps + [Psi_p]
+
+    if Psi is not None:
+        Phis_ps = Phis_ps + [Psi_p]
 
     output_file(
         filepath, 
         'percent mass per feature over bases')
-    show(vplot(*plot_list))
+    show(vplot(*Phis_ps))
 
 def _plot_basis(basis, name, features, basis_elements):
 
