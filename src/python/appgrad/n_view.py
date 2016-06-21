@@ -31,19 +31,9 @@ class NViewAppGradCCA:
         self.has_been_fit = False
         self.basis_pairs = None
         #self.Psi = None
-        self.history = None
 
-    def get_status(self):
-
-        return {
-            'k': self.k,
-            'num_views': self.num_views,
-            'online': self.online,
-            'epsilons': self.epsilons,
-            'has_been_fit': self.has_been_fit,
-            'basis_pairs': self.basis_pairs,
-            #'Psi': self.Psi,
-            'history': self.history}
+        if self.online:
+            self.filtering_history = None
 
     def fit(self,
         ds_list, 
@@ -52,8 +42,6 @@ class NViewAppGradCCA:
         etas=None,
         verbose=False,
         max_iter=10000):
-
-        self.history = []
 
         if etas is None:
             etas = [0.00001] * (self.num_views + 1)
@@ -113,6 +101,8 @@ class NViewAppGradCCA:
                 # Get new minibatches and Gram matrices
                 (Xs, Sxs) = self._get_batch_and_gram_lists(ds_list, gs_list)
 
+                self._update_filtering_history(Xs, basis_pairs_t)
+                
             if verbose:
                 print "\tGetting updated basis estimates"
 
@@ -219,3 +209,30 @@ class NViewAppGradCCA:
             Xs = [X[:n] if X.ndim == 1 else X[:n,:] for X in Xs]
 
         return (Xs, Sxs)
+
+    def _update_filtering_history(self, Xs, basis_pairs):
+
+        if self.filtering_history is None:
+            normed = unzip(basis_pairs)[1]
+            self.filtering_history = [np.dot(X[-1,:], Phi).T
+                                      for (X, Phi) in zip(Xs, normed)]
+        else:
+            normed = unzip(basis_pairs)[1]
+
+            for i in xrange(self.num_views):
+                current = self.filtering_history[i]
+                new = np.dot(Xs[i][-1,:], normed[i]).T
+                self.filtering_history[i] = np.hstack([current, new])
+
+    def get_status(self):
+
+        return {
+            'k': self.k,
+            'num_views': self.num_views,
+            'online': self.online,
+            'epsilons': self.epsilons,
+            'has_been_fit': self.has_been_fit,
+            'basis_pairs': self.basis_pairs,
+            #'Psi': self.Psi,
+            'filtering_history': self.filtering_history}
+
