@@ -1,5 +1,6 @@
 from experiments.e4.online import run_n_view_online_appgrad_e4_data_experiment as run_nvoaede
 from experiments.plotting import plot_canonical_bases as pcb
+from experiments.plotting import plot_cca_filtering as pcf
 from drrobert.misc import unzip, get_nums_as_strings as n2s
 
 from random import choice
@@ -51,7 +52,7 @@ def randomize_or_die_son(hdf5_path, subject, trials=50):
             plot_path = os.path.join(plot_path_base, new_dir)
 
             os.mkdir(plot_path)
+            pcf(model.get_status()['filtering_history'], plot_path=plot_path)
             pcb(unzip(model.get_bases())[1], plot_path=plot_path)
         except Exception as e:
             print e 
-        
