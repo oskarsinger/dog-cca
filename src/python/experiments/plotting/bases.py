@@ -15,7 +15,6 @@ def plot_canonical_bases(model, plot_path='.'):
 
     Phis = unzip(model.get_bases())[1]
     (ps, ks) = unzip([Phi.shape for Phi in Phis])
-
     k = None
     
     if len(set(ks)) == 1:
