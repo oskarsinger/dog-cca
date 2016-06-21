@@ -83,13 +83,9 @@ class NViewAppGradCCA:
                 (unn, normed) = unzip(basis_pairs_t)
                 print "\tObjective:", agu.get_objective(Xs, normed)
 
-            self.history.append({})
-
             # Update step sizes
             etas_i = [eta / i**0.5 for eta in etas]
             
-            self.history[-1]['etas'] = list(etas_i)
-
             if verbose:
                 print "Iteration:", i
                 print "\t".join(["eta" + str(j) + " " + str(eta)
@@ -113,16 +109,10 @@ class NViewAppGradCCA:
             if verbose:
                 print "\tGetting updated auxiliary variable estimate"
 
-            # Get updated auxiliary variable
-            #Psi = self._get_Psi_update(
-            #    Xs, basis_pairs_t1, Psi, etas_i[-1], optimizers[-1])
-
             # Check for convergence
             pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
             converged = agu.is_converged(pairs, self.epsilons, verbose) 
 
-            #self.history[-1]['distances'] = list(distances)
-                            
             # Update iterates
             basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
                              for unn_Phi, Phi in basis_pairs_t1]
@@ -180,8 +170,6 @@ class NViewAppGradCCA:
                  for (X, Phi) in zip(Xs, Phis)]
         residuals = [np.linalg.norm(d) for d in diffs]
         
-        self.history[-1]['residuals'] = list(residuals)
-
         return (2.0 / Psi.shape[0]) * sum(diffs)
 
     def _init_data(self, ds_list, gs_list):
@@ -214,15 +202,15 @@ class NViewAppGradCCA:
 
         if self.filtering_history is None:
             normed = unzip(basis_pairs)[1]
-            self.filtering_history = [np.dot(X[-1,:], Phi).T
+            self.filtering_history = [np.dot(X[-1,:], Phi)
                                       for (X, Phi) in zip(Xs, normed)]
         else:
             normed = unzip(basis_pairs)[1]
 
             for i in xrange(self.num_views):
                 current = self.filtering_history[i]
-                new = np.dot(Xs[i][-1,:], normed[i]).T
-                self.filtering_history[i] = np.hstack([current, new])
+                new = np.dot(Xs[i][-1,:], normed[i])
+                self.filtering_history[i] = np.vstack([current, new])
 
     def get_status(self):
 
@@ -233,6 +221,5 @@ class NViewAppGradCCA:
             'epsilons': self.epsilons,
             'has_been_fit': self.has_been_fit,
             'basis_pairs': self.basis_pairs,
-            #'Psi': self.Psi,
             'filtering_history': self.filtering_history}
 

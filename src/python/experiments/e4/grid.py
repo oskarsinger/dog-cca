@@ -52,7 +52,8 @@ def randomize_or_die_son(hdf5_path, subject, trials=50):
             plot_path = os.path.join(plot_path_base, new_dir)
 
             os.mkdir(plot_path)
-            pcf(model.get_status()['filtering_history'], plot_path=plot_path)
+            filtering_history = model.get_status()['filtering_history']
+            pcf(filtering_history, plot_path=plot_path)
             pcb(unzip(model.get_bases())[1], plot_path=plot_path)
         except Exception as e:
             print e 
