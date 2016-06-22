@@ -1,7 +1,7 @@
 from experiments.e4.online import run_n_view_online_appgrad_e4_data_experiment as run_nvoaede
-from experiments.plotting import plot_canonical_bases as pcb
-from experiments.plotting import plot_grouped_by_view as pgbv
-from experiments.plotting import plot_grouped_by_component as pgbc
+from experiments.plotting.bases import plot_canonical_bases as pcb
+from experiments.plotting.filtering import plot_grouped_by_view as pgbv
+from experiments.plotting.filtering import plot_grouped_by_component as pgbc
 from drrobert.misc import unzip, get_nums_as_strings as n2s
 
 from random import choice
@@ -31,12 +31,14 @@ def randomize_or_die_son(hdf5_path, subject, trials=50):
 
         # Run experiment
         try:
+            print "Training model"
             model = run_nvoaede(
                 hdf5_path, cca_k, subject,
                 seconds=seconds, 
                 exps=exps, windows=windows,
                 num_coords=num_coords,
                 etas=etas)
+            print "Creating plot path"
             plot_path_base = '/home/oskar/GitRepos/online-cca/plots/'
             new_dir = '_'.join([
                 'k',
@@ -53,6 +55,7 @@ def randomize_or_die_son(hdf5_path, subject, trials=50):
                 '-'.join(n2s(etas))])
             plot_path = os.path.join(plot_path_base, new_dir)
 
+            print "Generating plots"
             os.mkdir(plot_path)
             pgbv(model, plot_path=plot_path)
             pgbv(model, historical=True, plot_path=plot_path)

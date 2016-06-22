@@ -40,10 +40,9 @@ def run_online_n_view_appgrad_experiment(
     etas=None, lowers=None,
     verbose=True):
 
-    model = NViewAppGradCCA(
-        k, len(servers), online=True)
     gram_servers = None
 
+    print "Creating gram servers"
     if (exps is not None) and (windows is not None):
         raise ValueError(
             'Only one of exp and window can be set to non-None values.')
@@ -52,16 +51,20 @@ def run_online_n_view_appgrad_experiment(
     elif windows is not None:
         gram_servers = [BGS(window=w) for w in windows]
 
+    print "Creating model object"
+    model = NViewAppGradCCA(
+        k, servers, gs_list=gram_servers, online=True)
+
     optims = None
 
+    print "Creating optimizers"
     if (lowers is not None) and (len(lowers) == len(servers)):
         optims = [MAG(lower=lower)
                   for lower in lowers] + \
                  [MAG()]
 
+    print "Fitting model"
     model.fit(
-        servers, 
-        gs_list=gram_servers,
         optimizers=optims,
         etas=etas,
         verbose=verbose)

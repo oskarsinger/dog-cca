@@ -22,7 +22,7 @@ class NViewAppGradCCA:
         self.k = k
         self.ds_list = ds_list
         self.num_views = len(self.ds_list)
-
+        
         if gs_list is None:
             gs_list = [BCGS() if self.online else BGS()
                        for i in range(self.num_views)]
@@ -67,12 +67,11 @@ class NViewAppGradCCA:
 
         (Xs, Sxs) = self._init_data()
 
-        print "Getting intial basis estimates"
+        print "Getting initial basis estimates"
 
         # Initialization of optimization variables
         basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
         basis_pairs_t1 = None
-        bs = ds_list[0].get_status()['batch_size']
 
         # Iteration variables
         converged = [False] * self.num_views
@@ -80,6 +79,8 @@ class NViewAppGradCCA:
         print "Starting optimization"
 
         while (not all(converged)) and self.num_rounds < max_iter:
+
+            self.num_rounds += 1
 
             if verbose:
                 (unn, normed) = unzip(basis_pairs_t)
@@ -118,8 +119,6 @@ class NViewAppGradCCA:
             # Update iterates
             basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
                              for unn_Phi, Phi in basis_pairs_t1]
-
-            self.num_rounds += 1
 
         self.has_been_fit = True
         self.basis_pairs = basis_pairs_t
@@ -195,6 +194,7 @@ class NViewAppGradCCA:
             'ds_list': self.ds_list,
             'gs_list': self.gs_list,
             'k': self.k,
+            'bases': unzip(self.basis_pairs)[1],
             'num_views': self.num_views,
             'online': self.online,
             'epsilons': self.epsilons,

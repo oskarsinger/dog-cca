@@ -64,6 +64,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
     bs = cca_k + icl(cca_k)
     mag = fn.get_row_magnitude
     fac = fn.get_fields_as_columns
+    print "Creating data loaders"
     dls = [
         FRL(hdf5_path, subject, 'ACC', seconds, mag, online=True),
         IBI(hdf5_path, subject, 'IBI', seconds, fac, online=True),
@@ -71,9 +72,11 @@ def run_n_view_online_appgrad_e4_data_experiment(
         FRL(hdf5_path, subject, 'TEMP', seconds, fac, online=True),
         FRL(hdf5_path, subject, 'HR', seconds, fac, online=True),
         FRL(hdf5_path, subject, 'EDA', seconds, fac, online=True)]
+    print "Creating data servers"
     dss = [M2M(dl, bs, num_coords=nc, n_components=pca_k) 
            for (dl, pca_k, nc) in zip(dls, pca_ks, num_coords)]
 
+    print "Training model"
     return eu.run_online_n_view_appgrad_experiment(
         dss, cca_k,
         exps=exps, windows=windows,
