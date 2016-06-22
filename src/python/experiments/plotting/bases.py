@@ -13,7 +13,7 @@ from bokeh.palettes import GnBu9, YlOrRd9, BuPu9
 
 def plot_canonical_bases(model, plot_path='.'):
 
-    Phis = unzip(model.get_bases())[1]
+    Phis = model.get_bases()
     (ps, ks) = unzip([Phi.shape for Phi in Phis])
     k = None
     

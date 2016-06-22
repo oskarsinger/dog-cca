@@ -25,7 +25,7 @@ def test_batch_appgrad(
         X_server, Y_server,
         verbose=True)
 
-    return model.get_bases()
+    return model
 
 def test_batch_n_view_appgrad(
     n, ps, cca_k,
@@ -43,40 +43,4 @@ def test_batch_n_view_appgrad(
         servers,
         verbose=True)
 
-    return model.get_bases()
-
-def run_two_view_tests(
-    n, p1, p2, k):
-
-    print "Parameters:\n\t", "\n\t".join([
-        "n: " + str(n),
-        "p1: " + str(p1),
-        "p2: " + str(p2),
-        "k: " + str(k)])
-
-    print "Testing CCA on low-rank data"
-    low_rank = test_batch_appgrad(
-        n, p1, p2, k, 
-        dl_k1=p1/2, dl_k2=p2/2)
-
-    print "Testing CCA on full-rank data"
-    full_rank = test_batch_appgrad(
-        n, p1, p2, k)
-
-def run_two_view_tests(
-    n, ps, k):
-
-    print "Gaussian random data batch AppGrad CCA tests"
-    print "Parameters:\n\t", "\n\t".join([
-        "n: " + str(n),
-        "ps: " + str(ps),
-        "k: " + str(k)])
-
-    print "Testing n-view CCA on low-rank data"
-    low_rank = test_batch_n_view_appgrad(
-        n, ps, k, 
-        dl_k1=p1/2, dl_k2=p2/2)
-
-    print "Testing n-view CCA on full-rank data"
-    full_rank = test_batch_n_view_appgrad(
-        n, ps, k)
+    return model
