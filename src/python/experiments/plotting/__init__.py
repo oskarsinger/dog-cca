@@ -1,2 +1,2 @@
-from bases import plot_canonical_bases
-from filtering import plot_cca_filtering
+import filtering
+import bases

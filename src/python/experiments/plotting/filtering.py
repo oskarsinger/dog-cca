@@ -25,7 +25,7 @@ def plot_grouped_by_component(
 
     shapes = [X.shape for X in filtered_Xs] 
     k = model_info['k']
-    seconds = model_info['seconds']
+    seconds = model_info['ds_list'][0].dl.get_status()['seconds']
     num_rounds = model_info['num_rounds']
     component_plots = []
     X_label = 'Time Step Observed'
@@ -34,7 +34,7 @@ def plot_grouped_by_component(
     for i in xrange(k):
         comp_map = {'Filtered X ' + str(j) + '\'s component ' :
                     (seconds * np.arange(num_rounds), X[:,i])
-                    for (j, X) in enumerate(Xs)}
+                    for (j, X) in enumerate(filtered_Xs)}
         component_plots.append(plot_lines(
             comp_map,
             X_label,
@@ -53,7 +53,7 @@ def plot_grouped_by_component(
     output_file(
         filepath, 
         'component-grouped CCA-filtered data points vs time step observed')
-    show(vplot(*X_plots))
+    show(vplot(*component_plots))
 
 def plot_grouped_by_view(
     model,
@@ -72,7 +72,7 @@ def plot_grouped_by_view(
 
     shapes = [X.shape for X in filtered_Xs] 
     k = model_info['k']
-    seconds = model_info['seconds']
+    seconds = model_info['ds_list'][0].dl.get_status()['seconds']
     num_rounds = model_info['num_rounds']
     X_plots = []
     X_label = 'Time Step Observed (seconds)'
@@ -107,7 +107,7 @@ def _get_refiltered_Xs(model_info):
     dss = model_info['ds_list']
     num_rounds = model_info['num_rounds']
     num_views = model_info['num_views']
-    Phis = model.get_bases()
+    Phis = model_info['bases']
     filtered_Xs = None
 
     for ds in dss:
@@ -120,10 +120,10 @@ def _get_refiltered_Xs(model_info):
             filtered_Xs = [np.dot(X[-1,:], Phi)
                            for (X, Phi) in zip(Xs, Phis)]
         else:
-            for i in xrange(num_views):
-                current = filtered_Xs[i]
-                new = np.dot(Xs[i][-1,:], Phis[i])
-                filtered_Xs[i] = np.vstack([current, new])
+            for j in xrange(num_views):
+                current = filtered_Xs[j]
+                new = np.dot(Xs[j][-1,:], Phis[j])
+                filtered_Xs[j] = np.vstack([current, new])
 
     return [np.copy(fX) for fX in filtered_Xs]
 
