@@ -17,7 +17,7 @@ def test_batch_appgrad(
         ds1, ds2,
         verbose=True)
 
-    return model.get_bases()
+    return model
 
 def test_batch_n_view_appgrad(
     ds_list, cca_k):
@@ -28,7 +28,7 @@ def test_batch_n_view_appgrad(
         ds_list,
         verbose=True)
 
-    return model.get_bases()
+    return model
 
 def test_two_fixed_rate_scalar(
     hdf5_path, cca_k, subject, 
@@ -42,16 +42,9 @@ def test_two_fixed_rate_scalar(
     dl2 = FRL(hdf5_path, subject, sensor2, seconds, reader2)
     ds1 = BS(dl1)
     ds2 = BS(dl2)
-    (Phi, unn_Phi, Psi, unn_Psi) = test_batch_appgrad(
+
+    return test_batch_appgrad(
         ds1, ds2, cca_k)
-    I_k = np.identity(cca_k)
-    gram1 = ds1.get_batch_and_gram()[1]
-    gram2 = ds2.get_batch_and_gram()[1]
-
-    print np.linalg.norm(quad(Phi, gram1) - I_k)
-    print np.linalg.norm(quad(Psi, gram2) - I_k)
-
-    return (Phi, Psi)
 
 def test_n_fixed_rate_scalar(
     hdf5_path, cca_k,
@@ -68,7 +61,6 @@ def test_n_fixed_rate_scalar(
         FRL(hdf5_path, subject, 'HR', seconds, sca),
         FRL(hdf5_path, subject, 'EDA', seconds, sca)]
     dss = [BS(dl) for dl in dls]
-    (basis_pairs, Psi) = test_batch_n_view_appgrad(
-        dss, cca_k)
 
-    return (basis_pairs, Psi)
+    return test_batch_n_view_appgrad(
+        dss, cca_k)

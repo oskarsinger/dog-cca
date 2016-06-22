@@ -9,35 +9,46 @@ from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 class NViewAppGradCCA:
 
     def __init__(self,
-        k, num_views,
+        k, ds_list, 
+        gs_list=None,
         online=False,
         epsilons=None):
 
-        self.k = k
-
-        if num_views < 2:
+        if not agu.is_k_valid(ds_list, k):
             raise ValueError(
-                'You must provide at least 2 data servers.')
-        else:
-            self.num_views = num_views
+                'The value of k must be less than or equal to the minimum of the' +
+                ' number of columns of X and Y.')
 
-        if epsilons is not None:
-            self.epsilons = epsilons
-        else:
-            self.epsilons = [10**(-4)] * (self.num_views + 1)
+        self.k = k
+        self.ds_list = ds_list
+        self.num_views = len(self.ds_list)
 
+        if gs_list is None:
+            gs_list = [BCGS() if self.online else BGS()
+                       for i in range(self.num_views)]
+        elif not len(gs_list) == self.num_views:
+            raise ValueError(
+                'Parameter gs_list must have length of ds_list.')
+
+        self.gs_list = gs_list    
+
+        if epsilons is None:
+            epsilons = [10**(-4)] * (self.num_views + 1)
+        elif not len(epsilons) == self.num_views:
+            raise ValueError(
+                'Parameter epsilons must have length of ds_list.')
+
+        self.epsilons = epsilons
         self.online = online
 
+        self.num_rounds = 0
         self.has_been_fit = False
         self.basis_pairs = None
-        #self.Psi = None
 
         if self.online:
             self.filtering_history = None
 
     def fit(self,
-        ds_list, 
-        gs_list=None,
         optimizers=None,
         etas=None,
         verbose=False,
@@ -46,13 +57,6 @@ class NViewAppGradCCA:
         if etas is None:
             etas = [0.00001] * (self.num_views + 1)
 
-        if gs_list is None:
-            gs_list = [BCGS() if self.online else BGS()
-                       for i in range(self.num_views)]
-        elif not len(gs_list) == self.num_views:
-            raise ValueError(
-                'Parameter gs_list must be of length num_views.')
-            
         if optimizers is None:
             optimizers = [MAG() for i in range(self.num_views + 1)]
         elif not len(optimizers) == self.num_views + 1:
@@ -61,7 +65,7 @@ class NViewAppGradCCA:
 
         print "Getting initial (mini)batches and Gram matrices"
 
-        (Xs, Sxs) = self._init_data(ds_list, gs_list)
+        (Xs, Sxs) = self._init_data()
 
         print "Getting intial basis estimates"
 
@@ -69,25 +73,23 @@ class NViewAppGradCCA:
         basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
         basis_pairs_t1 = None
         bs = ds_list[0].get_status()['batch_size']
-        #Psi = np.random.randn(bs, self.k)
 
         # Iteration variables
         converged = [False] * self.num_views
-        i = 1
 
         print "Starting optimization"
 
-        while (not all(converged)) and i < max_iter:
+        while (not all(converged)) and self.num_rounds < max_iter:
 
             if verbose:
                 (unn, normed) = unzip(basis_pairs_t)
                 print "\tObjective:", agu.get_objective(Xs, normed)
 
             # Update step sizes
-            etas_i = [eta / i**0.5 for eta in etas]
+            etas_i = [eta / self.num_rounds**0.5 for eta in etas]
             
             if verbose:
-                print "Iteration:", i
+                print "Iteration:", self.num_rounds
                 print "\t".join(["eta" + str(j) + " " + str(eta)
                                  for j, eta in enumerate(etas_i)])
                 if self.online:
@@ -95,7 +97,7 @@ class NViewAppGradCCA:
 
             if self.online:
                 # Get new minibatches and Gram matrices
-                (Xs, Sxs) = self._get_batch_and_gram_lists(ds_list, gs_list)
+                (Xs, Sxs) = self._get_batch_and_gram_lists()
 
                 self._update_filtering_history(Xs, basis_pairs_t)
                 
@@ -117,11 +119,10 @@ class NViewAppGradCCA:
             basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
                              for unn_Phi, Phi in basis_pairs_t1]
 
-            i += 1
+            self.num_rounds += 1
 
         self.has_been_fit = True
         self.basis_pairs = basis_pairs_t
-        #self.Psi = Psi
 
     def get_bases(self):
 
@@ -129,7 +130,7 @@ class NViewAppGradCCA:
             raise Exception(
                 'Model has not yet been fit.')
 
-        return (self.basis_pairs)#, self.Psi)
+        return unzip(self.basis_pairs)[1]
 
     def _get_basis_updates(self, 
         Xs, Sxs, basis_pairs, etas, optimizers):
@@ -148,42 +149,18 @@ class NViewAppGradCCA:
 
         return normed_pairs
 
-    def _get_Psi_update(self, Xs, basis_pairs, Psi, eta, optimizer):
-
-        Phis = [pair[1] for pair in basis_pairs]
-        gradient = self._get_Psi_gradient(Psi, Xs, Phis)
-
-        return optimizer.get_update(Psi, gradient, eta)
-
-    def _get_batch_and_gram_lists(self, ds_list, gs_list):
+    def _get_batch_and_gram_lists(self):
 
         batch_list = [ds.get_data()
-                      for ds in ds_list]
+                      for ds in self.ds_list]
         gram_list = [gs.get_gram(batch)
-                     for (gs, batch) in zip(gs_list, batch_list)]
+                     for (gs, batch) in zip(self.gs_list, batch_list)]
 
         return (batch_list, gram_list)
 
-    def _get_Psi_gradient(self, Psi, Xs, Phis):
+    def _init_data(self):
 
-        diffs = [np.dot(X, Phi) - Psi
-                 for (X, Phi) in zip(Xs, Phis)]
-        residuals = [np.linalg.norm(d) for d in diffs]
-        
-        return (2.0 / Psi.shape[0]) * sum(diffs)
-
-    def _init_data(self, ds_list, gs_list):
-
-        if not len(ds_list) == self.num_views:
-            raise ValueError(
-                'Parameter ds_list must have length num_views.')
-
-        if not agu.is_k_valid(ds_list, self.k):
-            raise ValueError(
-                'The value of k must be less than or equal to the minimum of the' +
-                ' number of columns of X and Y.')
-
-        (Xs, Sxs) = self._get_batch_and_gram_lists(ds_list, gs_list)
+        (Xs, Sxs) = self._get_batch_and_gram_lists()
 
         if not self.online:
             # Find a better solution to this
@@ -215,11 +192,13 @@ class NViewAppGradCCA:
     def get_status(self):
 
         return {
+            'ds_list': self.ds_list,
+            'gs_list': self.gs_list,
             'k': self.k,
             'num_views': self.num_views,
             'online': self.online,
             'epsilons': self.epsilons,
+            'num_rounds': self.num_rounds,
             'has_been_fit': self.has_been_fit,
             'basis_pairs': self.basis_pairs,
             'filtering_history': self.filtering_history}
-
