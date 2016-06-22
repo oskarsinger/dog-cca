@@ -23,7 +23,6 @@ def plot_grouped_by_component(
     else:
         filtered_Xs = _get_refiltered_Xs(model_info)
 
-    shapes = [X.shape for X in filtered_Xs] 
     k = model_info['k']
     seconds = model_info['ds_list'][0].dl.get_status()['seconds']
     num_rounds = model_info['num_rounds']
@@ -70,7 +69,6 @@ def plot_grouped_by_view(
     else:
         filtered_Xs = _get_refiltered_Xs(model_info)
 
-    shapes = [X.shape for X in filtered_Xs] 
     k = model_info['k']
     seconds = model_info['ds_list'][0].dl.get_status()['seconds']
     num_rounds = model_info['num_rounds']
@@ -126,4 +124,3 @@ def _get_refiltered_Xs(model_info):
                 filtered_Xs[j] = np.vstack([current, new])
 
     return [np.copy(fX) for fX in filtered_Xs]
-
