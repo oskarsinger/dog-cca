@@ -15,6 +15,9 @@
 
 ##Implementation
 
+###Features
+* Histograms for fixed time intervals. Add a data transformer for this.
+
 ###Corrections and Regularization
 * Try the cubic regularization technique maybe.
 
