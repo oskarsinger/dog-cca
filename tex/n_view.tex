@@ -38,7 +38,7 @@
 	
 	\noindent where $\mbPhi_i$ are the optimization variables.
 	
-	\subsubsection{(Mean Field Variational?) Approximation of Fully Connected Graph} \label{subsubsec:approxfcgraph}
+	\subsubsection{(Mean Field Variational?) Approximation of Complete Graph} \label{subsubsec:approxfcgraph}
 	
 	\begin{align*}
 		\tnb{minimize}&\ \ \sum_{i=1}^m \norm{\mbX_i \mbPhi_i - \mbPsi}_F^2\\
@@ -72,7 +72,7 @@
 	\subsection{Stochastic AppGrad} \label{subsec:appgrad}
 	
 	\begin{algorithm}
-	\caption{Stochastic $m$-View AppGrad} \label{alg:stochappgrad}
+	\caption{Stochastic $m$-view, rank-$k$ AppGrad} \label{alg:stochappgrad}
 	\begin{algorithmic}[1]
 		\STATE \textbf{Input:} batch size $n$, step sizes $\eta_{1t},\ldots,\eta_{mt}$, max iter $T$, num components $k$
 		\STATE \textbf{Output:} Canonical bases $\fitp{\mbPhi_1, \ldots, \mbPhi_m}$
@@ -100,6 +100,43 @@
 	
 	\begin{algorithm}
 	\caption{GenELinK} \label{alg:genelink}
+	\begin{algorithmic}[1]
+	\STATE \textbf{Input:} $T$, $k$, symmetric matrix $\mbA$, PSD matrix $\mbB$, subroutine $\tn{GS}_{\mbB}\fitp{\cdot}$ that performs Gram-Schmidt process, with inner product $\fitab{\cdot,\cdot}_{\mbB}$
+	\STATE \textbf{Output:} top $k$ eigen-space $\mbW \in \mbbR^{d \times k}$
+	\STATE $\tilde{\mbW}_0 \leftarrow$ random $d \times k$ matrix with each entry i.i.d. from $\mcN \fitp{0,1}$
+	\STATE $\mbW_0 \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}_0}$
+	\FOR{$t=0,\ldots,T-1$}
+	\STATE $\mbGamma_t \leftarrow \fitp{\mbW_t^{\top}\mbB\mbW_t}^{-1}\fitp{\mbW_t^{\top}\mbA\mbW_t}$
+	\STATE $\tilde{\mbW}_{t+1} \leftarrow \argmin{\mbW} \tn{tr}\fitp{\frac{1}{2}\mbW^{\top}\mbB\mbW - \mbW^{\top}\mbA\mbW}$
+	\STATE $\mbW_{t+1} \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}_{t+1}}$
+	\ENDFOR
+	\RETURN $\mbW_T$
+	\end{algorithmic}
+	\end{algorithm}
+	
+	\begin{algorithm}
+	\caption{CCALin} \label{alg:ccalin}
+	\begin{algorithmic}[1]
+	\STATE \textbf{Input:} $T$, $k$, data matrix $\mbX \in \mbbR^{n \times d_1}$, $\mbY \in \mbbR^{n \times d_2}$, subroutine $\tn{GS}_{\mbB}\fitp{\cdot}$ that performs Gram-Schmidt process, with inner product $\fitab{\cdot,\cdot}_{\mbB}$
+	\STATE \textbf{Output:} top $k$ canonical subspace $\mbW_x \in \mbbR^{d_1 \times k}$, $\mbW_y \in \mbbR^{d_2 \times k}$
+	\STATE $\mbS_{xx} \leftarrow \mbX^{\top}\mbX/n$, $\mbS_{yy} \leftarrow \mbY^{\top}\mbY/n$, $\mbS_{xy} \leftarrow \mbX^{\top}\mbY/n$
+	\STATE $\mbA = \fitp{\begin{array}{cc}0 & \mbS_{xy} \\ \mbS_{xy}^{\top} & 0 \end{array}}$, $\mbB = \fitp{\begin{array}{cc}\mbS_{xx} & 0 \\ 0 & \mbS_{yy} \end{array}}$
+	\STATE $\fitp{\begin{array}{cc} \bar{\mbW_x} \in \mbbR^{d_1 \times k} \\\bar{\mbW_y} \in \mbbR^{d_2 \times k} \end{array}} \leftarrow \tn{GenELinK}\fitp{\mbA,\mbB, T, k}$
+	\STATE $\mbU \leftarrow 2k \times k$ random Gaussian matrix
+	\STATE $\tilde{\mbW_x} \leftarrow \bar{\mbW_x} \mbU$, $\tilde{\mbW_y} \leftarrow \bar{\mbW_y} \mbU$
+	\STATE $\mbW_x \leftarrow \tn{GS}_{\mbS_{xx}}\fitp{\tilde{\mbW_x}}$, $\mbW_y \leftarrow \tn{GS}_{\mbS_{yy}}\fitp{\tilde{\mbW_y}}$
+	\end{algorithmic}
+	\end{algorithm}
+	
+	\begin{algorithm}
+	\caption{Stochastic GenELinK Subroutine} \label{alg:stochgenelink}
+	\begin{algorithmic}[1]
+	\STATE
+	\end{algorithmic}
+	\end{algorithm}
+	
+	\begin{algorithm}
+	\caption{Stochastic CCALin} \label{alg:stochccalin}
 	\begin{algorithmic}[1]
 	\STATE
 	\end{algorithmic}
