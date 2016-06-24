@@ -26,13 +26,14 @@ def plot_grouped_by_component(
     k = model_info['k']
     seconds = model_info['ds_list'][0].dl.get_status()['seconds']
     num_rounds = model_info['num_rounds']
+    X_axis = seconds * np.arange(num_rounds)
     component_plots = []
     X_label = 'Time Step Observed'
     Y_label = 'Filtered Data Point for Component '
 
     for i in xrange(k):
         comp_map = {'Filtered X ' + str(j) + '\'s component ' :
-                    (seconds * np.arange(num_rounds), X[:,i])
+                    (X_axis, X[:,i])
                     for (j, X) in enumerate(filtered_Xs)}
         component_plots.append(plot_lines(
             comp_map,
