@@ -130,13 +130,18 @@
 	\end{algorithm}
 	
 	\begin{algorithm}
-	\caption{Stochastic GenELinK Subroutine} \label{alg:stochgenelink}
+	\caption{Stochastic GenELinK} \label{alg:stochgenelink}
 	\begin{algorithmic}[1]
-	\STATE \textbf{Input:} symmetric matrix $\mbA$, PSD matrix $\mbB$, subroutine $\tn{GS}_{\mbB}\fitp{\cdot}$ that performs Gram-Schmidt process, with inner product $\fitab{\cdot,\cdot}_{\mbB}$
-	\STATE \textbf{Output:} (top?) $k$ eigen-space $\mbW \in \mbbR^{d \times k}$
-	\STATE $\tilde{\mbW}_0 \leftarrow$ random $d \times k$ matrix with each entry i.i.d. from $\mcN \fitp{0,1}$
-	\STATE $\mbW_0 \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}_0}$
-	
+	\STATE \textbf{Initialization:} $\tilde{\mbW}_0 \leftarrow$ random $d \times k$ matrix with each entry i.i.d. from $\mcN \fitp{0,1}$ 
+	\WHILE{True}
+	\STATE \textbf{Receive} symmetric matrix $\mbA_t$, PSD matrix $\mbB_t$, subroutine $\tn{GS}_{\mbB_t}\fitp{\cdot}$ that performs Gram-Schmidt process, with inner product $\fitab{\cdot,\cdot}_{\mbB_t}$
+	\STATE $\mbW_t \leftarrow \tn{GS}_{\mbB_t}\fitp{\tilde{\mbW}_t}$
+	\STATE $\mbGamma_t \leftarrow \fitp{\mbW_t^{\top}\mbB_t\mbW_t}^{-1}\fitp{\mbW_t^{\top}\mbA_t\mbW_t}$
+	\STATE $\tilde{\mbW}_{t+1} \leftarrow \argmin{\mbW} \tn{tr}\fitp{\frac{1}{2}\mbW^{\top}\mbB_t\mbW - \mbW^{\top}\mbA_t\mbW}$
+	\STATE $\fitcb{\tn{Use an optimization subroutine with initialization } \mbW_t\mbGamma_t}$
+	\STATE $\mbW_{t+1} \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}_{t+1}}$
+	\STATE \textbf{yield} $\mbW_{t+1}$
+	\ENDWHILE
 	\end{algorithmic}
 	\end{algorithm}
 	
