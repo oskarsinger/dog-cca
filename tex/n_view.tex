@@ -171,12 +171,22 @@
 		\item State from previous parameter updates are maintained across minibatches.
 	\end{itemize}
 	
-	\noindent To satisfy these criteria, it will likely be necessary to make a call to the GenELinK subroutine or something like it for each minibatch. There are at least two clear options:
+	\noindent To satisfy these criteria, it will likely be necessary to make a call to the GenELinK subroutine or something like it for each minibatch. There are at least two clear options aside from what is described in Algorithm~\ref{alg:genelink-filter}.
 	
 	\begin{itemize}
 		\item Perform the full GenELinK subroutine on each minibatch and initialize each round's GenELinK with the previous round's canonical bases.
 		\item For each minibatch, perform only a single stochastic gradient step on the quadratic program inside the GenELinK subroutine before giving the output back to the CCA algorithm
 	\end{itemize}
+	
+	\subsubsection{$m$-View CCALin}
+	To derive the $m$-view variation of CCALin, it should be sufficient to receive $m$ datasets $\mbX_1,\ldots,\mbX_m$ (or minibatches for the filtering scenario) and change the generation of $\mbA$ and $\mbB$ to the following
+	
+	\begin{align*}
+		\mbA &\leftarrow \fitp{\begin{array}{cccc}0 & \mbS_{x_1 x_2} & \cdots & \mbS_{x_1 x_m} \\ \fitp{\mbS_{x_1 x_2}}^{\top} & 0 & \ddots & \vdots \\ \vdots & \ddots & \ddots & \mbS_{x_{m-1} x_m} \\ \fitp{\mbS_{x_1 x_m}}^{\top} & \cdots & \fitp{\mbS_{x_{m-1} x_m}}^{\top} & 0 \end{array}}\\
+		\mbB &\leftarrow \fitp{\begin{array}{cccc}\mbS_{x_1} & 0 & \cdots & 0 \\ 0 & \ddots & \ddots & \vdots \\ \vdots & \ddots & \ddots & 0 \\ 0 & \cdots & 0 & \mbS_{x_m} \end{array}}
+	\end{align*}
+	
+	\noindent where $\mbS_{x_i x_j} \leftarrow \mbX_i^{\top}\mbX_j/n$ and $\mbS_{x_i} \leftarrow \mbX_i^{\top}\mbX_i/n$.
 	
 	\bibliographystyle{apalike}
 	\bibliography{../../hosinger/tex/citations.bib}
