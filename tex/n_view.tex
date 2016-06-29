@@ -103,15 +103,15 @@
 	\begin{algorithmic}[1]
 	\STATE \textbf{Input:} $T$, $k$, symmetric matrix $\mbA$, PSD matrix $\mbB$, subroutine $\tn{GS}_{\mbB}\fitp{\cdot}$ that performs Gram-Schmidt process, with inner product $\fitab{\cdot,\cdot}_{\mbB}$
 	\STATE \textbf{Output:} top $k$ eigen-space $\mbW \in \mbbR^{d \times k}$
-	\STATE $\tilde{\mbW}_0 \leftarrow$ random $d \times k$ matrix with each entry i.i.d. from $\mcN \fitp{0,1}$
-	\STATE $\mbW_0 \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}_0}$
+	\STATE $\tilde{\mbW}^{(0)} \leftarrow$ random $d \times k$ matrix with each entry i.i.d. from $\mcN \fitp{0,1}$
+	\STATE $\mbW^{(0)} \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}^{(0)}}$
 	\FOR{$t=0,\ldots,T-1$}
-	\STATE $\mbGamma_t \leftarrow \fitp{\mbW_t^{\top}\mbB\mbW_t}^{-1}\fitp{\mbW_t^{\top}\mbA\mbW_t}$
-	\STATE $\tilde{\mbW}_{t+1} \leftarrow \argmin{\mbW} \tn{tr}\fitp{\frac{1}{2}\mbW^{\top}\mbB\mbW - \mbW^{\top}\mbA\mbW}$
-	\STATE $\fitcb{\tn{Use an optimization subroutine with initialization } \mbW_t\mbGamma_t}$
-	\STATE $\mbW_{t+1} \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}_{t+1}}$
+	\STATE $\mbGamma^{(t)} \leftarrow \fitp{\fitp{\mbW^{(t)}}^{\top}\mbB\mbW^{(t)}}^{-1} \fitp{\fitp{\mbW^{(t)}}^{\top}\mbA\mbW^{(t)}}$
+	\STATE $\tilde{\mbW}^{(t+1)} \leftarrow \argmin{\mbW} \tn{tr}\fitp{\frac{1}{2}\mbW^{\top}\mbB\mbW - \mbW^{\top}\mbA\mbW}$
+	\STATE $\fitcb{\tn{Use an optimization subroutine with initialization } \mbW^{(t)}\mbGamma^{(t)}}$
+	\STATE $\mbW^{(t+1)} \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}^{(t+1)}}$
 	\ENDFOR
-	\RETURN $\mbW_T$
+	\RETURN $\mbW^{(T)}$
 	\end{algorithmic}
 	\end{algorithm}
 	
@@ -121,39 +121,50 @@
 	\STATE \textbf{Input:} $T$, $k$, data matrix $\mbX \in \mbbR^{n \times d_1}$, $\mbY \in \mbbR^{n \times d_2}$, subroutine $\tn{GS}_{\mbM}\fitp{\cdot}$ that performs Gram-Schmidt process, with inner product $\fitab{\cdot,\cdot}_{\mbM}$ where $\mbM$ is any PSD matrix
 	\STATE \textbf{Output:} top $k$ canonical subspace $\mbW_x \in \mbbR^{d_1 \times k}$, $\mbW_y \in \mbbR^{d_2 \times k}$
 	\STATE $\mbS_{xx} \leftarrow \mbX^{\top}\mbX/n$, $\mbS_{yy} \leftarrow \mbY^{\top}\mbY/n$, $\mbS_{xy} \leftarrow \mbX^{\top}\mbY/n$
-	\STATE $\mbA = \fitp{\begin{array}{cc}0 & \mbS_{xy} \\ \mbS_{xy}^{\top} & 0 \end{array}}$, $\mbB = \fitp{\begin{array}{cc}\mbS_{xx} & 0 \\ 0 & \mbS_{yy} \end{array}}$
-	\STATE $\fitp{\begin{array}{cc} \bar{\mbW_x} \in \mbbR^{d_1 \times k} \\\bar{\mbW_y} \in \mbbR^{d_2 \times k} \end{array}} \leftarrow \tn{GenELinK}\fitp{\mbA,\mbB, T, k}$
+	\STATE $\mbA \leftarrow \fitp{\begin{array}{cc}0 & \mbS_{xy} \\ \mbS_{xy}^{\top} & 0 \end{array}}$, $\mbB \leftarrow \fitp{\begin{array}{cc}\mbS_{xx} & 0 \\ 0 & \mbS_{yy} \end{array}}$
+	\STATE $\fitp{\begin{array}{cc} \bar{\mbW}_x \in \mbbR^{d_1 \times k} \\\bar{\mbW}_y \in \mbbR^{d_2 \times k} \end{array}} \leftarrow \tn{GenELinK}\fitp{\mbA,\mbB, T, k}$
 	\STATE $\mbU \leftarrow 2k \times k$ random Gaussian matrix
-	\STATE $\tilde{\mbW_x} \leftarrow \bar{\mbW_x} \mbU$, $\tilde{\mbW_y} \leftarrow \bar{\mbW_y} \mbU$
-	\STATE $\mbW_x \leftarrow \tn{GS}_{\mbS_{xx}}\fitp{\tilde{\mbW_x}}$, $\mbW_y \leftarrow \tn{GS}_{\mbS_{yy}}\fitp{\tilde{\mbW_y}}$
+	\STATE $\tilde{\mbW}_x \leftarrow \bar{\mbW}_x \mbU$, $\tilde{\mbW}_y \leftarrow \bar{\mbW}_y \mbU$
+	\STATE $\mbW_x \leftarrow \tn{GS}_{\mbS_{xx}}\fitp{\tilde{\mbW}_x}$, $\mbW_y \leftarrow \tn{GS}_{\mbS_{yy}}\fitp{\tilde{\mbW}_y}$
 	\end{algorithmic}
 	\end{algorithm}
 	
 	\begin{algorithm}
-	\caption{Stochastic GenELinK} \label{alg:stochgenelink}
+	\caption{GenELinK Filter} \label{alg:genelink-filter}
 	\begin{algorithmic}[1]
-	\STATE \textbf{Initialization:} $\tilde{\mbW}_0 \leftarrow$ random $d \times k$ matrix with each entry i.i.d. from $\mcN \fitp{0,1}$ 
+	\STATE \textbf{Initialization:} $\tilde{\mbW}^{(0)} \leftarrow$ random $d \times k$ matrix with each entry i.i.d. from $\mcN \fitp{0,1}$, $t \leftarrow 0$
 	\WHILE{True}
-	\STATE \textbf{Receive} symmetric matrix $\mbA_t$, PSD matrix $\mbB_t$, subroutine $\tn{GS}_{\mbB_t}\fitp{\cdot}$ that performs Gram-Schmidt process, with inner product $\fitab{\cdot,\cdot}_{\mbB_t}$
-	\STATE $\mbW_t \leftarrow \tn{GS}_{\mbB_t}\fitp{\tilde{\mbW}_t}$
-	\STATE $\mbGamma_t \leftarrow \fitp{\mbW_t^{\top}\mbB_t\mbW_t}^{-1}\fitp{\mbW_t^{\top}\mbA_t\mbW_t}$
-	\STATE $\tilde{\mbW}_{t+1} \leftarrow \argmin{\mbW} \tn{tr}\fitp{\frac{1}{2}\mbW^{\top}\mbB_t\mbW - \mbW^{\top}\mbA_t\mbW}$
-	\STATE $\fitcb{\tn{Use an optimization subroutine with initialization } \mbW_t\mbGamma_t}$
-	\STATE $\mbW_{t+1} \leftarrow \tn{GS}_{\mbB}\fitp{\tilde{\mbW}_{t+1}}$
-	\STATE \textbf{yield} $\mbW_{t+1}$
+	\STATE \textbf{Receive} symmetric matrix $\mbA^{(t)}$, PSD matrix $\mbB^{(t)}$, subroutine $\tn{GS}_{\mbB^{(t)}}\fitp{\cdot}$ that performs Gram-Schmidt process, with inner product $\fitab{\cdot,\cdot}_{\mbB^{(t)}}$
+	\STATE $\mbW^{(t)} \leftarrow \tn{GS}_{\mbB^{(t)}}\fitp{\tilde{\mbW}^{(t)}}$
+	\STATE $\mbGamma^{(t)} \leftarrow \fitp{\fitp{\mbW^{(t)}}^{\top}\mbB_t\mbW^{(t)}}^{-1}\fitp{\fitp{\mbW^{(t)}}^{\top}\mbA_t\mbW^{(t)}}$
+	\STATE $\tilde{\mbW}^{(t+1)} \leftarrow \argmin{\mbW} \tn{tr}\fitp{\frac{1}{2}\mbW^{\top}\mbB^{(t)}\mbW - \mbW^{\top}\mbA^{(t)}\mbW}$
+	\STATE $\fitcb{\tn{Use an optimization subroutine with initialization } \mbW^{(t)}\mbGamma^{(t)}}$
+	\STATE $\mbW^{(t+1)} \leftarrow \tn{GS}_{\mbB^{(t)}}\fitp{\tilde{\mbW}^{(t+1)}}$
+	\STATE \textbf{yield} $\mbW^{(t+1)}$
+	\STATE $t \leftarrow t + 1$
 	\ENDWHILE
 	\end{algorithmic}
 	\end{algorithm}
 	
 	\begin{algorithm}
-	\caption{Stochastic CCALin} \label{alg:stochccalin}
+	\caption{CCALin Filter} \label{alg:ccalin-filter}
 	\begin{algorithmic}[1]
-	\STATE
+	\STATE \textbf{Initialization:} $t \leftarrow 0$, $\tn{GF} \fitp{\cdot, \cdot, \cdot}$ an instance of GenELinK Filter
+	\WHILE{True}
+	\STATE \textbf{Receive} $\mbX^{(t)} \in \mbbR^{n \times d_1}$, $\mbY^{(t)} \in \mbbR^{n \times d_2}$
+	\STATE $\mbS_{xx}^{(t)} \leftarrow \fitp{\mbX^{(t)}}^{\top}\mbX^{(t)}/n$, $\mbS_{yy}^{(t)} \leftarrow \fitp{\mbY^{(t)}}^{\top}\mbY^{(t)}/n$, $\mbS_{xy}^{(t)} \leftarrow \fitp{\mbX^{(t)}}^{\top}\mbY^{(t)}/n$
+	\STATE $\mbA^{(t)} \leftarrow \fitp{\begin{array}{cc}0 & \mbS_{xy}^{(t)} \\ \fitp{\mbS_{xy}^{(t)}}^{\top} & 0 \end{array}}$, $\mbB^{(t)} \leftarrow \fitp{\begin{array}{cc}\mbS_{xx}^{(t)} & 0 \\ 0 & \mbS_{yy}^{(t)} \end{array}}$
+	\STATE $\fitp{\begin{array}{cc} \bar{\mbW}_x \in \mbbR^{d_1 \times k} \\\bar{\mbW}_y \in \mbbR^{d_2 \times k} \end{array}} \leftarrow \tn{GF}\fitp{\mbA^{(t)},\mbB^{(t)}, GS_{\mbB^{(t)}}}$
+	\STATE $\mbU^{(t)} \leftarrow 2k \times k$ random Gaussian matrix
+	\STATE $\tilde{\mbW}_x^{(t)} \leftarrow \bar{\mbW}_x^{(t)} \mbU^{(t)}$, $\tilde{\mbW}_y^{(t)} \leftarrow \bar{\mbW}_y^{(t)} \mbU^{(t)}$
+	\STATE $\mbW_x^{(t)} \leftarrow \tn{GS}_{\mbS_{xx}^{(t)}}\fitp{\tilde{\mbW}_x^{(t)}}$, $\mbW_y^{(t)} \leftarrow \tn{GS}_{\mbS_{yy}^{(t)}}\fitp{\tilde{\mbW}_y^{(t)}}$
+	\STATE \textbf{yield} $\mbW_x^{(t)}$, $\mbW_y^{(t)}$
+	\ENDWHILE
 	\end{algorithmic}
 	\end{algorithm}
 	
-	\subsubsection{Stochastic GenELinK and CCALin}
-	For transforming the CCA algorithm with GenELinK subroutine into a stochastic minibatch algorithm, we need to ensure that two criteria are satisfied:
+	\subsubsection{GenELinK and CCALin Filters}
+	For transforming the CCA algorithm with GenELinK subroutine into an adaptive filtering algorithm, we need to ensure that two criteria are satisfied:
 	
 	\begin{itemize}
 		\item There is an updated set of canonical bases available for filtering unseen datapoints after each minibatch is processed.
