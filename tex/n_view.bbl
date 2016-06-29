@@ -4,4 +4,22 @@
 Bach, F.~R. and Jordan, M.~I. (2005).
 \newblock A probabilistic interpretation of canonical correlation analysis.
 
+\bibitem[Duchi et~al., 2011]{duchi2011adaptive}
+Duchi, J., Hazan, E., and Singer, Y. (2011).
+\newblock Adaptive subgradient methods for online learning and stochastic
+  optimization.
+\newblock {\em The Journal of Machine Learning Research}, 12:2121--2159.
+
+\bibitem[Ge et~al., 2016]{ge2016efficient}
+Ge, R., Jin, C., Kakade, S.~M., Netrapalli, P., and Sidford, A. (2016).
+\newblock Efficient algorithms for large-scale generalized eigenvector
+  computation and canonical correlation analysis.
+\newblock {\em arXiv preprint arXiv:1604.03930}.
+
+\bibitem[Ma et~al., 2015]{ma2015finding}
+Ma, Z., Lu, Y., and Foster, D. (2015).
+\newblock Finding linear structure in large datasets with scalable canonical
+  correlation analysis.
+\newblock {\em arXiv preprint arXiv:1506.08170}.
+
 \end{thebibliography}

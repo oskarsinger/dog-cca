@@ -69,7 +69,9 @@
 	
 \section{Algorithms} \label{sec:alg}
 
-	\subsection{Stochastic AppGrad} \label{subsec:appgrad}
+	\subsection{Stochastic $m$-View AppGrad} \label{subsec:appgrad}
+	
+	The algorithm in this section is derived from a similar algorithm for classical two-view CCA given in \cite{ma2015finding}.
 	
 	\begin{algorithm}
 	\caption{Stochastic $m$-view, rank-$k$ AppGrad} \label{alg:stochappgrad}
@@ -91,12 +93,14 @@
 	
 	\noindent \textbf{Minibatch Management:} It should be noted that the minibatches are managed by fixed-length queues to deal with different sampling rates for different views, so the pseudocode for Algorithm~\ref{alg:stochappgrad} is not entirely faithful to my implementation. I would like to eventually give more rigorous treatment of this later, possibly using some Markov chain theory.
 	
-	\noindent \textbf{Parameter Updates:} It should be noted that I am not making na\"{i}ve gradient updates. This is overlooked in the pseudocode for clarity and relevance reasons. I am actually applying AdaGrad scaling with optional dual averaging and shrinkage-and-thresholding to the singular values of the parameter matrix and gradient matrix.
+	\noindent \textbf{Parameter Updates:} It should be noted that I am not making na\"{i}ve gradient updates. This is overlooked in the pseudocode for clarity and relevance reasons. I am actually applying AdaGrad scaling with optional dual averaging and shrinkage-and-thresholding to the singular values of the parameter matrix and gradient matrix \citep{duchi2011adaptive}.
 	
 	\subsubsection{Why gradients?} \label{subsubsec:whygradients}
 	Gradient-based updates allow us to easily derive stochastic and mini-batch algorithms and make incremental updates where we have complete control over the scale and influence of the incremental updates. These abilities facilitate a filter-like perspective of CCA and similar problems, and since we can control the scale/influence of each incremental update, we can control the rate of change of each parameter as a function of many quantities, including the update rates of other parameters. We can use tools from online learning and online optimization to approach these problems efficiently and with strong theoretical guarantees.
 	
 	\subsection{GenELinK and CCALin} \label{subsec:genelinkandccalin}
+	
+	Algorithms~\ref{alg:genelink} and~\ref{alg:ccalin} in this section are taken directly from \cite{ge2016efficient}. Algorithms~\ref{alg:genelink-filter} and~\ref{alg:ccalin-filter} are inspired by \cite{ge2016efficient}.
 	
 	\begin{algorithm}
 	\caption{GenELinK} \label{alg:genelink}
@@ -154,7 +158,7 @@
 	\STATE \textbf{Receive} $\mbX^{(t)} \in \mbbR^{n \times d_1}$, $\mbY^{(t)} \in \mbbR^{n \times d_2}$
 	\STATE $\mbS_{xx}^{(t)} \leftarrow \fitp{\mbX^{(t)}}^{\top}\mbX^{(t)}/n$, $\mbS_{yy}^{(t)} \leftarrow \fitp{\mbY^{(t)}}^{\top}\mbY^{(t)}/n$, $\mbS_{xy}^{(t)} \leftarrow \fitp{\mbX^{(t)}}^{\top}\mbY^{(t)}/n$
 	\STATE $\mbA^{(t)} \leftarrow \fitp{\begin{array}{cc}0 & \mbS_{xy}^{(t)} \\ \fitp{\mbS_{xy}^{(t)}}^{\top} & 0 \end{array}}$, $\mbB^{(t)} \leftarrow \fitp{\begin{array}{cc}\mbS_{xx}^{(t)} & 0 \\ 0 & \mbS_{yy}^{(t)} \end{array}}$
-	\STATE $\fitp{\begin{array}{cc} \bar{\mbW}_x \in \mbbR^{d_1 \times k} \\\bar{\mbW}_y \in \mbbR^{d_2 \times k} \end{array}} \leftarrow \tn{GF}\fitp{\mbA^{(t)},\mbB^{(t)}, GS_{\mbB^{(t)}}}$
+	\STATE $\fitp{\begin{array}{cc} \bar{\mbW}_x \in \mbbR^{d_1 \times k} \\\bar{\mbW}_y \in \mbbR^{d_2 \times k} \end{array}} \leftarrow \tn{GF}\fitp{\mbA^{(t)},\mbB^{(t)}, \tn{GS}_{\mbB^{(t)}}}$
 	\STATE $\mbU^{(t)} \leftarrow 2k \times k$ random Gaussian matrix
 	\STATE $\tilde{\mbW}_x^{(t)} \leftarrow \bar{\mbW}_x^{(t)} \mbU^{(t)}$, $\tilde{\mbW}_y^{(t)} \leftarrow \bar{\mbW}_y^{(t)} \mbU^{(t)}$
 	\STATE $\mbW_x^{(t)} \leftarrow \tn{GS}_{\mbS_{xx}^{(t)}}\fitp{\tilde{\mbW}_x^{(t)}}$, $\mbW_y^{(t)} \leftarrow \tn{GS}_{\mbS_{yy}^{(t)}}\fitp{\tilde{\mbW}_y^{(t)}}$
