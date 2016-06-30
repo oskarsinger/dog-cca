@@ -1,1 +1,2 @@
-import genelink
+from batch import BatchGenELinKSolver
+from online import OnlineGenELinKSubroutine
