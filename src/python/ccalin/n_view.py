@@ -1,4 +1,5 @@
 import numpy as np
+import appgrad.utils as agu
 
 from data.servers.gram import BatchGramServer as BGS
 from linal.gep.genelink import GenELinK as GLK
@@ -8,47 +9,63 @@ from linal.utils import multi_dot
 class NViewCCALin:
 
     def __init__(self,
-        k, num_views,
+        k, ds_list,
+        gs_list=None,
+        online=False,
         epsilons=None):
 
-        if epsilons is not None:
-            if not len(epsilons) == num_views:
-                raise ValueError(
-                    'Parameter epsilons should have length num_views.')
-        else:
-            epsilons = [10**(-5)] * num_views
+        if not agu.is_k_valid(ds_list, k):
+            raise ValueError(
+                'The value of k must be less than or equal to the minimum of the' +
+                ' number of columns of X and Y.')
+
+        self.k = k
+        self.ds_list = ds_list
+        self.num_views = len(self.ds_list)
+        
+        if gs_list is None:
+            gs_list = [BCGS() if self.online else BGS()
+                       for i in range(self.num_views)]
+        elif not len(gs_list) == self.num_views:
+            raise ValueError(
+                'Parameter gs_list must have length of ds_list.')
+
+        self.gs_list = gs_list    
+
+        if epsilons is None:
+            epsilons = [10**(-4)] * (self.num_views + 1)
+        elif not len(epsilons) == self.num_views:
+            raise ValueError(
+                'Parameter epsilons must have length of ds_list.')
 
         self.epsilons = epsilons
-        self.k = k
-        self.num_views = num_views
+        self.online = online
 
+        self.num_rounds = 0
         self.has_been_fit = False
         self.Phis = None
 
     def fit(self,
-        ds_list,
-        gs_list=None,
         max_iter=10000,
         reg=0.1,
         verbose=False):
 
-        if gs_list is None:
-            gs_list = [BGS() for i in range(self.num_views)]
-        elif not len(gs_list) == self.num_views:
-            raise ValueError(
-                'Parameter gs_list must be of length num_views.')
-
         # Get data
-        (Xs, Sxs) = ccau.init_data(ds_list, gs_list)
+        (Xs, Sxs) = agu.init_data(ds_list, gs_list)
 
         # Prepare GEP input
         A = self._get_A(Xs)
         B = self._get_B(Sxs)
 
-        # Get GEP solution
-        gep_solution = GLK().fit(
-            A, B, 2*self.k,
+        # Create GEP solver
+        gep_solver = GLK(2*self.k, A, B)
+
+        # Calculate GEP solution
+        gep_solver.fit(
             max_iter=max_iter, verbose=verbose)
+
+        # Get GEP solution from solver
+        gep_solution = gep_solver.get_basis()
 
         # Extract unnormed bases from GEP solution
         pre_Wxs = self._get_pre_Wxs(gep_solution, gs_list)
