@@ -1,2 +1,2 @@
 from batch import BatchGenELinKSolver
-from online import OnlineGenELinKSubroutine
+from sub import GenELinKSubroutine
