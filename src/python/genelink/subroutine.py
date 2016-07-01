@@ -1,5 +1,7 @@
 import numpy as np
 
+import global_utils as gu
+
 from linal.qr import get_q
 from linal.utils import multi_dot, quadratic as quad
 from linal.svd_funcs import get_svd_power
@@ -65,7 +67,8 @@ class GenELinKSubroutine:
             W_i1 = optimizer.get_update(W_i, gradient, eta_i)
 
             # Check for convergence
-            converged = is_converged(W_i, W_i1, self.epsilon, verbose)
+            converged = gu.misc.is_converged(
+                [(W_i, W_i1)], [self.epsilon], verbose)
 
             # Update iteration variables
             W_i = np.copy(W_i1)

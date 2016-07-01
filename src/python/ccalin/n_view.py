@@ -12,6 +12,7 @@ class OnlineNViewCCALin:
 
     def __init__(self,
         k, ds_list,
+        gep_solver=None,
         gs_list=None):
 
         if not agu.is_k_valid(ds_list, k):
@@ -31,37 +32,66 @@ class OnlineNViewCCALin:
 
         self.gs_list = gs_list    
 
+        if gep_solver is None:
+            gep_solver = GLKS(self.k, self.d)
+
+        self.gep_solver = gep_solver
+
         self.num_rounds = 0
         self.has_been_fit = False
         self.Phis = None
 
-        def fit(self, 
-            max_iter=10000, 
-            eta = 0.1,
-            verbose=False):
+    def fit(self, 
+        max_iter=10000, 
+        eta = 0.1,
+        verbose=False):
 
-            subroutine = GLKS(self.k, self.d)
+        # Initialize iteration variables
+        converged = False
+        W_i = None
+        W_i1 = None
 
-            # Initialize iteration variables
-            converged = False
-            i = 0
+        while not converged and self.num_rounds < max_iter:
+            
+            # Get the new data and gram matrices
+            (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
+                self.ds_list, self.gs_list)
 
-            while not converged and i < max_iter:
-                
-                (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
-                    self.ds_list, self.gs_list)
+            # Generate the matrices for the GEP
+            A = ccalinu.get_A(Xs)
+            B = ccalinu.get_B(Sxs)
 
-                A = ccalinu.get_A(Xs)
-                B = ccalinu.get_B(Sxs)
-                W_i = subroutine.get_update(A, B, eta)
+            # Get an update from the GenELinK subroutine
+            if W_i is None:
+                (W_i, gep_converged) = self.gep_solver.get_update(
+                    A, B, eta)
+            else:
+                (W_i1, gep_converged) = self.gep_solver.get_update(
+                    A, B, eta)
 
-                # TODO: Check for convergence here
+                # Check for convergence
+                converged = gu.misc.is_converged(
+                    [(W_i, W_i1)], [self.epsilon], verbose)
+                W_i = np.copy(W_i1)
 
-                i += 1
+            self.num_rounds += 1
 
-            # TODO: Extract Phis from GenELinK subroutine
+        # Extract unnormed bases from GEP solution
+        pre_Wxs = ccalinu.get_pre_Wxs(gep_solution, self.gs_list, self.k)
 
-            self.Phis = "Something"
+        # Normalize bases
+        self.Phis = np.copy(ccalinu.get_normed_Wxs(pre_Wxs, Sxs))
+
+        # Update model state
+        self.has_been_fit = True
+
+    def get_bases(self):
+
+        if not self.has_been_fit:
+            raise Exception(
+                'Has not yet been fit.')
+
+        return [np.copy(Phi) for Phi in self.Phis]
 
 class NViewCCALin:
 
@@ -118,7 +148,7 @@ class NViewCCALin:
         pre_Wxs = ccalinu.get_pre_Wxs(gep_solution, self.gs_list, self.k)
 
         # Normalize bases
-        self.Phis = ccalinu.get_normed_Wxs(pre_Wxs, Sxs)
+        self.Phis = np.copy(ccalinu.get_normed_Wxs(pre_Wxs, Sxs))
 
         # Update model state
         self.has_been_fit = True
