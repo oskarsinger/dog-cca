@@ -3,19 +3,8 @@ import numpy as np
 from numpy.random import choice
 from linal.utils import quadratic as quad
 from linal.svd_funcs import get_svd_power
-from optimization.utils import is_converged as is_conv
 from drrobert.random import normal
 from drrobert.misc import unzip
-
-def is_converged(
-    unn_Phi_pairs,
-    epsilons, 
-    verbose):
-
-    conv_info = zip(unn_Phi_pairs, epsilons)
-
-    return [is_conv(unn_Phi_t, unn_Phi_t1, eps, verbose)
-            for (unn_Phi_t, unn_Phi_t1), eps in conv_info]
 
 def get_gradients(Xs, basis_pairs):
 

@@ -1,5 +1,17 @@
 import numpy as np
 
+from optimization.utils import is_converged as is_conv
+
+def is_converged(
+    unn_Phi_pairs,
+    epsilons, 
+    verbose):
+
+    conv_info = zip(unn_Phi_pairs, epsilons)
+
+    return [is_conv(unn_Phi_t, unn_Phi_t1, eps, verbose)
+            for (unn_Phi_t, unn_Phi_t1), eps in conv_info]
+
 def is_k_valid(ds_list, k):
 
     p = min([ds.cols() for ds in ds_list])

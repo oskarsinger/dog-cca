@@ -1,5 +1,7 @@
 import numpy as np
+
 import utils as agu
+import global_utils as gu
 
 from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
 from optimization.utils import get_gram
@@ -106,7 +108,7 @@ class AppGradCCA:
                     [X, Y], [Phi_t1, Psi_t1])
 
             # Check for convergence
-            converged = agu.is_converged(
+            converged = gu.misc.is_converged(
                 [(unn_Phi_t, unn_Phi_t1), (unn_Psi_t, unn_Psi_t1)],
                 [self.eps1, self.eps2],
                 verbose)
