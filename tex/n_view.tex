@@ -163,6 +163,7 @@
 	\STATE $\tilde{\mbW}_x^{(t)} \leftarrow \bar{\mbW}_x^{(t)} \mbU^{(t)}$, $\tilde{\mbW}_y^{(t)} \leftarrow \bar{\mbW}_y^{(t)} \mbU^{(t)}$
 	\STATE $\mbW_x^{(t)} \leftarrow \tn{GS}_{\mbS_{xx}^{(t)}}\fitp{\tilde{\mbW}_x^{(t)}}$, $\mbW_y^{(t)} \leftarrow \tn{GS}_{\mbS_{yy}^{(t)}}\fitp{\tilde{\mbW}_y^{(t)}}$
 	\STATE \textbf{yield} $\mbW_x^{(t)}$, $\mbW_y^{(t)}$
+	\STATE $t \leftarrow t + 1$
 	\ENDWHILE
 	\end{algorithmic}
 	\end{algorithm}
