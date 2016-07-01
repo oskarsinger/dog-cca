@@ -1,5 +1,7 @@
 import numpy as np
+
 import utils as agu
+import global_utils as gu
 
 from drrobert.misc import unzip
 from optimization.utils import get_gram
@@ -14,7 +16,7 @@ class NViewAppGradCCA:
         online=False,
         epsilons=None):
 
-        if not agu.is_k_valid(ds_list, k):
+        if not gu.misc.is_k_valid(ds_list, k):
             raise ValueError(
                 'The value of k must be less than or equal to the minimum of the' +
                 ' number of columns of X and Y.')
@@ -65,7 +67,7 @@ class NViewAppGradCCA:
 
         print "Getting initial (mini)batches and Gram matrices"
 
-        (Xs, Sxs) = self._init_data()
+        (Xs, Sxs) = gu.data.init_data(self.ds_list, self.gs_list)
 
         print "Getting initial basis estimates"
 
@@ -84,7 +86,7 @@ class NViewAppGradCCA:
 
             if verbose:
                 (unn, normed) = unzip(basis_pairs_t)
-                print "\tObjective:", agu.get_objective(Xs, normed)
+                print "\tObjective:", gu.misc.get_objective(Xs, normed)
 
             # Update step sizes
             etas_i = [eta / self.num_rounds**0.5 for eta in etas]
@@ -98,7 +100,8 @@ class NViewAppGradCCA:
 
             if self.online:
                 # Get new minibatches and Gram matrices
-                (Xs, Sxs) = self._get_batch_and_gram_lists()
+                (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
+                    self.ds_list, self.gs_list)
 
                 self._update_filtering_history(Xs, basis_pairs_t)
                 
@@ -143,36 +146,10 @@ class NViewAppGradCCA:
                        for i in range(self.num_views)]
 
         # Normalize with Gram-parameterized Mahalanobis
-        normed_pairs = [(unn, agu.get_gram_normed(unn, Sx))
+        normed_pairs = [(unn, gu.misc.get_gram_normed(unn, Sx))
                         for unn, Sx in zip(updated_unn, Sxs)]
 
         return normed_pairs
-
-    def _get_batch_and_gram_lists(self):
-
-        batch_list = [ds.get_data()
-                      for ds in self.ds_list]
-        gram_list = [gs.get_gram(batch)
-                     for (gs, batch) in zip(self.gs_list, batch_list)]
-
-        return (batch_list, gram_list)
-
-    def _init_data(self):
-
-        (Xs, Sxs) = self._get_batch_and_gram_lists()
-
-        if not self.online:
-            # Find a better solution to this
-            n = min([X.shape[0] for X in Xs])
-
-            # Remove to-be-truncated examples from Gram matrices
-            removed = [X[n:] if X.ndim == 1 else X[n:,:] for X in Xs]
-            Sxs = [Sx - get_gram(r) for r, Sx in zip(removed, Sxs)]
-
-            # Truncate extra examples
-            Xs = [X[:n] if X.ndim == 1 else X[:n,:] for X in Xs]
-
-        return (Xs, Sxs)
 
     def _update_filtering_history(self, Xs, basis_pairs):
 

@@ -5,19 +5,20 @@ from linal.utils import multi_dot, quadratic as quad
 from linal.svd_funcs import get_svd_power
 from optimization.utils import is_converged
 from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
-from optimization.optimizers import AbstractOptimizer
 
 class GenELinKSubroutine:
 
     def __init__(self,
         k, d,
         epsilon=10**(-3),
+        max_iter=100,
         get_optimizer=None):
 
         # Set the easy ones
         self.k = k
         self.d = d
         self.epsilon = epsilon
+        self.max_iter = max_iter
 
         # Verify and set the optimizer factory
         if get_optimizer is None:
@@ -55,7 +56,7 @@ class GenELinKSubroutine:
         W_i1 = None
         i = 1
 
-        while not converged:
+        while not converged and i <= self.max_iter:
             # Update iteration variable
             eta_i = eta / i**(0.5)
 
@@ -69,10 +70,10 @@ class GenELinKSubroutine:
             # Update iteration variables
             W_i = np.copy(W_i1)
 
-        # Update global state of W
+        # Update global state of W with normalized W_i
         self.W = get_q(W_i, inner_product=inner_product)
 
-        return np.copy(W_i)
+        return np.copy(self.W)
 
     def get_status(self):
 
@@ -80,5 +81,6 @@ class GenELinKSubroutine:
             'k': self.k,
             'd': self.d,
             'W': self.W,
+            'max_iter': self.max_iter,
             'epsilon': self.epsilon,
             'get_optimizer': self.get_optimizer}
