@@ -3,6 +3,7 @@ from experiments.plotting.bases import plot_canonical_bases as pcb
 from experiments.plotting.filtering import plot_grouped_by_view as pgbv
 from experiments.plotting.filtering import plot_grouped_by_component as pgbc
 from drrobert.misc import unzip, get_nums_as_strings as n2s
+from drrobert.random import normal
 
 from random import choice
 
@@ -27,7 +28,7 @@ def ccalin_randomize_or_die_son(hdf5_path, subject, trials=50, verbose=False):
 
         upper = min(seconds+1, 20)
         num_coords = npr.randint(cca_k,upper,6).tolist()
-        eta = np.absolute(npr.randn(1))[0]
+        eta = normal(scale=0.01)[0]
 
         # Run experiment
         try:
