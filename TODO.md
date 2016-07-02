@@ -15,6 +15,9 @@
 
 ##Implementation
 
+###Gram Variations
+* Is it problematic that my cross-Gram matrices are not stateful like the Gram matrices? Maybe I should implement the algorithms to run the stateful updates on the cross Grams too. Should brainstorm with Sijia or John about this at some point.
+
 ###Features
 * Histograms for fixed time intervals. Add a data transformer for this.
 
