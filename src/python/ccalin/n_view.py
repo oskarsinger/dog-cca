@@ -25,7 +25,8 @@ class OnlineNViewCCALin:
         self.k = k
         self.ds_list = ds_list
         self.num_views = len(self.ds_list)
-        self.d = sum([ds.cols() for ds in self.ds_list])
+        dims = [ds.cols() for ds in self.ds_list]
+        self.d = sum(dims)
         self.epsilon = epsilon
         self.verbose = verbose
 
@@ -69,6 +70,9 @@ class OnlineNViewCCALin:
             A = ccalinu.get_A(Xs)
             B = ccalinu.get_B(Sxs)
 
+            # Initialize GEP convergence variable
+            gep_converged = False
+
             # Get an update from the GenELinK subroutine
             if W_i is None:
                 (W_i, gep_converged) = self.gep_solver.get_update(
@@ -77,8 +81,6 @@ class OnlineNViewCCALin:
                 (W_i1, gep_converged) = self.gep_solver.get_update(
                     A, B, eta)
 
-                print W_i, W_i1
-
                 if self.verbose:
                     print 'OnlineNViewCCALin checking for convergence'
 
@@ -86,6 +88,9 @@ class OnlineNViewCCALin:
                 converged = gu.misc.is_converged(
                     [(W_i, W_i1)], [self.epsilon], self.verbose)
                 W_i = np.copy(W_i1)
+
+            if self.verbose:
+                print 'GEP', self.num_rounds, 'converged?:', gep_converged
 
             self.num_rounds += 1
 

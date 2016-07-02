@@ -26,7 +26,7 @@ def appgrad_randomize_or_die_son(hdf5_path, subject, trials=50):
             windows = npr.randint(0,51,6).tolist()
 
         upper = min(seconds+1, 20)
-        num_coords = npr.randint(1,upper,6).tolist()
+        num_coords = npr.randint(cca_k,upper,6).tolist()
         etas = np.absolute(npr.randn(6)).tolist()
 
         # Run experiment

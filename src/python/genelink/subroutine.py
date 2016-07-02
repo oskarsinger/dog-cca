@@ -33,7 +33,7 @@ class GenELinKSubroutine:
 
         # Initialize object-wide state variable for W
         self.W = None
-        self.num_rounds = 0
+        self.num_rounds = []
 
     def get_update(self, A, B, eta):
 
@@ -52,6 +52,9 @@ class GenELinKSubroutine:
         inner_prod = get_mip(B)
 
         if self.W is None:
+            if self.verbose:
+                print 'GenELinKSubroutine Initializing W'
+
             unnormed = np.random.randn(self.d, self.k)
             self.W = get_q(unnormed, inner_prod=inner_prod)
 
@@ -61,14 +64,15 @@ class GenELinKSubroutine:
         W_i = multi_dot([self.W, B_term, A_term])
         W_i1 = None
         converged = [False]
+        i = 0
 
-        while not all(converged) and self.num_rounds < self.max_iter:
+        while not all(converged) and i < self.max_iter:
 
             if self.verbose:
-                print 'GenELinKSubroutine Iteration:', self.num_rounds
+                print 'GenELinKSubroutine Iteration:', i
 
             # Update iteration variable
-            eta_i = eta / (self.num_rounds + 1)**(0.5)
+            eta_i = eta / (i + 1)**(0.5)
 
             # Get new parameter estimate
             gradient = np.dot((0.5*B - A).T, W_i)
@@ -83,7 +87,9 @@ class GenELinKSubroutine:
 
             # Update iteration variables
             W_i = np.copy(W_i1)
-            self.num_rounds += 1
+            i += 1
+
+        self.num_rounds.append(i)
 
         # Update global state of W with normalized W_i
         self.W = get_q(W_i, inner_prod=inner_prod)
