@@ -13,9 +13,10 @@ class OnlineNViewCCALin:
     def __init__(self,
         k, ds_list,
         gep_solver=None,
-        gs_list=None):
+        gs_list=None,
+        epsilon=10**(-4)):
 
-        if not agu.is_k_valid(ds_list, k):
+        if not gu.misc.is_k_valid(ds_list, k):
             raise ValueError(
                 'The value of k must be less than or equal to the minimum of the' +
                 ' number of columns of X and Y.')
@@ -23,6 +24,8 @@ class OnlineNViewCCALin:
         self.k = k
         self.ds_list = ds_list
         self.num_views = len(self.ds_list)
+        self.d = sum([ds.cols() for ds in self.ds_list])
+        self.epsilon = epsilon
 
         if gs_list is None:
             gs_list = [BCGS() for i in range(self.num_views)]
@@ -33,7 +36,7 @@ class OnlineNViewCCALin:
         self.gs_list = gs_list    
 
         if gep_solver is None:
-            gep_solver = GLKS(self.k, self.d)
+            gep_solver = GLKS(2*self.k, self.d)
 
         self.gep_solver = gep_solver
 
@@ -52,6 +55,9 @@ class OnlineNViewCCALin:
         W_i1 = None
 
         while not converged and self.num_rounds < max_iter:
+
+            if verbose:
+                print 'Iteration:', self.num_rounds
             
             # Get the new data and gram matrices
             (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
@@ -69,6 +75,8 @@ class OnlineNViewCCALin:
                 (W_i1, gep_converged) = self.gep_solver.get_update(
                     A, B, eta)
 
+                print W_i, W_i1
+
                 # Check for convergence
                 converged = gu.misc.is_converged(
                     [(W_i, W_i1)], [self.epsilon], verbose)
@@ -77,7 +85,7 @@ class OnlineNViewCCALin:
             self.num_rounds += 1
 
         # Extract unnormed bases from GEP solution
-        pre_Wxs = ccalinu.get_pre_Wxs(gep_solution, self.gs_list, self.k)
+        pre_Wxs = ccalinu.get_pre_Wxs(W_i, self.ds_list, self.k)
 
         # Normalize bases
         self.Phis = np.copy(ccalinu.get_normed_Wxs(pre_Wxs, Sxs))
@@ -92,6 +100,20 @@ class OnlineNViewCCALin:
                 'Has not yet been fit.')
 
         return [np.copy(Phi) for Phi in self.Phis]
+
+    def get_status(self):
+
+        return {
+            'k': self.k,
+            'ds_list': self.ds_list,
+            'gs_list': self.gs_list,
+            'gep_solver': self.gep_solver,
+            'epsilon': self.epsilon,
+            'num_views': self.num_views,
+            'num_rounds': self.num_rounds,
+            'd': self.d,
+            'bases': self.Phis,
+            'has_been_fit': self.has_been_fit}
 
 class NViewCCALin:
 
@@ -145,7 +167,7 @@ class NViewCCALin:
         gep_solution = gep_solver.get_basis()
 
         # Extract unnormed bases from GEP solution
-        pre_Wxs = ccalinu.get_pre_Wxs(gep_solution, self.gs_list, self.k)
+        pre_Wxs = ccalinu.get_pre_Wxs(gep_solution, self.ds_list, self.k)
 
         # Normalize bases
         self.Phis = np.copy(ccalinu.get_normed_Wxs(pre_Wxs, Sxs))

@@ -1,2 +1,2 @@
-from batch import BatchGenELinKSolver
 from subroutine import GenELinKSubroutine
+from batch import BatchGenELinKSolver

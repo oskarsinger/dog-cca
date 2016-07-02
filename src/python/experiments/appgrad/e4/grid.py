@@ -1,4 +1,4 @@
-from experiments.e4.online import run_n_view_online_appgrad_e4_data_experiment as run_nvoaede
+from experiments.appgrad.e4.online import run_n_view_online_appgrad_e4_data_experiment as run_nvoaede
 from experiments.plotting.bases import plot_canonical_bases as pcb
 from experiments.plotting.filtering import plot_grouped_by_view as pgbv
 from experiments.plotting.filtering import plot_grouped_by_component as pgbc

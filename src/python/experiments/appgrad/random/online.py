@@ -4,7 +4,7 @@ from data.loaders.random import GaussianLoader as GL
 from data.servers.minibatch import Batch2Minibatch as B2M
 from drrobert.arithmetic import int_ceil_log as icl
 
-import experiments.appgrad.utils as eau
+from .. import utils as eau
 
 def run_online_appgrad_random_data_experiment(
     p1, p2, k, 
