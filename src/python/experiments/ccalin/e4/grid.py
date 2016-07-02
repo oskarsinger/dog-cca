@@ -11,7 +11,7 @@ import numpy.random as npr
 
 import os
 
-def ccalin_randomize_or_die_son(hdf5_path, subject, trials=50):
+def ccalin_randomize_or_die_son(hdf5_path, subject, trials=50, verbose=False):
 
     for i in range(trials):
         # Prepare parameter choices
@@ -26,18 +26,11 @@ def ccalin_randomize_or_die_son(hdf5_path, subject, trials=50):
             windows = npr.randint(0,51,6).tolist()
 
         upper = min(seconds+1, 20)
-        num_coords = npr.randint(1,upper,6).tolist()
+        num_coords = npr.randint(cca_k,upper,6).tolist()
         eta = np.absolute(npr.randn(1))[0]
 
         # Run experiment
         try:
-            print "Training model"
-            model = run_nvoaede(
-                hdf5_path, cca_k, subject,
-                seconds=seconds, 
-                exps=exps, windows=windows,
-                num_coords=num_coords,
-                eta=eta)
             print "Creating plot path"
             plot_path_base = '/home/oskar/GitRepos/online-cca/plots/ccalin/'
             new_dir = '_'.join([
@@ -52,11 +45,23 @@ def ccalin_randomize_or_die_son(hdf5_path, subject, trials=50):
                 'num_coords',
                 '-'.join(n2s(num_coords)),
                 'eta',
-                eta])
+                str(eta)])
             plot_path = os.path.join(plot_path_base, new_dir)
+            print plot_path
+
+            print "Training model"
+            model = run_nvocede(
+                hdf5_path, cca_k, subject,
+                seconds=seconds, 
+                exps=exps, windows=windows,
+                num_coords=num_coords,
+                eta=eta,
+                verbose=verbose)
+
+            print "Creating plot directory"
+            os.mkdir(plot_path)
 
             print "Generating plots"
-            os.mkdir(plot_path)
             pgbv(model, plot_path=plot_path)
             pgbc(model, plot_path=plot_path)
             pcb(model, plot_path=plot_path)
