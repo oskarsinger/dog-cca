@@ -60,7 +60,7 @@ class NViewAppGradCCA:
             etas = [0.00001] * (self.num_views + 1)
 
         if optimizers is None:
-            optimizers = [MAG() for i in range(self.num_views + 1)]
+            optimizers = [MAG(verbose=verbose) for i in range(self.num_views + 1)]
         elif not len(optimizers) == self.num_views + 1:
             raise ValueError(
                 'Parameter optimizers must be of length num_views+1.')

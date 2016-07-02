@@ -1,6 +1,8 @@
 import numpy as np
 
 from optimization.utils import is_converged as is_conv
+from linal.utils import quadratic as quad
+from linal.svd_funcs import get_svd_power
 
 def is_converged(
     unn_Phi_pairs,

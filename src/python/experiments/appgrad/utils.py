@@ -20,10 +20,10 @@ def run_online_appgrad_experiment(
     Y_optimizer = None
     
     if lower1 is not None:
-        X_optimizer = MAG(lower=lower1)
+        X_optimizer = MAG(lower=lower1, verbose=verbose)
 
     if lower2 is not None:
-        Y_optimizer = MAG(lower=lower2)
+        Y_optimizer = MAG(lower=lower2, verbose=verbose)
 
     model.fit(
         X_server, Y_server, 
@@ -59,9 +59,8 @@ def run_online_n_view_appgrad_experiment(
 
     print "Creating optimizers"
     if (lowers is not None) and (len(lowers) == len(servers)):
-        optims = [MAG(lower=lower)
-                  for lower in lowers] + \
-                 [MAG()]
+        optims = [MAG(lower=lower, verbose=verbose)
+                  for lower in lowers]
 
     print "Fitting model"
     model.fit(

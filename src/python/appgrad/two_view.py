@@ -35,10 +35,10 @@ class AppGradCCA:
         max_iter=10000):
 
         if X_optimizer is None:
-            X_optimizer = MAG()
+            X_optimizer = MAG(verbose=verbose)
 
         if Y_optimizer is None:
-            Y_optimizer = MAG()
+            Y_optimizer = MAG(verbose=verbose)
 
         if X_gs is None:
             X_gs = BCGS() if self.online else BGS()
