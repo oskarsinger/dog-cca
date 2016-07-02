@@ -60,9 +60,9 @@ class GenELinKSubroutine:
         A_term = quad(self.W, A)
         W_i = multi_dot([self.W, B_term, A_term])
         W_i1 = None
-        converged = False
+        converged = [False]
 
-        while not converged and self.num_rounds < self.max_iter:
+        while not all(converged) and self.num_rounds < self.max_iter:
 
             if self.verbose:
                 print 'GenELinKSubroutine Iteration:', self.num_rounds

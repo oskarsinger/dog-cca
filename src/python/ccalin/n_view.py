@@ -52,11 +52,11 @@ class OnlineNViewCCALin:
         eta = 0.1):
 
         # Initialize iteration variables
-        converged = False
         W_i = None
         W_i1 = None
+        converged = [False]
 
-        while not converged and self.num_rounds < max_iter:
+        while not all(converged) and self.num_rounds < max_iter:
 
             if self.verbose:
                 print 'OnlineNViewCCALin Iteration:', self.num_rounds
