@@ -33,6 +33,7 @@ class GenELinKSubroutine:
 
         # Initialize object-wide state variable for W
         self.W = None
+        self.num_rounds = 0
 
     def get_update(self, A, B, eta):
 
@@ -60,15 +61,21 @@ class GenELinKSubroutine:
         W_i = multi_dot([self.W, B_term, A_term])
         W_i1 = None
         converged = False
-        i = 1
 
-        while not converged and i <= self.max_iter:
+        while not converged and self.num_rounds < self.max_iter:
+
+            if self.verbose:
+                print 'GenELinKSubroutine Iteration:', self.num_rounds
+
             # Update iteration variable
-            eta_i = eta / i**(0.5)
+            eta_i = eta / (self.num_rounds + 1)**(0.5)
 
             # Get new parameter estimate
             gradient = np.dot((0.5*B - A).T, W_i)
             W_i1 = optimizer.get_update(W_i, gradient, eta_i)
+
+            if self.verbose:
+                print 'GenELinKSubroutine checking for convergence'
 
             # Check for convergence
             converged = gu.misc.is_converged(
@@ -76,6 +83,7 @@ class GenELinKSubroutine:
 
             # Update iteration variables
             W_i = np.copy(W_i1)
+            self.num_rounds += 1
 
         # Update global state of W with normalized W_i
         self.W = get_q(W_i, inner_prod=inner_prod)
@@ -88,6 +96,7 @@ class GenELinKSubroutine:
             'k': self.k,
             'd': self.d,
             'W': self.W,
+            'num_rounds': self.num_rounds,
             'max_iter': self.max_iter,
             'epsilon': self.epsilon,
             'get_optimizer': self.get_optimizer}
