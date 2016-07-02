@@ -23,12 +23,11 @@ def run_online_n_view_ccalin_experiment(
 
     print "Creating model object"
     model = OnlineNViewCCALin(
-        k, servers, gs_list=gs_list)
+        k, servers, gs_list=gs_list, verbose=verbose)
 
     print "Fitting model"
     model.fit(
         max_iter=max_iter,
-        eta=eta,
-        verbose=verbose)
+        eta=eta)
 
     return model

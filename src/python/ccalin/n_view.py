@@ -14,7 +14,8 @@ class OnlineNViewCCALin:
         k, ds_list,
         gep_solver=None,
         gs_list=None,
-        epsilon=10**(-4)):
+        epsilon=10**(-4),
+        verbose=False):
 
         if not gu.misc.is_k_valid(ds_list, k):
             raise ValueError(
@@ -26,6 +27,7 @@ class OnlineNViewCCALin:
         self.num_views = len(self.ds_list)
         self.d = sum([ds.cols() for ds in self.ds_list])
         self.epsilon = epsilon
+        self.verbose = verbose
 
         if gs_list is None:
             gs_list = [BCGS() for i in range(self.num_views)]
@@ -36,7 +38,8 @@ class OnlineNViewCCALin:
         self.gs_list = gs_list    
 
         if gep_solver is None:
-            gep_solver = GLKS(2*self.k, self.d)
+            gep_solver = GLKS(
+                2*self.k, self.d, verbose=self.verbose)
 
         self.gep_solver = gep_solver
 
@@ -46,8 +49,7 @@ class OnlineNViewCCALin:
 
     def fit(self, 
         max_iter=10000, 
-        eta = 0.1,
-        verbose=False):
+        eta = 0.1):
 
         # Initialize iteration variables
         converged = False
@@ -56,8 +58,8 @@ class OnlineNViewCCALin:
 
         while not converged and self.num_rounds < max_iter:
 
-            if verbose:
-                print 'Iteration:', self.num_rounds
+            if self.verbose:
+                print 'OnlineNViewCCALin Iteration:', self.num_rounds
             
             # Get the new data and gram matrices
             (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
@@ -77,9 +79,12 @@ class OnlineNViewCCALin:
 
                 print W_i, W_i1
 
+                if self.verbose:
+                    print 'OnlineNViewCCALin checking for convergence'
+
                 # Check for convergence
                 converged = gu.misc.is_converged(
-                    [(W_i, W_i1)], [self.epsilon], verbose)
+                    [(W_i, W_i1)], [self.epsilon], self.verbose)
                 W_i = np.copy(W_i1)
 
             self.num_rounds += 1
