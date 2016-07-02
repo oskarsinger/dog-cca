@@ -53,10 +53,13 @@ class GenELinKSubroutine:
 
         if self.W is None:
             if self.verbose:
-                print 'GenELinKSubroutine Initializing W'
+                print 'GenELinKSubroutine initializing W'
 
             unnormed = np.random.randn(self.d, self.k)
             self.W = get_q(unnormed, inner_prod=inner_prod)
+
+        if self.verbose:
+            print 'GenELinKSubroutine computing optimization initialization.'
 
         # Initialize iteration variables
         B_term = get_svd_power(quad(self.W, B), power=-1)
@@ -65,6 +68,9 @@ class GenELinKSubroutine:
         W_i1 = None
         converged = [False]
         i = 0
+
+        if self.verbose:
+            print 'GenELinKSubroutine beginning optimization.'
 
         while not all(converged) and i < self.max_iter:
 

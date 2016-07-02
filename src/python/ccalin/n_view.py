@@ -12,7 +12,7 @@ class OnlineNViewCCALin:
 
     def __init__(self,
         k, ds_list,
-        gep_solver=None,
+        gep_max_iter=1000,
         gs_list=None,
         epsilon=10**(-4),
         verbose=False):
@@ -38,11 +38,11 @@ class OnlineNViewCCALin:
 
         self.gs_list = gs_list    
 
-        if gep_solver is None:
-            gep_solver = GLKS(
-                2*self.k, self.d, verbose=self.verbose)
-
-        self.gep_solver = gep_solver
+        self.gep_solver = GLKS(
+            2*self.k, 
+            self.d, 
+            max_iter=gep_max_iter, 
+            verbose=self.verbose)
 
         self.num_rounds = 0
         self.has_been_fit = False
