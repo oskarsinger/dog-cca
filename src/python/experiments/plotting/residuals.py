@@ -37,7 +37,7 @@ def plot_grouped_by_component(
 
     filename = get_ts(
         'component_grouped_' +
-        '_cca_filtered_data_point_residuals_vs_time_step_observed') + '.html')
+        '_cca_filtered_data_point_residuals_vs_time_step_observed' + '.html')
     filpath = os.path.join(plot_path, filename)
     output_file(
         filepath,

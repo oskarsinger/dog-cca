@@ -1,7 +1,7 @@
 import numpy as np
 
 from data.servers.gram import BatchGramServer as BGS
-from linal.gep.genelink import GenELinK as GLK
+from genelink import BatchGenELinKSolver as GLK
 from linal.qr import get_q
 from linal.utils import multi_dot
 

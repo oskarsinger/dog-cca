@@ -6,9 +6,8 @@ from data.loaders.e4 import IBILoader as IBI
 from data.loaders.readers import from_num as fn
 from data.servers.minibatch import Minibatch2Minibatch as M2M
 from drrobert.arithmetic import int_ceil_log as icl
-from drrobert.misc import multi_zip
+from .. import utils as eau
 
-import experiments.utils as eu
 import h5py
 
 def run_online_appgrad_e4_data_experiment(
@@ -47,7 +46,7 @@ def run_online_appgrad_e4_data_experiment(
     ds1 = M2M(dl1, bs, n_components=pca_k1)
     ds2 = M2M(dl2, bs, n_components=pca_k2)
 
-    return eu.run_online_appgrad_experiment(
+    return eau.run_online_appgrad_experiment(
         ds1, ds2, cca_k,
         exp=exp, 
         lower1=lower1, lower2=lower2,
@@ -77,7 +76,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
            for (dl, pca_k, nc) in zip(dls, pca_ks, num_coords)]
 
     print "Training model"
-    return eu.run_online_n_view_appgrad_experiment(
+    return eau.run_online_n_view_appgrad_experiment(
         dss, cca_k,
         exps=exps, windows=windows,
         lowers=lowers, etas=etas, 

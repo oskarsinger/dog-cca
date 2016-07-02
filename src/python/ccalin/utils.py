@@ -2,6 +2,7 @@ import numpy as np
 
 from linal.qr import get_q
 from linal.utils import multi_dot
+from linal.utils import get_mahalanobis_inner_product as get_mip
 
 def get_A(Xs):
 
@@ -21,7 +22,7 @@ def get_A(Xs):
             j_end = sum(dims[:j+1])
 
             # Create cross-Gram matrix for i-th and j-th views
-            Sxy = np.dot(Xs[i], Xs[j])
+            Sxy = np.dot(Xs[i].T, Xs[j])
 
             # Insert cross-Gram matrix into A matrix
             A[i_start:i_end,j_start:j_end] += Sxy
@@ -49,17 +50,16 @@ def get_B(Sxs):
 def get_normed_Wxs(pre_Wxs, Sxs):
 
     # Make inner products for generalized QR decomposition
-    ips = [lambda x1, x2: multi_dot([x1,Sx,x2])
-           for Sx in Sxs]
+    ips = [get_mip(Sx) for Sx in Sxs]
     
     # Perform generalized QR on each view's basis
-    return [get_q(pre_Wx, inner_product=ip)
+    return [get_q(pre_Wx, inner_prod=ip)
             for (pre_Wx, ip) in zip(pre_Wxs, ips)]
 
-def get_pre_Wxs(gep_solution, gs_list, k):
+def get_pre_Wxs(gep_solution, ds_list, k):
 
     # Set boundaries for extracting view-specific bases
-    col_list = [gs.cols() for gs in gs_list]
+    col_list = [ds.cols() for ds in ds_list]
     ends = [sum(col_list[:i+1])
             for i in range(len(col_list))]
     boundaries = zip([0]+ends[:-1], ends)
