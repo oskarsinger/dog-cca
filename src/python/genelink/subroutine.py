@@ -2,7 +2,6 @@ import numpy as np
 
 import global_utils as gu
 
-from linal.qr import get_q
 from linal.utils import multi_dot, quadratic as quad
 from linal.utils import get_mahalanobis_inner_product as get_mip
 from linal.svd_funcs import get_svd_power
@@ -46,7 +45,7 @@ class GenELinKSubroutine:
                 'All dimensions of both A and B should be equal.')
 
         # Initializing optimizer for this round
-        optimizer = self.get_optimizer()
+        optimizer = self.get_optimizer(verbose=self.verbose)
         
         # Create inner product for Gram-Schmidt orthogonalization
         inner_prod = get_mip(B)
@@ -56,7 +55,7 @@ class GenELinKSubroutine:
                 print 'GenELinKSubroutine initializing W'
 
             unnormed = np.random.randn(self.d, self.k)
-            self.W = get_q(unnormed, inner_prod=inner_prod)
+            self.W = gu.misc.get_gram_normed(unnormed,B)
 
         if self.verbose:
             print 'GenELinKSubroutine computing optimization initialization.'
@@ -98,7 +97,7 @@ class GenELinKSubroutine:
         self.num_rounds.append(i)
 
         # Update global state of W with normalized W_i
-        self.W = get_q(W_i, inner_prod=inner_prod)
+        self.W = gu.misc.get_gram_normed(W_i, B)
 
         return (np.copy(self.W), converged)
 

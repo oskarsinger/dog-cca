@@ -1,8 +1,9 @@
 import numpy as np
 
+import global_utils as gu
+
 from data.servers.gram import BatchGramServer as BGS
 from genelink import BatchGenELinKSolver as GLK
-from linal.qr import get_q
 from linal.utils import multi_dot
 
 class CCALin:
@@ -53,12 +54,8 @@ class CCALin:
         pre_Wy = np.dot(pre_Wy, U)
 
         # Normalize the CCA solution
-        self.Phi = get_q(
-            pre_Wx, 
-            inner_product=lambda x1, x2: multi_dot([x1, Sx, x2]))
-        self.Psi = get_q(
-            pre_Wy, 
-            inner_product=lambda y1, y2: multi_dot([y1, Sy, y2]))
+        self.Phi = gu.misc.get_gram_normed(pre_Wx, Sx)
+        self.Psi = gu.misc.get_gram_normed(pre_Wy, Sy)
 
         # Update model state
         self.has_been_fit = True
