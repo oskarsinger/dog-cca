@@ -12,9 +12,9 @@ class OnlineNViewCCALin:
 
     def __init__(self,
         k, ds_list,
-        gep_max_iter=1000,
+        gep_max_iter=100,
         gs_list=None,
-        epsilon=10**(-4),
+        epsilon=10**(-3),
         verbose=False):
 
         if not gu.misc.is_k_valid(ds_list, k):

@@ -3,7 +3,6 @@ import numpy as np
 import global_utils as gu
 
 from linal.utils import multi_dot, quadratic as quad
-from linal.utils import get_mahalanobis_inner_product as get_mip
 from linal.svd_funcs import get_svd_power
 from optimization.utils import is_converged
 from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
@@ -33,6 +32,7 @@ class GenELinKSubroutine:
         # Initialize object-wide state variable for W
         self.W = None
         self.num_rounds = []
+        self.convergence_history = []
 
     def get_update(self, A, B, eta):
 
@@ -47,9 +47,6 @@ class GenELinKSubroutine:
         # Initializing optimizer for this round
         optimizer = self.get_optimizer(verbose=self.verbose)
         
-        # Create inner product for Gram-Schmidt orthogonalization
-        inner_prod = get_mip(B)
-
         if self.W is None:
             if self.verbose:
                 print 'GenELinKSubroutine initializing W'
@@ -94,6 +91,7 @@ class GenELinKSubroutine:
             W_i = np.copy(W_i1)
             i += 1
 
+        self.convergence_history.append(converged)
         self.num_rounds.append(i)
 
         # Update global state of W with normalized W_i
