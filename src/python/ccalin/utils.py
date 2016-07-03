@@ -1,7 +1,8 @@
 import numpy as np
 
+import global_utils as gu
+
 from linal.utils import multi_dot
-from linal.utils import get_mahalanobis_inner_product as get_mip
 
 def get_A(Xs):
 
@@ -49,7 +50,7 @@ def get_B(Sxs):
 def get_normed_Wxs(pre_Wxs, Sxs):
 
     # Perform generalized QR on each view's basis
-    return [get_gram_normed(pre_Wx, Sx)
+    return [gu.misc.get_gram_normed(pre_Wx, Sx)
             for (pre_Wx, Sx) in zip(pre_Wxs, Sxs)]
 
 def get_pre_Wxs(gep_solution, ds_list, k):
