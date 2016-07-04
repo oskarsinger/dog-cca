@@ -7,7 +7,7 @@ from .. import utils as ecu
 
 import h5py
 
-def run_n_view_online_ccalin_e4_data_experiment(
+def run_online_n_view_ccalin_e4_data_experiment(
     hdf5_path, cca_k, subject,
     seconds=10, 
     max_iter=10000,

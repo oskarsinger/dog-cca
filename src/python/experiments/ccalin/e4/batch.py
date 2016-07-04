@@ -7,14 +7,14 @@ from .. import utils as ecu
 
 import h5py
 
-def run_n_view_ccalin_e4_data_experiment(
+def run_batch_n_view_ccalin_e4_data_experiment(
     hdf5_path, cca_k, subject,
     seconds=10, 
-    max_iter=10000,
+    gep_max_iter=100,
     eta=0.1,
     exps=None, windows=None,
     num_coords=[None]*6,
-    gep_max_iter=100,
+    subroutine_max_iter=1000,
     verbose=False):
 
     mag = fn.get_row_magnitude
@@ -34,8 +34,8 @@ def run_n_view_ccalin_e4_data_experiment(
     print "Training model"
     return ecu.run_batch_n_view_ccalin_experiment(
         dss, cca_k,
-        max_iter=max_iter,
-        eta=eta, 
         gep_max_iter=gep_max_iter,
+        eta=eta, 
+        subroutine_max_iter=subroutine_max_iter,
         verbose=verbose)
 

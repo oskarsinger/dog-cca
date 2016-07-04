@@ -61,7 +61,7 @@ def get_pre_Wxs(gep_solution, ds_list, k):
             for i in range(len(col_list))]
     boundaries = zip([0]+ends[:-1], ends)
 
-    # Create random projection
+    # Create random projection matrix
     U = np.random.randn(2*k, k)
 
     # Extract and project basis for each view

@@ -11,11 +11,11 @@ def get_batch_and_gram_lists(ds_list, gs_list):
 
     return (batch_list, gram_list)
 
-def init_data(ds_list, gs_list):
+def init_data(ds_list, gs_list, online=False):
 
     (Xs, Sxs) = get_batch_and_gram_lists(ds_list, gs_list)
 
-    if not self.online:
+    if not online:
         # Find a better solution to this
         n = min([X.shape[0] for X in Xs])
 
