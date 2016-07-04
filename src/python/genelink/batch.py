@@ -42,9 +42,10 @@ class BatchGenELinKSolver:
                 max_iter=subroutine_max_iter,
                 verbose=self.verbose)
 
-
         # Initialize object-wide state variable for W
         self.W = None
+
+        self.has_been_fit = False
 
     def fit(self, eta=0.1):
 
@@ -57,10 +58,10 @@ class BatchGenELinKSolver:
         while not converged and t < self.max_iter:
 
             if W_t is None:
-                W_t = self.subroutine.get_update(
+                (W_t, sub_converged) = self.subroutine.get_update(
                     self.A, self.B, eta)
             else:
-                W_t1 = self.subroutine.get_update(
+                (W_t1, sub_converged) = self.subroutine.get_update(
                     self.A, self.B, eta)
 
                 # Check for convergence
@@ -74,6 +75,8 @@ class BatchGenELinKSolver:
             t += 1
 
         self.W = np.copy(W_t)
+
+        self.has_been_fit = True
 
     def get_basis(self):
 

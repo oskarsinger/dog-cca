@@ -50,8 +50,7 @@ class OnlineNViewCCALin:
         self.has_been_fit = False
         self.Phis = None
 
-    def fit(self, 
-        eta = 0.1):
+    def fit(self, eta = 0.1):
 
         # Initialize iteration variables
         W_i = None
@@ -99,7 +98,7 @@ class OnlineNViewCCALin:
         pre_Wxs = ccalinu.get_pre_Wxs(W_i, self.ds_list, self.k)
 
         # Normalize bases
-        self.Phis = np.copy(ccalinu.get_normed_Wxs(pre_Wxs, Sxs))
+        self.Phis = np.copy(ccalinu.get_normed_Wxs(pre_Wxs, self.Sxs))
 
         # Update model state
         self.has_been_fit = True
@@ -131,11 +130,11 @@ class NViewCCALin:
     def __init__(self,
         k, ds_list,
         gs_list=None,
-        gep_max_iter=1000,
-        subroutine_max_iter=100,
+        gep_max_iter=100,
+        subroutine_max_iter=1000,
         verbose=False):
 
-        if not gu.is_k_valid(ds_list, k):
+        if not gu.misc.is_k_valid(ds_list, k):
             raise ValueError(
                 'The value of k must be less than or equal to the minimum of the' +
                 ' number of columns of X and Y.')
@@ -144,20 +143,31 @@ class NViewCCALin:
         self.ds_list = ds_list
         self.num_views = len(self.ds_list)
         self.verbose = verbose
-        self.gep_solver = GLK(
-            2*self.k, A, B, 
-            verbose=verbose, 
-            max_iter=gep_max_iter,
-            subroutine_max_iter=subroutine_max_iter)
 
+        
         if gs_list is None:
-            gs_list = [BCGS() if self.online else BGS()
-                       for i in range(self.num_views)]
+            gs_list = [BGS() for i in range(self.num_views)]
         elif not len(gs_list) == self.num_views:
             raise ValueError(
                 'Parameter gs_list must have length of ds_list.')
 
         self.gs_list = gs_list    
+
+        print 'Getting data.'
+        # Get data
+        (self.Xs, self.Sxs) = gu.data.init_data(self.ds_list, self.gs_list)
+
+        print 'Preparing GEP input.'
+        # Prepare GEP input
+        A = ccalinu.get_A(self.Xs)
+        B = ccalinu.get_B(self.Sxs)
+
+        print 'Creating GEP solver object.'
+        self.gep_solver = BGLKS(
+            2*self.k, A, B, 
+            verbose=self.verbose, 
+            max_iter=gep_max_iter,
+            subroutine_max_iter=subroutine_max_iter)
 
         self.num_rounds = 0
         self.has_been_fit = False
@@ -165,13 +175,7 @@ class NViewCCALin:
 
     def fit(self, eta=0.1):
 
-        # Get data
-        (Xs, Sxs) = gu.data.init_data(ds_list, gs_list)
-
-        # Prepare GEP input
-        A = ccalinu.get_A(Xs)
-        B = ccalinu.get_B(Sxs)
-
+        print 'Solving GEP.'
         # Calculate GEP solution
         self.gep_solver.fit(
             eta=eta)
@@ -179,11 +183,13 @@ class NViewCCALin:
         # Get GEP solution from solver
         gep_solution = self.gep_solver.get_basis()
 
+        print 'Extracting canonical bases from GEP solution.'
         # Extract unnormed bases from GEP solution
         pre_Wxs = ccalinu.get_pre_Wxs(gep_solution, self.ds_list, self.k)
 
+        print 'Normalizing canonical bases.'
         # Normalize bases
-        self.Phis = ccalinu.get_normed_Wxs(pre_Wxs, Sxs)
+        self.Phis = ccalinu.get_normed_Wxs(pre_Wxs, self.Sxs)
 
         # Update model state
         self.has_been_fit = True

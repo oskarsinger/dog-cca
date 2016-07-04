@@ -1,5 +1,6 @@
 from ccalin import OnlineNViewCCALin, NViewCCALin
-from data.servers.gram import BatchGramServer as BGS
+from data.servers.gram import BoxcarGramServer as BGS
+from data.servers.gram import ExpGramServer as EGS
 
 def run_online_n_view_ccalin_experiment(
     servers, k, 
@@ -11,7 +12,7 @@ def run_online_n_view_ccalin_experiment(
 
     gs_list = None
 
-    print "Creating gram servers"
+    print 'Creating gram servers'
     if (exps is not None) and (windows is not None):
         raise ValueError(
             'Only one of exp and window can be set to non-None values.')
@@ -36,17 +37,14 @@ def run_online_n_view_ccalin_experiment(
 
 def run_batch_n_view_ccalin_experiment(
     servers, k,
-    gep_max_iter=1000,
-    subroutine_max_iter=100,
+    gep_max_iter=100,
+    subroutine_max_iter=1000,
     eta=0.1,
     verbose=True):
-
-    gs_list = [BGS() for i in range(len(servers))]
 
     print 'Creating model object'
     model = NViewCCALin(
         k, servers,
-        gs_list=gs_list,
         gep_max_iter=gep_max_iter,
         subroutine_max_iter=subroutine_max_iter,
         verbose=verbose)
