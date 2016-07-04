@@ -12,6 +12,7 @@ class OnlineNViewCCALin:
 
     def __init__(self,
         k, ds_list,
+        max_iter=10000, 
         gep_max_iter=100,
         gs_list=None,
         epsilon=10**(-3),
@@ -28,6 +29,7 @@ class OnlineNViewCCALin:
         dims = [ds.cols() for ds in self.ds_list]
         self.d = sum(dims)
         self.epsilon = epsilon
+        self.max_iter = max_iter
         self.verbose = verbose
 
         if gs_list is None:
@@ -49,7 +51,6 @@ class OnlineNViewCCALin:
         self.Phis = None
 
     def fit(self, 
-        max_iter=10000, 
         eta = 0.1):
 
         # Initialize iteration variables
@@ -57,7 +58,7 @@ class OnlineNViewCCALin:
         W_i1 = None
         converged = [False]
 
-        while not all(converged) and self.num_rounds < max_iter:
+        while not all(converged) and self.num_rounds < self.max_iter:
 
             if self.verbose:
                 print 'OnlineNViewCCALin Iteration:', self.num_rounds
@@ -130,7 +131,9 @@ class NViewCCALin:
     def __init__(self,
         k, ds_list,
         gs_list=None,
-        online=False):
+        gep_max_iter=1000,
+        subroutine_max_iter=100,
+        verbose=False):
 
         if not gu.is_k_valid(ds_list, k):
             raise ValueError(
@@ -140,7 +143,13 @@ class NViewCCALin:
         self.k = k
         self.ds_list = ds_list
         self.num_views = len(self.ds_list)
-        
+        self.verbose = verbose
+        self.gep_solver = GLK(
+            2*self.k, A, B, 
+            verbose=verbose, 
+            max_iter=gep_max_iter,
+            subroutine_max_iter=subroutine_max_iter)
+
         if gs_list is None:
             gs_list = [BCGS() if self.online else BGS()
                        for i in range(self.num_views)]
@@ -149,15 +158,12 @@ class NViewCCALin:
                 'Parameter gs_list must have length of ds_list.')
 
         self.gs_list = gs_list    
-        self.online = online
 
         self.num_rounds = 0
         self.has_been_fit = False
         self.Phis = None
 
-    def fit(self,
-        max_iter=10000,
-        verbose=False):
+    def fit(self, eta=0.1):
 
         # Get data
         (Xs, Sxs) = gu.data.init_data(ds_list, gs_list)
@@ -166,21 +172,18 @@ class NViewCCALin:
         A = ccalinu.get_A(Xs)
         B = ccalinu.get_B(Sxs)
 
-        # Create GEP solver
-        gep_solver = GLK(2*self.k, A, B)
-
         # Calculate GEP solution
-        gep_solver.fit(
-            max_iter=max_iter, verbose=verbose)
+        self.gep_solver.fit(
+            eta=eta)
 
         # Get GEP solution from solver
-        gep_solution = gep_solver.get_basis()
+        gep_solution = self.gep_solver.get_basis()
 
         # Extract unnormed bases from GEP solution
         pre_Wxs = ccalinu.get_pre_Wxs(gep_solution, self.ds_list, self.k)
 
         # Normalize bases
-        self.Phis = np.copy(ccalinu.get_normed_Wxs(pre_Wxs, Sxs))
+        self.Phis = ccalinu.get_normed_Wxs(pre_Wxs, Sxs)
 
         # Update model state
         self.has_been_fit = True
@@ -192,3 +195,17 @@ class NViewCCALin:
                 'Has not yet been fit.')
 
         return [np.copy(Phi) for Phi in self.Phis]
+
+    def get_status(self):
+
+        return {
+            'k': self.k,
+            'ds_list': self.ds_list,
+            'gs_list': self.gs_list,
+            'gep_solver': self.gep_solver,
+            'num_rounds': 1,
+            'epsilon': self.epsilon,
+            'num_views': self.num_views,
+            'd': self.d,
+            'bases': self.Phis,
+            'has_been_fit': self.has_been_fit}
