@@ -1,10 +1,10 @@
-from ccalin import OnlineNViewCCALin
-from data.servers.gram import ExpGramServer as EGS
-from data.servers.gram import BoxcarGramServer as BGS
+from ccalin import OnlineNViewCCALin, NViewCCALin
+from data.servers.gram import BatchGramServer as BGS
 
 def run_online_n_view_ccalin_experiment(
     servers, k, 
     max_iter=10000,
+    gep_max_iter=100,
     eta=0.1,
     exps=None, windows=None,
     verbose=True):
@@ -20,13 +20,38 @@ def run_online_n_view_ccalin_experiment(
     elif windows is not None:
         gs_list = [BGS(window=w) for w in windows]
 
-    print "Creating model object"
+    print 'Creating model object'
     model = OnlineNViewCCALin(
-        k, servers, gs_list=gs_list, verbose=verbose)
-
-    print "Fitting model"
-    model.fit(
+        k, servers, 
+        gs_list=gs_list, 
         max_iter=max_iter,
+        gep_max_iter=gep_max_iter,
+        verbose=verbose)
+
+    print 'Fitting model'
+    model.fit(
         eta=eta)
+
+    return model
+
+def run_batch_n_view_ccalin_experiment(
+    servers, k,
+    gep_max_iter=1000,
+    subroutine_max_iter=100,
+    eta=0.1,
+    verbose=True):
+
+    gs_list = [BGS() for i in range(len(servers))]
+
+    print 'Creating model object'
+    model = NViewCCALin(
+        k, servers,
+        gs_list=gs_list,
+        gep_max_iter=gep_max_iter,
+        subroutine_max_iter=subroutine_max_iter,
+        verbose=verbose)
+
+    print 'Fitting model'
+    model.fit(eta=eta)
 
     return model

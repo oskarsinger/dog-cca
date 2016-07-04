@@ -10,12 +10,17 @@ class BatchGenELinKSolver:
     def __init__(self, 
         k, A, B,
         epsilon=10**(-5),
-        get_optimizer=None):
+        get_optimizer=None,
+        max_iter=1000,
+        subroutine_max_iter=100,
+        verbose=False):
 
         # Set the easy ones
         self.k = k
         self.epsilon = epsilon
         self.get_optimizer = get_optimizer
+        self.max_iter = max_iter
+        self.verbose = verbose
 
         # Check that dimensions of A and B are valid
         (nA, pA) = A.shape
@@ -30,18 +35,18 @@ class BatchGenELinKSolver:
         self.B = B
         self.d = ds[0]
 
+        # Initialize GenELinK subroutine
+        self.subroutine = GenELinKSubroutine(
+                self.k, self.d, 
+                get_optimizer=get_optimizer,
+                max_iter=subroutine_max_iter,
+                verbose=self.verbose)
+
+
         # Initialize object-wide state variable for W
         self.W = None
 
-    def fit(self, 
-        eta=0.1,
-        max_iter=1000, 
-        verbose=False):
-
-        # Initialize GenELinK subroutine
-        subroutine = GenELinKSubroutine(
-                self.k, self.d, 
-                get_optimizer=get_optimizer)
+    def fit(self, eta=0.1):
 
         # Initialize iteration variables
         converged = False
@@ -49,16 +54,18 @@ class BatchGenELinKSolver:
         W_t1 = None
         t = 0
 
-        while not converged and t < max_iter:
+        while not converged and t < self.max_iter:
 
             if W_t is None:
-                W_t = subroutine.get_update(self.A, self.B, eta)
+                W_t = self.subroutine.get_update(
+                    self.A, self.B, eta)
             else:
-                W_t1 = subroutine.get_update(self.A, self.B, eta)
+                W_t1 = self.subroutine.get_update(
+                    self.A, self.B, eta)
 
                 # Check for convergence
                 converged = is_converged(
-                    W_t, W_t1, self.epsilon, verbose)
+                    W_t, W_t1, self.epsilon, self.verbose)
 
                 # Update W_t
                 W_t = np.copy(W_t1)
