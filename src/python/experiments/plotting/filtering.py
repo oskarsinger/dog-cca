@@ -1,6 +1,7 @@
 import os
-
 import numpy as np
+
+import global_utils as gu
 
 from lazyprojector import plot_lines
 from drrobert.file_io import get_timestamped as get_ts
@@ -26,7 +27,7 @@ def plot_grouped_by_component(
     k = model_info['k']
     seconds = model_info['ds_list'][0].dl.get_status()['seconds']
     num_rounds = model_info['num_rounds']
-    X_axis = seconds * np.arange(num_rounds)
+    X_axis = seconds * np.arange(filtered_Xs[0].shape[0])
     component_plots = []
     X_label = 'Time Step Observed'
     Y_label = 'Filtered Data Point for Component '
@@ -65,6 +66,7 @@ def plot_grouped_by_view(
     model_info = model.get_status()
     filtered_Xs = None
 
+    print 'Getting filtered data'
     if historical:
         filtered_Xs = model_info['filtering_history']
     else:
@@ -79,7 +81,7 @@ def plot_grouped_by_view(
 
     for (i, X) in enumerate(filtered_Xs):
         X_map = {'Filtered X dimension ' + str(j) : 
-                 (seconds * np.arange(num_rounds), X[:,j])
+                 (seconds * np.arange(filtered_Xs[0].shape[0]), X[:,j])
                  for j in xrange(k)}
         X_plots.append(plot_lines(
             X_map,
@@ -99,6 +101,8 @@ def plot_grouped_by_view(
     output_file(
         filepath, 
         'view-grouped CCA-filtered data points vs time step observed')
+
+    print 'Displaying plots'
     show(vplot(*X_plots))
 
 def _get_refiltered_Xs(model_info):
@@ -113,16 +117,22 @@ def _get_refiltered_Xs(model_info):
         for ds in dss:
             ds.refresh()
     
-    for i in range(num_rounds):
-        Xs = [ds.get_data() for ds in dss]
+        for i in range(num_rounds):
+            Xs = [ds.get_data() for ds in dss]
 
-        if filtered_Xs is None:
-            filtered_Xs = [np.dot(X[-1,:], Phi)
-                           for (X, Phi) in zip(Xs, Phis)]
-        else:
-            for j in xrange(num_views):
-                current = filtered_Xs[j]
-                new = np.dot(Xs[j][-1,:], Phis[j])
-                filtered_Xs[j] = np.vstack([current, new])
+            if filtered_Xs is None:
+                filtered_Xs = [np.dot(X[-1,:], Phi)
+                               for (X, Phi) in zip(Xs, Phis)]
+            else:
+                for j in xrange(num_views):
+                    current = filtered_Xs[j]
+                    new = np.dot(Xs[j][-1,:], Phis[j])
+                    filtered_Xs[j] = np.vstack([current, new])
+
+    else:
+        gss = model_info['gs_list']
+        Xs = gu.data.init_data(dss, gss)[0]
+        filtered_Xs = [np.dot(X, Phi) 
+                       for (X, Phi) in zip(Xs, Phis)]
 
     return [np.copy(fX) for fX in filtered_Xs]
