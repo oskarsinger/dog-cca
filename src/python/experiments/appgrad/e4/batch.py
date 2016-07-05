@@ -5,6 +5,7 @@ from data.loaders.e4 import IBILoader as IBI
 from data.loaders.readers import from_num as fn
 from data.servers.batch import BatchServer as BS
 from linal.utils import quadratic as quad
+from ... import utils as eu
 
 import numpy as np
 
@@ -47,19 +48,10 @@ def test_two_fixed_rate_scalar(
         ds1, ds2, cca_k)
 
 def test_n_fixed_rate_scalar(
-    hdf5_path, cca_k,
+    hdf5_path, subject, cca_k,
     seconds=10):
 
-    mag = fn.get_row_magnitude
-    vec = fn.get_fields_as_columns
-    sca = fn.get_array_as_is
-    dls = [
-        FRL(hdf5_path, subject, 'ACC', seconds, mag),
-        IBI(hdf5_path, subject, 'IBI', seconds, vec),
-        FRL(hdf5_path, subject, 'BVP', seconds, sca),
-        FRL(hdf5_path, subject, 'TEMP', seconds, sca),
-        FRL(hdf5_path, subject, 'HR', seconds, sca),
-        FRL(hdf5_path, subject, 'EDA', seconds, sca)]
+    dls = eu.get_e4_loaders(hdf5_path, subject, seconds, False)
     dss = [BS(dl) for dl in dls]
 
     return test_batch_n_view_appgrad(

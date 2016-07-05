@@ -37,12 +37,7 @@ def get_objective(Xs, Phis):
 
 def get_gram_normed(unnormed, S):
 
-    if (S == 0).all():
-        raise Exception('This should never be zero.')
-
     basis_quad = quad(unnormed, S)
-    # print "Basis Quad", str((basis_quad == 0).all())
     normalizer = get_svd_power(basis_quad, -0.5)
-    # print "Normalizer", str((normalizer == 0).all())
 
     return np.dot(unnormed, normalizer)

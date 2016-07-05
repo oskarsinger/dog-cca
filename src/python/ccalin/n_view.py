@@ -98,7 +98,8 @@ class OnlineNViewCCALin:
         pre_Wxs = ccalinu.get_pre_Wxs(W_i, self.ds_list, self.k)
 
         # Normalize bases
-        self.Phis = np.copy(ccalinu.get_normed_Wxs(pre_Wxs, self.Sxs))
+        self.Phis = [gu.misc.get_gram_normed(pre_Wx, Sx)
+                     for (pre_Wx, Sx) in zip(pre_Wxs, Sxs)]
 
         # Update model state
         self.has_been_fit = True
@@ -130,6 +131,7 @@ class NViewCCALin:
     def __init__(self,
         k, ds_list,
         gs_list=None,
+        epsilon=10**(-3),
         gep_max_iter=100,
         subroutine_max_iter=1000,
         verbose=False):
@@ -143,7 +145,9 @@ class NViewCCALin:
         self.ds_list = ds_list
         self.num_views = len(self.ds_list)
         self.verbose = verbose
-
+        self.epsilon = epsilon
+        dims = [ds.cols() for ds in self.ds_list]
+        self.d = sum(dims)
         
         if gs_list is None:
             gs_list = [BGS() for i in range(self.num_views)]
@@ -189,7 +193,8 @@ class NViewCCALin:
 
         print 'Normalizing canonical bases.'
         # Normalize bases
-        self.Phis = ccalinu.get_normed_Wxs(pre_Wxs, self.Sxs)
+        self.Phis = [gu.misc.get_gram_normed(pre_Wx, Sx)
+                     for (pre_Wx, Sx) in zip(pre_Wxs, self.Sxs)]
 
         # Update model state
         self.has_been_fit = True
