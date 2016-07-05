@@ -109,8 +109,9 @@ def _get_refiltered_Xs(model_info):
     Phis = model_info['bases']
     filtered_Xs = None
 
-    for ds in dss:
-        ds.refresh()
+    if num_rounds > 1:
+        for ds in dss:
+            ds.refresh()
     
     for i in range(num_rounds):
         Xs = [ds.get_data() for ds in dss]

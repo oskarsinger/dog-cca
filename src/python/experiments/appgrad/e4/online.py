@@ -1,55 +1,12 @@
 from appgrad import AppGradCCA as AGCCA
 from appgrad import NViewAppGradCCA as NVAGCCA
 
-from data.loaders.e4 import FixedRateLoader as FRL
-from data.loaders.e4 import IBILoader as IBI
-from data.loaders.readers import from_num as fn
 from data.servers.minibatch import Minibatch2Minibatch as M2M
 from drrobert.arithmetic import int_ceil_log as icl
 from .. import utils as eau
+from ... import utils as eu
 
 import h5py
-
-def run_online_appgrad_e4_data_experiment(
-    hdf5_path, cca_k, subject, 
-    sensor1, sensor2, 
-    seconds=10,
-    reader1=fn.get_fields_as_columns,
-    reader2=fn.get_fields_as_columns,
-    exp=False, verbose=False,
-    etas=None, lower1=None, lower2=None):
-
-    bs = cca_k + icl(cca_k)
-    dl1 = None 
-    
-    if 'IBI' in file1:
-        dl1 = IBI(
-            hdf5_path, subject, sensor1, seconds, reader1, 
-            online=True)
-    else:
-        dl1 = FRL(
-            hdf5_path, subject, sensor1, seconds, reader1, 
-            online=True)
-
-    dl2 = None 
-    
-    if 'IBI' in file1:
-        dl2 = IBI(
-            hdf5_path, subject, sensor2, seconds, reader2, 
-            online=True)
-    else:
-        dl2 = FRL(
-            hdf5_path, subject, sensor2, seconds, reader2, 
-            online=True)
-
-    ds1 = M2M(dl1, bs)
-    ds2 = M2M(dl2, bs)
-
-    return eau.run_online_appgrad_experiment(
-        ds1, ds2, cca_k,
-        exp=exp, 
-        lower1=lower1, lower2=lower2,
-        verbose=verbose, etas=etas)
 
 def run_n_view_online_appgrad_e4_data_experiment(
     hdf5_path, cca_k, subject,
@@ -60,16 +17,8 @@ def run_n_view_online_appgrad_e4_data_experiment(
     etas=None, lowers=None):
 
     bs = cca_k + icl(cca_k)
-    mag = fn.get_row_magnitude
-    fac = fn.get_fields_as_columns
     print "Creating data loaders"
-    dls = [
-        FRL(hdf5_path, subject, 'ACC', seconds, mag, online=True),
-        IBI(hdf5_path, subject, 'IBI', seconds, fac, online=True),
-        FRL(hdf5_path, subject, 'BVP', seconds, fac, online=True),
-        FRL(hdf5_path, subject, 'TEMP', seconds, fac, online=True),
-        FRL(hdf5_path, subject, 'HR', seconds, fac, online=True),
-        FRL(hdf5_path, subject, 'EDA', seconds, fac, online=True)]
+    dls = eu.get_e4_loaders(hdf5_path, subject, seconds, True)
     print "Creating data servers"
     dss = [M2M(dl, bs, num_coords=nc)
            for (dl, nc) in zip(dls, num_coords)]

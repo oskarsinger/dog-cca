@@ -47,12 +47,6 @@ def get_B(Sxs):
 
     return np.copy(B)
 
-def get_normed_Wxs(pre_Wxs, Sxs):
-
-    # Perform generalized QR on each view's basis
-    return [gu.misc.get_gram_normed(pre_Wx, Sx)
-            for (pre_Wx, Sx) in zip(pre_Wxs, Sxs)]
-
 def get_pre_Wxs(gep_solution, ds_list, k):
 
     # Set boundaries for extracting view-specific bases
