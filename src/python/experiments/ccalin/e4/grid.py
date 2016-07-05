@@ -108,9 +108,11 @@ def batch_ccalin_randomize_or_die_son(hdf5_path, subject, trials=50, verbose=Fal
             print 'Creating plot directory'
             os.mkdir(plot_path)
 
-            print 'Generating plots'
+            print 'Generating filter grouped by view plots'
             pgbv(model, plot_path=plot_path)
+            print 'Generating filter grouped by component plots'
             pgbc(model, plot_path=plot_path)
+            print 'Generating bases heat map plots'
             pcb(model, plot_path=plot_path)
         except Exception as e:
             print e 
