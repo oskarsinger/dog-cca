@@ -22,4 +22,9 @@ Ma, Z., Lu, Y., and Foster, D. (2015).
   correlation analysis.
 \newblock {\em arXiv preprint arXiv:1506.08170}.
 
+\bibitem[Parikh et~al., 2014]{parikh2014proximal}
+Parikh, N., Boyd, S.~P., et~al. (2014).
+\newblock Proximal algorithms.
+\newblock {\em Foundations and Trends in optimization}, 1(3):127--239.
+
 \end{thebibliography}
