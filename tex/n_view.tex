@@ -14,12 +14,22 @@
 \begin{document}
 
 \section{Intro} \label{sec:intro}
-\section{Optimization Problems} \label{sec:model}
 
-	\subsection{Objective Functions} \label{subsec:objective}
-	I would like to develop rigorous probabilistic models for each of these objective functions below. The place to start is probably \cite{bach2005probabilistic}.
+\subsection{Notation} \label{subsec:notation}
+
+In the following notes, $\mbX_i \in \mbbR^{n \times p_i}$ will refer to the observation matrix for the $i$-th 'view' of some assumed underlying phenomenon, where $n$ is the number of observations and $p_i$ is the ambient dimension of the $i$-th view. $\mbPhi_i \in \mbbR^{p_i \times k}$ will refer to some linear transform of $\mbX_i$ into a $k$-dimensional space. The $k \times k$ identity matrix is denoted $\mbI_k$.
+
+\subsection{Canonical Correlation Analysis} \label{subsec:cca}
+
+\subsection{Generalized Eigenvalue Problems} \label{subsec:gep}
+
+\section{Optimization} \label{sec:optimization}
+
+	\subsection{Optimization Problem Formulation} \label{subsec:problemformulation}
 	
 	\subsubsection{Classical Two-View CCA} \label{subsubsec:classicalcca}
+	
+	This problem formulation is limited to two views, and it does not take advantage of the full power of the corresponding generalized eigenvalue problem formulation.
 	
 	\begin{align*}
 		\tnb{minimize}&\ \ \norm{\mbX_1 \mbPhi_1 - \mbX_2 \mbPhi_2}_F^2\\
@@ -31,6 +41,8 @@
 	
 	\subsubsection{Complete Multiview Graph} \label{subsubsec:cgraph}
 	
+	This problem formulation is capable of considering an arbitrary, finite number of views of the data, and it assumes the existence of non-spurious correlation between each pair of views.
+	
 	\begin{align*}
 		\tnb{minimize}&\ \ \sum_{i=1}^m \sum_{j=i+1}^m \norm{\mbX_i \mbPhi_i - \mbX_j \mbPhi_j}_F^2\\
 		\tnb{subject to}&\ \  \mbPhi_i^{\top}\mbX_i^{\top}\mbX_i\mbPhi_i = \mbI_k\ \ i=1,\ldots,m \tn{,}
@@ -38,7 +50,9 @@
 	
 	\noindent where $\mbPhi_i$ are the optimization variables.
 	
-	\subsubsection{(Mean Field Variational?) Approximation of Complete Graph} \label{subsubsec:approxfcgraph}
+	\subsubsection{Approximation of Complete Graph} \label{subsubsec:approxfcgraph}
+	
+	This problem formulation simplifies the model in section~\ref{subsubsec:cgraph} by replacing the exhaustive pairwise comparisons with $m$ comparisons to a global auxiliary variable. The idea is that the different views are related to each other via $\mbPsi$ without having to enumerate $O\fitp{m}$ penalties. However, doesn't provide much benefit in terms of the cost of computing the gradient for each $\mbPhi_i$. Also, it is not obvious to me how to reformulate this as a GEP. I am not even sure that its possible. On the other hand, $\mbPsi$ may have a meaningful and interesting interpretation as a summarizer.
 	
 	\begin{align*}
 		\tnb{minimize}&\ \ \sum_{i=1}^m \norm{\mbX_i \mbPhi_i - \mbPsi}_F^2\\
@@ -49,12 +63,14 @@
 
 	\subsubsection{Arbitrary Dependency Graph} \label{subsubsec:arbdepgraph}
 	
+	This optimization problem is a good fit for a scenario in which the user has prior knowledge of which views should be correlated with each other. If this prior knowledge is close enough to correct, then using this formulation may reduce the risk of noise-dominated updates from high distances between uncorrelated views as well as discovery of spurious correlations.
+	
 	\begin{align*}
 		\tnb{minimize}&\ \ \sum_{(i,j) \in E}\norm{\mbX_i \mbPhi_i - \mbX_j \mbPhi_j}_F^2\\
 		\tnb{subject to}&\ \  \mbPhi_i^{\top}\mbX_i^{\top}\mbX_i\mbPhi_i = \mbI_k\ \ i=1,\ldots,m \tn{,}
 	\end{align*}
 	
-	\noindent where $E$ is the set of edges in the dependency graph between the views, and $\mbPhi_i$ are the optimization variables.
+	\noindent where $E$ is the set of edges in the dependency graph between the views, and $\mbPhi_i$ are the optimization variables. Note that we recover the optimization problem from section~\ref{subsubsec:cgraph} by setting $E = \fitcb{(i,j) : i \in \fitcb{1,\ldots,m-1}, j \in \fitcb{i+1, \ldots, m}}$.
 	
 	\subsection{Constraints} \label{subsec:constraints}
 	The classical formulation of generalized eigenvalue problems including CCA is to have quadratic equality constraints $\mbX^{\top}\mbA\mbX = \mbI$ on the parameters $\mbX$ for some quadratic form $\mbA$. The purpose of these constraints is to force the parameters to counteract/reflect the scale of the data so that the model is robust to each view having dramatically different scale.
@@ -62,14 +78,21 @@
 	\subsubsection{Issues with Equality Constraints} \label{subsubsec:issueswithequality}
 	For both the classical and projected gradient algorithms for estimating CCA parameters, to satisfy the equality constraints, we are forced to orthogonalize some basis either via Gram-Schmidt orthogonalization or matrix square-roots. For batch classical and projected gradient optimization techniques, this causes scaling issues for both computation and storage. For the stochastic projected gradient algorithm, the projections onto a non-convex feasible region (a quadratic surface) result in lack of convergence guarantees and very likely slower local convergence when this is attainable. Additionally, if we want to use the transformations as dimensionality reduction on unseen data, we might consider satisfaction of equality constraints to be overfitting.
 	
-	\subsubsection{Alternatives} \label{subsubsec:alternatives}
-	If we want to improve convergence guarantees and reduce computation, but still account for and be robust to differences in scale between the two data views, it may be benificial to penalized the parameters for straying from the equality constraints rather than requiring exact constraint satisfaction. In fact, when using the stochastic projected gradient algorithm, violating the equality constraints by a little bit is unavoidable because we use minibatches for projecting the parameters, but the feasible region is defined in terms of the full dataset.
+	If we want to improve convergence guarantees and reduce computation, but still account for and be robust to differences in scale between the two data views, it may be benificial to penalized the parameters for straying from the equality constraints rather than requiring exact constraint satisfaction on a non-convex (possibly not even locally convex) quadratic surface feasible region. In fact, when using the stochastic projected gradient algorithm, violating the equality constraints by a little bit is unavoidable because we use minibatches for projecting the parameters, but the feasible region is defined in terms of the full dataset.
 	
-	If we define some penality function $R(\mbX) = \norm{\mbX^{\top}\mbA\mbX - \mbI}_F^2$ and use this penalty function as a proximal function or regularizer, it may result in more efficient computation and better convergence properties for parameter estimation and better generalization ability for the dimensionality reduction defined in terms of the parameters.
+	\subsubsection{Potential Proximal Alternatives} \label{subsubsec:alternatives}
+	If we define some penality function $R(\mbX) = \norm{\mbX^{\top}\mbA\mbX - \mbI}_F^2$ and use this penalty function as a proximal function, it may result in more efficient computation and better convergence properties for parameter estimation and better generalization ability for the dimensionality reduction defined in terms of the parameters. I am somewhat certain that this function, although non-convex, has no spurious critical points. 
 	
-\section{Algorithms} \label{sec:alg}
+	Using $R(\mbX)$ as a proximal function is somewhat problematic because of the lack of closed-form solution. However, since we are relaxing the constraints to a soft penalty anyway, it may be acceptable to take a small, fixed number of gradient steps to approximate the proximal operator's solution at each round.
+	
+	Also, I need to read further to see if I can apply this and if it will be helpful, but (I think) according to \cite{parikh2014proximal}, in some cases, for a proximal operator on a matrix-valued parameter, there is some equivalent proximal operator of the parameter's singular values.
+	
+	\subsection{Algorithms} \label{subsec:alg}
+	
+	\subsubsection{Why gradients?} \label{subsubsec:whygradients}
+	Gradient-based updates allow us to easily derive stochastic and mini-batch algorithms and make incremental updates where we have complete control over the scale and influence of the incremental updates. These abilities facilitate a filter-like perspective of CCA and similar problems, and since we can control the scale/influence of each incremental update, we can control the rate of change of each parameter as a function of many quantities, including the update rates of other parameters. We can use tools from online learning and online optimization to approach these problems efficiently and with strong theoretical guarantees.
 
-	\subsection{Stochastic $m$-View AppGrad} \label{subsec:appgrad}
+	\subsubsection{Stochastic $m$-View AppGrad} \label{subsubsec:appgrad}
 	
 	The algorithm in this section is derived from a similar algorithm for classical two-view CCA given in \cite{ma2015finding}.
 	
@@ -95,10 +118,7 @@
 	
 	\noindent \textbf{Parameter Updates:} It should be noted that I am not making na\"{i}ve gradient updates. This is overlooked in the pseudocode for clarity and relevance reasons. I am actually applying AdaGrad scaling with optional dual averaging and shrinkage-and-thresholding to the singular values of the parameter matrix and gradient matrix \citep{duchi2011adaptive}.
 	
-	\subsubsection{Why gradients?} \label{subsubsec:whygradients}
-	Gradient-based updates allow us to easily derive stochastic and mini-batch algorithms and make incremental updates where we have complete control over the scale and influence of the incremental updates. These abilities facilitate a filter-like perspective of CCA and similar problems, and since we can control the scale/influence of each incremental update, we can control the rate of change of each parameter as a function of many quantities, including the update rates of other parameters. We can use tools from online learning and online optimization to approach these problems efficiently and with strong theoretical guarantees.
-	
-	\subsection{GenELinK and CCALin} \label{subsec:genelinkandccalin}
+	\subsubsection{GenELinK and CCALin} \label{subsubsec:genelinkandccalin}
 	
 	Algorithms~\ref{alg:genelink} and~\ref{alg:ccalin} in this section are taken directly from \cite{ge2016efficient}. Algorithms~\ref{alg:genelink-filter} and~\ref{alg:ccalin-filter} are inspired by \cite{ge2016efficient}.
 	
@@ -192,6 +212,9 @@
 	\end{align*}
 	
 	\noindent where $\mbS_{x_i x_j} \leftarrow \mbX_i^{\top}\mbX_j/n$ and $\mbS_{x_i} \leftarrow \mbX_i^{\top}\mbX_i/n$.
+	
+\section{Probabilistic Models} \label{sec:probabilisticmodels}
+Eventually, I would like to develop rigorous probabilistic models for each of the objective functions in section~\ref{subsec:objective}. The place to start is probably \cite{bach2005probabilistic}, which develops such a model for the optimization problem in section~\ref{subsubsec:classicalcca}. It is important to note that the resulting graphical models are not identical to the dependency graphs discussed in section~\ref{subsec:problemformulation}.
 	
 	\bibliographystyle{apalike}
 	\bibliography{../../hosinger/tex/citations.bib}
