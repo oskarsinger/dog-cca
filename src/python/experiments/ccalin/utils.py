@@ -1,6 +1,7 @@
 from ccalin import OnlineNViewCCALin, NViewCCALin
 from data.servers.gram import BoxcarGramServer as BGS
 from data.servers.gram import ExpGramServer as EGS
+from data.servers.percentile import Data2Percentiles as D2P
 
 def run_online_n_view_ccalin_experiment(
     servers, k, 
@@ -8,6 +9,7 @@ def run_online_n_view_ccalin_experiment(
     gep_max_iter=100,
     eta=0.1,
     exps=None, windows=None,
+    percentiles=None,
     verbose=True):
 
     gs_list = None
@@ -20,6 +22,10 @@ def run_online_n_view_ccalin_experiment(
         gs_list = [EGS(weight=w) for w in exps]
     elif windows is not None:
         gs_list = [BGS(window=w) for w in windows]
+
+    if percentiles is not None:
+        servers = [D2P(ds, ps) 
+                   for (ds, ps) in zip(servers, percentiles)]
 
     print 'Creating model object'
     model = OnlineNViewCCALin(
@@ -39,8 +45,13 @@ def run_batch_n_view_ccalin_experiment(
     servers, k,
     gep_max_iter=100,
     subroutine_max_iter=1000,
+    percentiles=None,
     eta=0.1,
     verbose=True):
+
+    if percentiles is not None:
+        servers = [D2P(ds, ps) 
+                   for (ds, ps) in zip(servers, percentiles)]
 
     print 'Creating model object'
     model = NViewCCALin(

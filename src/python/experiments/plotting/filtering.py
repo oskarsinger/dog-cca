@@ -12,30 +12,35 @@ from bokeh.palettes import Spectral11
 def plot_grouped_by_component(
     model,
     historical=False,
-    width=900,
+    width=1200,
     height=400,
     plot_path='.'):
 
     model_info = model.get_status()
     filtered_Xs = None
 
+    print 'Getting filtered data'
     if historical:
         filtered_Xs = model_info['filtering_history']
     else:
         filtered_Xs = _get_refiltered_Xs(model_info)
 
+    names = [ds.get_status()['data_loader'].name()
+             for ds in model['ds_list']]
+    named2fX = {name : fX
+                for (name, fX) in zip(names,filterd_Xs)}
+
     k = model_info['k']
-    seconds = model_info['ds_list'][0].dl.get_status()['seconds']
     num_rounds = model_info['num_rounds']
-    X_axis = seconds * np.arange(filtered_Xs[0].shape[0])
+    X_axis = _get_X_axis(model_info, filtered_Xs[0].shape[0])
     component_plots = []
-    X_label = 'Time Step Observed'
+    X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Point for Component '
 
     for i in xrange(k):
-        comp_map = {'Filtered X ' + str(j) + '\'s component ' :
+        comp_map = {'Filtered ' + name + '\'s component ' :
                     (X_axis, X[:,i])
-                    for (j, X) in enumerate(filtered_Xs)}
+                    for (name, X) in filtered_Xs.items()}
         component_plots.append(plot_lines(
             comp_map,
             X_label,
@@ -59,7 +64,7 @@ def plot_grouped_by_component(
 def plot_grouped_by_view(
     model,
     historical=False,
-    width=900,
+    width=1200,
     height=400,
     plot_path='.'):
 
@@ -72,22 +77,27 @@ def plot_grouped_by_view(
     else:
         filtered_Xs = _get_refiltered_Xs(model_info)
 
+    names = [ds.get_status()['data_loader'].name()
+             for ds in model['ds_list']]
+    named2fX = {name : fX
+                for (name, fX) in zip(names,filterd_Xs)}
+
     k = model_info['k']
-    seconds = model_info['ds_list'][0].dl.get_status()['seconds']
     num_rounds = model_info['num_rounds']
     X_plots = []
-    X_label = 'Time Step Observed (seconds)'
-    Y_label = 'Filtered Data Point for View '
+    X_axis = _get_X_axis(model_info, filtered_Xs[0].shape[0])
+    X_label = 'Time Step Observed (days)'
+    Y_label = 'Filtered Data Points for View '
 
-    for (i, X) in enumerate(filtered_Xs):
-        X_map = {'Filtered X dimension ' + str(j) : 
-                 (seconds * np.arange(filtered_Xs[0].shape[0]), X[:,j])
+    for (name, X) in filtered_Xs.items():
+        X_map = {'Filtered ' + name + ' dimension ' + str(j) : 
+                 (X_axis, X[:,j])
                  for j in xrange(k)}
         X_plots.append(plot_lines(
             X_map,
             X_label,
-            Y_label + str(i),
-            Y_label + str(i) + ' vs ' + X_label,
+            Y_label + name,
+            Y_label + name + ' vs ' + X_label,
             colors=Spectral11[:4]+Spectral11[-4:],
             width=width,
             height=height))
@@ -104,6 +114,15 @@ def plot_grouped_by_view(
 
     print 'Displaying plots'
     show(vplot(*X_plots))
+
+def _get_X_axis(model_info, length):
+
+    ds = model_info['ds_list'][0]
+    dl = ds.get_status()['data_loader']
+    seconds = dl.get_status()['seconds']
+    scale = float(seconds) / (3600.0 * 24.0)
+
+    return scale * np.arange(length).astype(float)
 
 def _get_refiltered_Xs(model_info):
 
@@ -132,7 +151,7 @@ def _get_refiltered_Xs(model_info):
     else:
         gss = model_info['gs_list']
         Xs = gu.data.init_data(dss, gss)[0]
-        filtered_Xs = [np.dot(X, Phi) 
+        filtered_Xs = [np.dot(X, Phi)
                        for (X, Phi) in zip(Xs, Phis)]
 
-    return [np.copy(fX) for fX in filtered_Xs]
+    return filtered_Xs

@@ -29,6 +29,12 @@ def online_ccalin_randomize_or_die_son(hdf5_path, subject, gep_max_iter=100, tri
 
         upper = min(seconds+1, 20)
         num_coords = npr.randint(cca_k,upper,6).tolist()
+        percentiles = None
+
+        #if choice([True, False]):
+        percentiles = [np.linspace(0,1,num=nc) for nc in num_coords]
+        #num_coords = None
+
         eta = normal(scale=0.01)[0]
 
         # Run experiment
@@ -40,12 +46,14 @@ def online_ccalin_randomize_or_die_son(hdf5_path, subject, gep_max_iter=100, tri
                 str(cca_k),
                 'seconds',
                 str(seconds),
-                'exp',
-                'None' if exps is None else '-'.join(n2s(exps)),
+                'exps',
+                _get_repr(exps),
                 'windows',
-                'None' if windows is None else '-'.join(n2s(windows)),
-                'num_coords',
-                '-'.join(n2s(num_coords)),
+                _get_repr(windows),
+                #'num_coords',
+                #_get_repr(num_coords),
+                'percentiles',
+                _get_repr(num_coords),
                 'eta',
                 str(eta)])
             plot_path = os.path.join(plot_path_base, new_dir)
@@ -56,6 +64,7 @@ def online_ccalin_randomize_or_die_son(hdf5_path, subject, gep_max_iter=100, tri
                 hdf5_path, cca_k, subject,
                 seconds=seconds, 
                 exps=exps, windows=windows,
+                percentiles=percentiles,
                 num_coords=num_coords,
                 eta=eta,
                 gep_max_iter=gep_max_iter,
@@ -79,6 +88,13 @@ def batch_ccalin_randomize_or_die_son(hdf5_path, subject, trials=50, verbose=Fal
         seconds = npr.randint(cca_k,51)
         upper = min(seconds+1, 20)
         num_coords = npr.randint(cca_k,upper,6).tolist()
+        percentiles = None
+
+        #if choice([True, False]):
+        percentiles = [np.linspace(0,1,num=nc).tolist() 
+                       for nc in num_coords]
+        #num_coords = None
+
         eta = normal(scale=0.01)[0]
 
         # Run experiment
@@ -90,8 +106,10 @@ def batch_ccalin_randomize_or_die_son(hdf5_path, subject, trials=50, verbose=Fal
                 str(cca_k),
                 'seconds',
                 str(seconds),
-                'num_coords',
-                '-'.join(n2s(num_coords)),
+                #'num_coords',
+                #_get_repr(num_coords),
+                'percentiles',
+                _get_repr(num_coords),
                 'eta',
                 str(eta)])
             plot_path = os.path.join(plot_path_base, new_dir)
@@ -102,6 +120,7 @@ def batch_ccalin_randomize_or_die_son(hdf5_path, subject, trials=50, verbose=Fal
                 hdf5_path, cca_k, subject,
                 seconds=seconds, 
                 num_coords=num_coords,
+                percentiles=percentiles,
                 eta=eta,
                 verbose=verbose)
 
@@ -117,3 +136,15 @@ def batch_ccalin_randomize_or_die_son(hdf5_path, subject, trials=50, verbose=Fal
         except Exception as e:
             print e 
 
+def _get_repr(l):
+
+    output = 'None'
+
+    if l is not None:
+        if type(l[0]) is list:
+            l = ['-'.join(n2s(x)) for x in l]
+            output = '_'.join(l)
+        else:
+            output = '-'.join(n2s(l))
+
+    return output
