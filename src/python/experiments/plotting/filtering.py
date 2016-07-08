@@ -27,9 +27,7 @@ def plot_grouped_by_component(
 
     names = [ds.get_status()['data_loader'].name()
              for ds in model['ds_list']]
-    named2fX = {name : fX
-                for (name, fX) in zip(names,filterd_Xs)}
-
+    name_and_data = zip(names, filtered_Xs)
     k = model_info['k']
     num_rounds = model_info['num_rounds']
     X_axis = _get_X_axis(model_info, filtered_Xs[0].shape[0])
@@ -40,7 +38,7 @@ def plot_grouped_by_component(
     for i in xrange(k):
         comp_map = {'Filtered ' + name + '\'s component ' :
                     (X_axis, X[:,i])
-                    for (name, X) in filtered_Xs.items()}
+                    for (name, X) in name_and_data}
         component_plots.append(plot_lines(
             comp_map,
             X_label,
@@ -79,8 +77,7 @@ def plot_grouped_by_view(
 
     names = [ds.get_status()['data_loader'].name()
              for ds in model['ds_list']]
-    named2fX = {name : fX
-                for (name, fX) in zip(names,filterd_Xs)}
+    name_and_data = zip(names,filterd_Xs)
 
     k = model_info['k']
     num_rounds = model_info['num_rounds']
@@ -89,7 +86,7 @@ def plot_grouped_by_view(
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Points for View '
 
-    for (name, X) in filtered_Xs.items():
+    for (name, X) in name_and_data:
         X_map = {'Filtered ' + name + ' dimension ' + str(j) : 
                  (X_axis, X[:,j])
                  for j in xrange(k)}
