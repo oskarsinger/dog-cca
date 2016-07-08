@@ -1,28 +1,29 @@
 import numpy as np
 
-from data.loaders.random import GaussianLoader as GL
-from data.servers.minibatch import Batch2Minibatch as B2M
+from data.loaders.random import ShiftingMeanGaussianLoader as SMGL
+from data.servers.minibatch import Minibatch2Minibatch as M2M
 from drrobert.arithmetic import int_ceil_log as icl
 from .. import utils as ecu
 
-def run_n_view_online_ccalin_random_data_experiment(
-    ps, k,
+def run_n_view_online_ccalin_shifting_mean_gaussian_data_experiment(
+    ps, cca_k, means, rates,
     max_iter=10000,
     eta=0.1,
-    exps=None, verbose=False,
-    means_list=None):
+    exps=None, windows=None,
+    percentiles=None,
+    gep_max_iter=10,
+    verbose=False):
 
-    if means_list is None:
-        means_list = [None] * len(ps)
-
-    bs = k + icl(k)
-    loaders = [GL(10*p, p, means=means)
-               for (means, p) in zip(means_list, ps)]
-    servers = [B2M(loader, bs) for loader in loaders]
+    bs = cca_k + icl(cca_k)
+    loaders = [SMGL(p, mean, rate)
+               for (p, mean, rate) in zip(ps, means, rates)]
+    servers = [M2M(loader, bs) for loader in loaders]
 
     return ecu.run_online_n_view_ccalin_experiment(
-        servers, k,
+        servers, cca_k,
         max_iter=max_iter,
         eta=eta,
-        exps=exps, 
+        exps=exps, windows=windows,
+        percentiles=percentiles,
+        gep_max_iter=gep_max_iter,
         verbose=verbose)
