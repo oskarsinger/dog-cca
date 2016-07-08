@@ -55,7 +55,7 @@ def online_randomize_or_die_son(ps, means, rates, trials=50, verbose=False):
             print plot_path
 
             print 'Training model'
-            model = run_onvcede(
+            model = rnvocsmgde(
                 ps, cca_k, means, rates,
                 exps=exps, windows=windows,
                 percentiles=percentiles,
