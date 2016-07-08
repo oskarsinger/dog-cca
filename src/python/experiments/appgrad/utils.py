@@ -2,40 +2,11 @@ from appgrad import AppGradCCA, NViewAppGradCCA
 from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
 from data.servers.gram import ExpGramServer as EGS
 from data.servers.gram import BoxcarGramServer as BGS
-
-def run_online_appgrad_experiment(
-    X_server, Y_server, k,
-    exp=False, verbose=True,
-    eta1=0.1, eta2=0.1, 
-    lower1=None, lower2=None):
-
-    model = AppGradCCA(k, online=True)
-    (X_gs, Y_gs) = (None, None)
-
-    if exp:
-        X_gs = EGS()
-        Y_gs = EGS()
-
-    X_optimizer = None
-    Y_optimizer = None
-    
-    if lower1 is not None:
-        X_optimizer = MAG(lower=lower1, verbose=verbose)
-
-    if lower2 is not None:
-        Y_optimizer = MAG(lower=lower2, verbose=verbose)
-
-    model.fit(
-        X_server, Y_server, 
-        X_gs=X_gs, Y_gs=Y_gs,
-        X_optimizer=X_optimizer,
-        Y_optimizer=Y_optimizer,
-        verbose=verbose)
-
-    return model
+from data.servers.percentile import Data2Percentiles as D2P
 
 def run_online_n_view_appgrad_experiment(
     servers, k, 
+    percentiles=None,
     exps=None, windows=None,
     etas=None, lowers=None,
     verbose=True):
@@ -50,6 +21,10 @@ def run_online_n_view_appgrad_experiment(
         gram_servers = [EGS(weight=w) for w in exps]
     elif windows is not None:
         gram_servers = [BGS(window=w) for w in windows]
+
+    if percentiles is not None:
+        servers = [D2P(ds, ps) 
+                   for (ds, ps) in zip(servers, percentiles)]
 
     print "Creating model object"
     model = NViewAppGradCCA(

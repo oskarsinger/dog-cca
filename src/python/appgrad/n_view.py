@@ -67,7 +67,9 @@ class NViewAppGradCCA:
 
         print "Getting initial (mini)batches and Gram matrices"
 
-        (Xs, Sxs) = gu.data.init_data(self.ds_list, self.gs_list)
+        (Xs, Sxs) = gu.data.init_data(
+            self.ds_list, self.gs_list, 
+            online=self.online)
 
         print "Getting initial basis estimates"
 

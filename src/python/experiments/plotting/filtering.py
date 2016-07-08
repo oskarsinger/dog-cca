@@ -26,7 +26,7 @@ def plot_grouped_by_component(
         filtered_Xs = _get_refiltered_Xs(model_info)
 
     names = [ds.get_status()['data_loader'].name()
-             for ds in model['ds_list']]
+             for ds in model_info['ds_list']]
     name_and_data = zip(names, filtered_Xs)
     k = model_info['k']
     num_rounds = model_info['num_rounds']
@@ -36,6 +36,7 @@ def plot_grouped_by_component(
     Y_label = 'Filtered Data Point for Component '
 
     for i in xrange(k):
+        # This needs to be able to deal with non-unique data server names
         comp_map = {'Filtered ' + name + '\'s component ' :
                     (X_axis, X[:,i])
                     for (name, X) in name_and_data}
@@ -76,8 +77,8 @@ def plot_grouped_by_view(
         filtered_Xs = _get_refiltered_Xs(model_info)
 
     names = [ds.get_status()['data_loader'].name()
-             for ds in model['ds_list']]
-    name_and_data = zip(names,filterd_Xs)
+             for ds in model_info['ds_list']]
+    name_and_data = zip(names,filtered_Xs)
 
     k = model_info['k']
     num_rounds = model_info['num_rounds']
@@ -87,6 +88,7 @@ def plot_grouped_by_view(
     Y_label = 'Filtered Data Points for View '
 
     for (name, X) in name_and_data:
+        # This needs to be able to deal with non-unique data server names
         X_map = {'Filtered ' + name + ' dimension ' + str(j) : 
                  (X_axis, X[:,j])
                  for j in xrange(k)}
@@ -114,10 +116,14 @@ def plot_grouped_by_view(
 
 def _get_X_axis(model_info, length):
 
+
     ds = model_info['ds_list'][0]
     dl = ds.get_status()['data_loader']
-    seconds = dl.get_status()['seconds']
-    scale = float(seconds) / (3600.0 * 24.0)
+    dl_info = dl.get_status()
+    scale = 1
+
+    if 'seconds' in dl_info:
+        scale = float(dl_info['seconds']) / (3600.0 * 24.0)
 
     return scale * np.arange(length).astype(float)
 

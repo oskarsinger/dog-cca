@@ -28,6 +28,7 @@ def online_randomize_or_die_son(ps, means, rates, trials=50, verbose=False):
             windows = npr.randint(0,51,num_views).tolist()
 
         percentiles = None
+        num_coords = None
 
         if choice([True, False]):
             upper = min(min(ps)+1, 20)
@@ -39,7 +40,7 @@ def online_randomize_or_die_son(ps, means, rates, trials=50, verbose=False):
         # Run experiment
         try:
             print 'Creating plot path'
-            plot_path_base = '/home/oskar/GitRepos/online-cca/plots/ccalin/online/random'
+            plot_path_base = '/home/oskar/GitRepos/online-cca/plots/ccalin/online/random/'
             new_dir = '_'.join([
                 'k',
                 str(cca_k),
