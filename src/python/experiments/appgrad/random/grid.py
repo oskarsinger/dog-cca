@@ -11,24 +11,30 @@ import numpy.random as npr
 
 import os
 
-def online_randomize_or_die_son(num_views, trials=50):
+def online_randomize_or_die_son(ps, means, rates, trials=50, verbose=False):
+
+    num_views = len(ps)
 
     for i in range(trials):
         # Prepare parameter choices
-        cca_k = npr.randint(1,10)
+        cca_k = npr.randint(1,min(ps))
         (exps, windows) = (None, None)
 
         if choice([True, False]):
             exps = npr.uniform(
-                low=0.5,high=0.99,size=4).tolist()
+                low=0.5,high=0.99,size=num_views).tolist()
         else:
-            windows = npr.randint(0,51,4).tolist()
+            windows = npr.randint(0,51,num_views).tolist()
 
-        upper = min(seconds+1, 20)
-        num_coords = npr.randint(cca_k,upper,4).tolist()
-        percentiles = [np.linspace(0,1,num=nc)
-                       for nc in num_coords]
-        etas = np.absolute(npr.randn(4)).tolist()
+        percentiles = None
+
+        if choice([True, False]):
+            upper = min(min(ps)+1, 20)
+            num_coords = npr.randint(cca_k,upper,num_views).tolist()
+            percentiles = [np.linspace(0,1,num=nc)
+                           for nc in num_coords]
+
+        etas = np.absolute(npr.randn(num_views)).tolist()
 
         # Run experiment
         try:
@@ -46,13 +52,13 @@ def online_randomize_or_die_son(num_views, trials=50):
                 'seconds',
                 str(seconds),
                 'exp',
-                'None' if exps is None else '-'.join(n2s(exps)),
+                _get_repr(exps)
                 'windows',
-                'None' if windows is None else '-'.join(n2s(windows)),
-                'num_coords',
-                '-'.join(n2s(num_coords)),
+                _get_repr(windows)
+                'percentiles',
+                _get_repr(num_coords),
                 'etas',
-                '-'.join(n2s(etas))])
+                _get_repr(etas)])
             plot_path = os.path.join(plot_path_base, new_dir)
 
             print "Generating plots"
@@ -64,3 +70,16 @@ def online_randomize_or_die_son(num_views, trials=50):
             pcb(model, plot_path=plot_path)
         except Exception as e:
             print e 
+
+def _get_repr(l):
+    
+    output = 'None'
+
+    if l is not None:
+        if type(l[0]) is list:
+            l = ['-'.join(n2s(x)) for x in l]
+            output = '_'.join(l)
+        else:
+            output = '-'.join(l)
+
+    return output
