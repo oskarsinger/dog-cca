@@ -6,33 +6,19 @@ from drrobert.arithmetic import int_ceil_log as icl
 
 from .. import utils as eau
 
-def run_online_appgrad_random_data_experiment(
-    p1, p2, k, 
-    exp=False, verbose=False, whiten=False,
-    lower1=None, lower2=None, means=None, etas=None):
+def run_n_view_online_appgrad_shifting_mean_gaussian_data_experiment(
+    ps, cca_k, means, rates,
+    exps=None, windows=None,
+    etas=None, lowers=None,
+    verbose=False):
 
-    bs = k + icl(k)
-    X_loader = GL(10*p1, p1, means=means)
-    Y_loader = GL(10*p2, p2, means=means)
-    X_server = B2M(X_loader, bs, whiten=whiten)
-    Y_server = B2M(Y_loader, bs, whiten=whiten)
+    bs = cca_k + icl(cca_k)
+    loaders = [SMGL(p, mean, rate)
+               for (p, mean, rate) in zip(ps, means, rates)]
+    servers = [M2M(loader, bs) for loader in loaders]
 
-    return eau.run_online_appgrad_experiment(
-        X_server, Y_server, k,
-        exp=exp, 
-        lower1=lower1, lower2=lower2,
-        verbose=verbose, etas=etas)
-
-def run_n_view_online_appgrad_random_data_experiment(
-    ps, k, 
-    exp=False, verbose=False, whiten=False,
-    lowers=None, means=None, etas=None):
-
-    bs = k + icl(k)
-    loaders = [GL(10*p, p, means=mean)
-               for mean, p in zip(means, ps)]
-    servers = [B2M(loader, bs, whiten=whiten) for loader in loaders]
-
-    return eau.run_online_n_view_appgrad_experiment(
-        servers, k,
-        exp=exp, lowers=lowers, verbose=verbose, etas=etas)
+    return ecu.run_online_n_view_appgrad_experiment(
+        servers, cca_k,
+        exps=exps, windows=windows,
+        lowers=lowers, etas=etas,
+        verbose=verbose)
