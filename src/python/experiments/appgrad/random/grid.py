@@ -1,4 +1,4 @@
-from experiments.appgrad.e4.online import run_n_view_online_appgrad_shifting_mean_gaussian_data_experiment as rnvoasmgde
+from experiments.appgrad.random.online import run_n_view_online_appgrad_shifting_mean_gaussian_data_experiment as rnvoasmgde
 from experiments.plotting.bases import plot_canonical_bases as pcb
 from experiments.plotting.filtering import plot_grouped_by_view as pgbv
 from experiments.plotting.filtering import plot_grouped_by_component as pgbc
@@ -27,6 +27,7 @@ def online_randomize_or_die_son(ps, means, rates, trials=50, verbose=False):
             windows = npr.randint(0,51,num_views).tolist()
 
         percentiles = None
+        num_coords = None
 
         if choice([True, False]):
             upper = min(min(ps)+1, 20)
@@ -45,16 +46,14 @@ def online_randomize_or_die_son(ps, means, rates, trials=50, verbose=False):
                 percentiles=percentiles,
                 etas=etas)
             print "Creating plot path"
-            plot_path_base = '/home/oskar/GitRepos/online-cca/plots/appgrad/'
+            plot_path_base = '/home/oskar/GitRepos/online-cca/plots/appgrad/online/random/'
             new_dir = '_'.join([
                 'k',
                 str(cca_k),
-                'seconds',
-                str(seconds),
                 'exp',
-                _get_repr(exps)
+                _get_repr(exps),
                 'windows',
-                _get_repr(windows)
+                _get_repr(windows),
                 'percentiles',
                 _get_repr(num_coords),
                 'etas',
@@ -80,6 +79,6 @@ def _get_repr(l):
             l = ['-'.join(n2s(x)) for x in l]
             output = '_'.join(l)
         else:
-            output = '-'.join(l)
+            output = '-'.join(n2s(l))
 
     return output

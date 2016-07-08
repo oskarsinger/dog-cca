@@ -6,6 +6,8 @@ from linal.svd_funcs import get_svd_power
 from drrobert.random import normal
 from drrobert.misc import unzip
 
+import global_utils as gu
+
 def get_gradients(Xs, basis_pairs):
 
     m = len(Xs)
@@ -30,6 +32,6 @@ def get_init_basis_pair(Sx, k):
     unn_Phi = normal(shape=(Sx.shape[0], k), scale=1000)
 
     # Normalize for initial normalized bases
-    Phi = get_gram_normed(unn_Phi, Sx)
+    Phi = gu.misc.get_gram_normed(unn_Phi, Sx)
 
     return (Phi, Phi)
