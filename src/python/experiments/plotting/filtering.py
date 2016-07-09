@@ -25,8 +25,9 @@ def plot_grouped_by_component(
     else:
         filtered_Xs = _get_refiltered_Xs(model_info)
 
-    names = [ds.get_status()['data_loader'].name()
-             for ds in model_info['ds_list']]
+    ds2name = lambda ds: ds.get_status()['data_loader'].name()
+    names = [ds2name(ds) + ' (' + str(i) + ')'
+             for (i, ds) in enumerate(model_info['ds_list'])]
     name_and_data = zip(names, filtered_Xs)
     k = model_info['k']
     num_rounds = model_info['num_rounds']
@@ -76,10 +77,10 @@ def plot_grouped_by_view(
     else:
         filtered_Xs = _get_refiltered_Xs(model_info)
 
-    names = [ds.get_status()['data_loader'].name()
-             for ds in model_info['ds_list']]
+    ds2name = lambda ds: ds.get_status()['data_loader'].name()
+    names = [ds2name(ds) + ' (' + str(i) + ')'
+             for (i, ds) in enumerate(model_info['ds_list'])]
     name_and_data = zip(names,filtered_Xs)
-
     k = model_info['k']
     num_rounds = model_info['num_rounds']
     X_plots = []
