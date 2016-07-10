@@ -14,6 +14,12 @@ def is_converged(
     return [is_conv(unn_Phi_t, unn_Phi_t1, eps, verbose)
             for (unn_Phi_t, unn_Phi_t1), eps in conv_info]
 
+def check_k(ds_list, k):
+
+    if not gu.misc.is_k_valid(ds_list, k):
+        raise ValueError(
+            'Parameter k must be <= minimum column dimension among views.')
+
 def is_k_valid(ds_list, k):
 
     p = min([ds.cols() for ds in ds_list])
