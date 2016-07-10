@@ -16,10 +16,7 @@ class NViewAppGradCCA:
         online=False,
         epsilons=None):
 
-        if not gu.misc.is_k_valid(ds_list, k):
-            raise ValueError(
-                'The value of k must be less than or equal to the minimum of the' +
-                ' number of columns of X and Y.')
+        gu.misc.check_k(ds_list, k)
 
         self.k = k
         self.ds_list = ds_list
@@ -57,11 +54,12 @@ class NViewAppGradCCA:
         max_iter=10000):
 
         if etas is None:
-            etas = [0.00001] * (self.num_views + 1)
+            etas = [0.00001] * self.num_views
 
         if optimizers is None:
-            optimizers = [MAG(verbose=verbose) for i in range(self.num_views + 1)]
-        elif not len(optimizers) == self.num_views + 1:
+            optimizers = [MAG(verbose=verbose) 
+                          for i in range(self.num_views)]
+        elif not len(optimizers) == self.num_views:
             raise ValueError(
                 'Parameter optimizers must be of length num_views+1.')
 
