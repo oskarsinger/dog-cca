@@ -36,8 +36,7 @@ def run_online_n_view_ccalin_experiment(
         verbose=verbose)
 
     print 'Fitting model'
-    model.fit(
-        eta=eta)
+    model.fit(eta=eta)
 
     return model
 

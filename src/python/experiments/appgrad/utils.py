@@ -28,7 +28,10 @@ def run_online_n_view_appgrad_experiment(
 
     print "Creating model object"
     model = NViewAppGradCCA(
-        k, servers, gs_list=gram_servers, online=True)
+        k, servers, 
+        gs_list=gram_servers, 
+        online=True,
+        verbose=verbose)
 
     optims = None
 
@@ -40,7 +43,6 @@ def run_online_n_view_appgrad_experiment(
     print "Fitting model"
     model.fit(
         optimizers=optims,
-        etas=etas,
-        verbose=verbose)
+        etas=etas)
 
     return model

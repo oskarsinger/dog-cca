@@ -14,6 +14,7 @@ class NViewAppGradCCA:
         k, ds_list, 
         gs_list=None,
         online=False,
+        verbose=False,
         epsilons=None):
 
         gu.misc.check_k(ds_list, k)
@@ -50,7 +51,6 @@ class NViewAppGradCCA:
     def fit(self,
         optimizers=None,
         etas=None,
-        verbose=False,
         max_iter=10000):
 
         if etas is None:
