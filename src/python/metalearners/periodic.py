@@ -40,7 +40,7 @@ class PeriodicMetaLearner:
                             for ds in ds_list] 
             gs_list = [self.get_gs() for i in xrange(self.num_views)]
             learner = self.get_learner(
-                self.k, periodic_dss, gs_list=gs_list)
+                self.k, periodic_dss, gs_list)
 
             learner.fit(verbose=self.verbose)
             learners.append(learner)
