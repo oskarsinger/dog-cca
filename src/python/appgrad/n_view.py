@@ -22,6 +22,7 @@ class NViewAppGradCCA:
         self.k = k
         self.ds_list = ds_list
         self.num_views = len(self.ds_list)
+        self.verbose = verbose
         
         if gs_list is None:
             gs_list = [BCGS() if self.online else BGS()
@@ -57,7 +58,7 @@ class NViewAppGradCCA:
             etas = [0.00001] * self.num_views
 
         if optimizers is None:
-            optimizers = [MAG(verbose=verbose) 
+            optimizers = [MAG(verbose=self.verbose) 
                           for i in range(self.num_views)]
         elif not len(optimizers) == self.num_views:
             raise ValueError(
@@ -84,14 +85,14 @@ class NViewAppGradCCA:
 
             self.num_rounds += 1
 
-            if verbose:
+            if self.verbose:
                 (unn, normed) = unzip(basis_pairs_t)
                 print "\tObjective:", gu.misc.get_objective(Xs, normed)
 
             # Update step sizes
             etas_i = [eta / self.num_rounds**0.5 for eta in etas]
             
-            if verbose:
+            if self.verbose:
                 print "Iteration:", self.num_rounds
                 print "\t".join(["eta" + str(j) + " " + str(eta)
                                  for j, eta in enumerate(etas_i)])
@@ -105,20 +106,20 @@ class NViewAppGradCCA:
 
                 self._update_filtering_history(Xs, basis_pairs_t)
                 
-            if verbose:
+            if self.verbose:
                 print "\tGetting updated basis estimates"
 
             # Get updated canonical bases
             basis_pairs_t1 = self._get_basis_updates(
                 Xs, Sxs, basis_pairs_t, etas_i, optimizers)
 
-            if verbose:
+            if self.verbose:
                 print "\tGetting updated auxiliary variable estimate"
 
             # Check for convergence
             pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
             converged = gu.misc.is_converged(
-                pairs, self.epsilons, verbose) 
+                pairs, self.epsilons, self.verbose) 
 
             # Update iterates
             basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))

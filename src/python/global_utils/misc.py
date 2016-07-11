@@ -16,7 +16,7 @@ def is_converged(
 
 def check_k(ds_list, k):
 
-    if not gu.misc.is_k_valid(ds_list, k):
+    if not is_k_valid(ds_list, k):
         raise ValueError(
             'Parameter k must be <= minimum column dimension among views.')
 
