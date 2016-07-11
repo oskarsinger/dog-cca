@@ -43,6 +43,7 @@ class NViewAppGradCCA:
         self.online = online
 
         self.num_rounds = 0
+        self.num_iters = 0
         self.has_been_fit = False
         self.basis_pairs = None
 
@@ -52,7 +53,7 @@ class NViewAppGradCCA:
     def fit(self,
         optimizers=None,
         etas=None,
-        max_iter=10000):
+        max_iter=10):
 
         if etas is None:
             etas = [0.00001] * self.num_views
@@ -79,51 +80,60 @@ class NViewAppGradCCA:
         # Iteration variables
         converged = [False] * self.num_views
 
+        # Data loaders 
+        dls = [ds.get_status()['data_loader']
+               for ds in self.ds_list]
+
         print "Starting optimization"
 
-        while (not all(converged)) and self.num_rounds < max_iter:
+        while not all(converged) and self.num_iters < max_iter:
+            while not any([dl.finished() for dl in dls]):
+                self.num_rounds += 1
 
-            self.num_rounds += 1
+                if self.verbose:
+                    (unn, normed) = unzip(basis_pairs_t)
+                    print "\tObjective:", gu.misc.get_objective(Xs, normed)
 
-            if self.verbose:
-                (unn, normed) = unzip(basis_pairs_t)
-                print "\tObjective:", gu.misc.get_objective(Xs, normed)
-
-            # Update step sizes
-            etas_i = [eta / self.num_rounds**0.5 for eta in etas]
-            
-            if self.verbose:
-                print "Iteration:", self.num_rounds
-                print "\t".join(["eta" + str(j) + " " + str(eta)
-                                 for j, eta in enumerate(etas_i)])
-                if self.online:
-                    print "\tGetting updated minibatches and grams"
-
-            if self.online:
-                # Get new minibatches and Gram matrices
-                (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
-                    self.ds_list, self.gs_list)
-
-                self._update_filtering_history(Xs, basis_pairs_t)
+                # Update step sizes
+                etas_i = [eta / self.num_rounds**0.5 for eta in etas]
                 
-            if self.verbose:
-                print "\tGetting updated basis estimates"
+                if self.verbose:
+                    print "Iteration:", self.num_rounds
+                    print "\t".join(["eta" + str(j) + " " + str(eta)
+                                     for j, eta in enumerate(etas_i)])
+                    if self.online:
+                        print "\tGetting updated minibatches and grams"
 
-            # Get updated canonical bases
-            basis_pairs_t1 = self._get_basis_updates(
-                Xs, Sxs, basis_pairs_t, etas_i, optimizers)
+                if self.online:
+                    # Get new minibatches and Gram matrices
+                    (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
+                        self.ds_list, self.gs_list)
 
-            if self.verbose:
-                print "\tGetting updated auxiliary variable estimate"
+                    self._update_filtering_history(Xs, basis_pairs_t)
+                    
+                if self.verbose:
+                    print "\tGetting updated basis estimates"
 
-            # Check for convergence
-            pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
-            converged = gu.misc.is_converged(
-                pairs, self.epsilons, self.verbose) 
+                # Get updated canonical bases
+                basis_pairs_t1 = self._get_basis_updates(
+                    Xs, Sxs, basis_pairs_t, etas_i, optimizers)
 
-            # Update iterates
-            basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
-                             for unn_Phi, Phi in basis_pairs_t1]
+                if self.verbose:
+                    print "\tGetting updated auxiliary variable estimate"
+
+                # Check for convergence
+                pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
+                converged = gu.misc.is_converged(
+                    pairs, self.epsilons, self.verbose) 
+
+                # Update iterates
+                basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
+                                 for unn_Phi, Phi in basis_pairs_t1]
+
+            self.num_iters += 1
+
+            for ds in self.ds_list:
+                ds.refresh()
 
         self.has_been_fit = True
         self.basis_pairs = basis_pairs_t
@@ -178,6 +188,7 @@ class NViewAppGradCCA:
             'online': self.online,
             'epsilons': self.epsilons,
             'num_rounds': self.num_rounds,
+            'num_iters': self.num_iters,
             'has_been_fit': self.has_been_fit,
             'basis_pairs': self.basis_pairs,
             'filtering_history': self.filtering_history}
