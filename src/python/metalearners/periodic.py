@@ -25,6 +25,8 @@ class PeriodicMetaLearner:
         if get_gs is None:
             get_gs = BCGS
 
+        self.get_gs = get_gs
+
         self.num_views = len(ds_list)
         self.learners = []
 
@@ -33,17 +35,17 @@ class PeriodicMetaLearner:
         for i in xrange(self.num_periods):
 
             if i > 0:
-                for ds in ds_list:
+                for ds in self.ds_list:
                     ds.refresh()
 
             periodic_dss = [M2P(ds, self.pl, self.num_periods, i+1)
-                            for ds in ds_list] 
+                            for ds in self.ds_list] 
             gs_list = [self.get_gs() for i in xrange(self.num_views)]
             learner = self.get_learner(
-                self.k, periodic_dss, gs_list)
+                self.k, periodic_dss, gs_list, self.verbose)
 
-            learner.fit(verbose=self.verbose)
-            learners.append(learner)
+            learner.fit()
+            self.learners.append(learner)
 
     def get_status(self):
 

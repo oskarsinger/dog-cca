@@ -14,9 +14,9 @@ def get_gradients(Xs, basis_pairs):
     X_transforms = [(np.dot(X, unnormed), np.dot(X, normed))
                     for (X, (unnormed,normed)) in zip(Xs, basis_pairs)]
     minus_term = sum(unzip(X_transforms)[1])
-    diffs = [(m-1)*X_transforms[i][0] - \
-             (minus_term - X_transforms[i][1])
-             for i in range(m)]
+    diffs = [(m-1)*unnormed - \
+             (minus_term - normed)
+             for (unnormed, normed) in X_transforms]
 
     return [np.dot(X.T, diff) / X.shape[0]
             for (X, diff) in zip(Xs, diffs)]
