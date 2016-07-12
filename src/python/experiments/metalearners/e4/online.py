@@ -9,7 +9,7 @@ def run_n_view_online_periodic_appgrad_e4_data_experiment(
     verbose=False):
 
     bs = k + icl(k)
-    period_length = (24 * 3600) / num_periods
+    period_length = (24 * 3600) / (num_periods * seconds)
     dl_list = eu.get_hr_and_acc(
         hdf5_path, 
         subject, 
