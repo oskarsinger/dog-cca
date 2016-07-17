@@ -1,6 +1,7 @@
 import numpy as np
 
 import global_utils as gu
+import global_utils.server_tools as gust
 import ccalin.utils as ccalinu
 
 from data.servers.gram import BatchGramServer as BGS
@@ -63,8 +64,8 @@ class OnlineNViewCCALin:
                 print 'OnlineNViewCCALin Iteration:', self.num_rounds
             
             # Get the new data and gram matrices
-            (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
-                self.ds_list, self.gs_list)
+            (Xs, Sxs, missing) = gust.get_batch_and_gram_lists(
+                self.ds_list, self.gs_list, Xs=Xs, Sxs=Sxs)
 
             # Generate the matrices for the GEP
             A = ccalinu.get_A(Xs)
@@ -159,7 +160,8 @@ class NViewCCALin:
 
         print 'Getting data.'
         # Get data
-        (self.Xs, self.Sxs) = gu.data.init_data(self.ds_list, self.gs_list)
+        (self.Xs, self.Sxs, self.missing) = gust.init_data(
+            self.ds_list, self.gs_list)
 
         print 'Preparing GEP input.'
         # Prepare GEP input
