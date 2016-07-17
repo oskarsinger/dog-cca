@@ -15,10 +15,8 @@ def get_batch_and_gram_lists(ds_list, gs_list, Xs=None, Sxs=None):
 
     new_batch_list = [ds.get_data()
                       for ds in ds_list]
-    missing = [type(batch) is MissingData 
+    missing = [isinstance(batch, MissingData)
                for batch in new_batch_list]
-    print new_batch_list
-    print missing
     batch_list = [Xs[i] if missing[i] else new_batch_list[i]
                   for i in xrange(len(new_batch_list))]
     get_gram_update = lambda i: gs_list[i].get_gram(new_batch_list[i])
