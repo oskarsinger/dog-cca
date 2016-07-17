@@ -67,7 +67,7 @@ class NViewAppGradCCA:
 
         print "Getting initial (mini)batches and Gram matrices"
 
-        (Xs, Sxs) = gu.data.init_data(
+        (Xs, Sxs, missing) = gu.data.init_data(
             self.ds_list, self.gs_list, 
             online=self.online)
 
@@ -94,8 +94,10 @@ class NViewAppGradCCA:
                     (unn, normed) = unzip(basis_pairs_t)
                     print "\tObjective:", gu.misc.get_objective(Xs, normed)
 
+                # TODO: determine if this needs to be paused for views with missing data
                 # Update step sizes
-                etas_i = [eta / self.num_rounds**0.5 for eta in etas]
+                etas_i = [eta / self.num_rounds**0.5 
+                          for eta in etas]
                 
                 if self.verbose:
                     print "Iteration:", self.num_rounds
@@ -106,7 +108,7 @@ class NViewAppGradCCA:
 
                 if self.online:
                     # Get new minibatches and Gram matrices
-                    (Xs, Sxs) = gu.data.get_batch_and_gram_lists(
+                    (Xs, Sxs, missing) = gu.data.get_batch_and_gram_lists(
                         self.ds_list, self.gs_list)
 
                     self._update_filtering_history(Xs, basis_pairs_t)
@@ -116,15 +118,19 @@ class NViewAppGradCCA:
 
                 # Get updated canonical bases
                 basis_pairs_t1 = self._get_basis_updates(
-                    Xs, Sxs, basis_pairs_t, etas_i, optimizers)
+                    Xs, Sxs, missing, basis_pairs_t, etas_i, optimizers)
 
                 if self.verbose:
                     print "\tGetting updated auxiliary variable estimate"
 
                 # Check for convergence
                 pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
-                converged = gu.misc.is_converged(
-                    pairs, self.epsilons, self.verbose) 
+                pre_converged = gu.misc.is_converged(
+                    pairs, self.epsilons, self.verbose)
+
+                # This is because bases are unchanged for missing data and will of course result in zero different between iterations
+                converged = [False if missing[i] else c 
+                             for c in converged]
 
                 # Update iterates
                 basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
@@ -147,16 +153,20 @@ class NViewAppGradCCA:
         return unzip(self.basis_pairs)[1]
 
     def _get_basis_updates(self, 
-        Xs, Sxs, basis_pairs, etas, optimizers):
+        Xs, Sxs, missing, basis_pairs, etas, optimizers):
 
         # Get gradients
         gradients = agu.get_gradients(Xs, basis_pairs)
 
+        # Get basis update for i-th basis 
+        get_new_b = lambda i: optimizers[i].get_update(
+            basis_pairs[i][0], gradients[i], etas[i])
+
         # Get unnormalized updates
-        updated_unn = [optimizers[i].get_update(
-                        basis_pairs[i][0], gradients[i], etas[i])
+        updated_unn = [basis_pairs[i][0] if missing[i] else get_new_b(i)
                        for i in range(self.num_views)]
 
+        # TODO: rewrite this to avoid redundant computation on unchanged bases
         # Normalize with Gram-parameterized Mahalanobis
         normed_pairs = [(unn, gu.misc.get_gram_normed(unn, Sx))
                         for unn, Sx in zip(updated_unn, Sxs)]
@@ -174,7 +184,13 @@ class NViewAppGradCCA:
 
             for i in xrange(self.num_views):
                 current = self.filtering_history[i]
-                new = np.dot(Xs[i][-1,:], normed[i])
+
+                # TODO: put meaningful filler here; zeroes are not meaningful
+                new = np.zeros((1, self.k))
+
+                if not missing[i]:
+                    new = np.dot(Xs[i][-1,:], normed[i])
+
                 self.filtering_history[i] = np.vstack([current, new])
 
     def get_status(self):

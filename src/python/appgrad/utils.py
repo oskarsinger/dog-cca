@@ -8,6 +8,7 @@ from drrobert.misc import unzip
 
 import global_utils as gu
 
+# TODO: account for missing data to reduce computation
 def get_gradients(Xs, basis_pairs):
 
     m = len(Xs)
