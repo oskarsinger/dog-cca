@@ -2,6 +2,7 @@ import numpy as np
 
 import utils as agu
 import global_utils as gu
+import global_utils.server_tools as gust
 
 from drrobert.misc import unzip
 from optimization.utils import get_gram
@@ -67,7 +68,7 @@ class NViewAppGradCCA:
 
         print "Getting initial (mini)batches and Gram matrices"
 
-        (Xs, Sxs, missing) = gu.data.init_data(
+        (Xs, Sxs, missing) = gust.init_data(
             self.ds_list, self.gs_list, 
             online=self.online)
 
@@ -108,10 +109,11 @@ class NViewAppGradCCA:
 
                 if self.online:
                     # Get new minibatches and Gram matrices
-                    (Xs, Sxs, missing) = gu.data.get_batch_and_gram_lists(
-                        self.ds_list, self.gs_list)
+                    (Xs, Sxs, missing) = gust.get_batch_and_gram_lists(
+                        self.ds_list, self.gs_list, Xs=Xs, Sxs=Sxs)
 
-                    self._update_filtering_history(Xs, basis_pairs_t)
+                    self._update_filtering_history(
+                        Xs, basis_pairs_t, missing)
                     
                 if self.verbose:
                     print "\tGetting updated basis estimates"
@@ -173,7 +175,7 @@ class NViewAppGradCCA:
 
         return normed_pairs
 
-    def _update_filtering_history(self, Xs, basis_pairs):
+    def _update_filtering_history(self, Xs, basis_pairs, missing):
 
         if self.filtering_history is None:
             normed = unzip(basis_pairs)[1]

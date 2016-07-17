@@ -154,7 +154,7 @@ def _get_refiltered_Xs(model_info):
 
     else:
         gss = model_info['gs_list']
-        Xs = gu.data.init_data(dss, gss)[0]
+        Xs = gu.server_tools.init_data(dss, gss)[0]
         filtered_Xs = [np.dot(X, Phi)
                        for (X, Phi) in zip(Xs, Phis)]
 
