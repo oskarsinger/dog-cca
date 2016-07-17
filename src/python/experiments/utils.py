@@ -8,6 +8,8 @@ def get_e4_loaders(hdf5_path, subject, seconds, online):
     fac = fn.get_fields_as_columns
 
     return [
+        FRL(hdf5_path, subject, 'EDA', seconds, fac, online=online),
+        FRL(hdf5_path, subject, 'TEMP', seconds, fac, online=online),
         FRL(hdf5_path, subject, 'ACC', seconds, mag, online=online),
         IBI(hdf5_path, subject, 'IBI', seconds, fac, online=online),
         FRL(hdf5_path, subject, 'BVP', seconds, fac, online=online),
