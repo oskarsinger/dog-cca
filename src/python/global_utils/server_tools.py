@@ -1,7 +1,7 @@
 import numpy as np
 
 from optimization.utils import get_gram
-from data.missing import MissingData
+from data.pseudodata import MissingData
 
 def get_batch_and_gram_lists(ds_list, gs_list, Xs=None, Sxs=None):
 

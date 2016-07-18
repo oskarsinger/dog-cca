@@ -1,6 +1,6 @@
 import global_utils as gu
 
-from data.servers.periodic import Minibatch2Periodic as M2P
+from data.servers.masks import PeriodicMask as PM
 from data.servers.gram.online import BoxcarGramServer as BCGS
 
 class PeriodicMetaLearner:
@@ -38,7 +38,7 @@ class PeriodicMetaLearner:
                 for ds in self.ds_list:
                     ds.refresh()
 
-            periodic_dss = [M2P(ds, self.pl, self.num_periods, i+1)
+            periodic_dss = [PM(ds, self.pl, self.num_periods, i+1)
                             for ds in self.ds_list] 
             gs_list = [self.get_gs() for i in xrange(self.num_views)]
             learner = self.get_learner(
