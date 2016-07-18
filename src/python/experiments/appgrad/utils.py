@@ -2,7 +2,7 @@ from appgrad import AppGradCCA, NViewAppGradCCA
 from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
 from data.servers.gram import ExpGramServer as EGS
 from data.servers.gram import BoxcarGramServer as BGS
-from data.servers.percentile import Data2Percentiles as D2P
+from data.servers.masks import PercentileMask as PM
 
 def run_online_n_view_appgrad_experiment(
     servers, k, 
@@ -23,7 +23,7 @@ def run_online_n_view_appgrad_experiment(
         gram_servers = [BGS(window=w) for w in windows]
 
     if percentiles is not None:
-        servers = [D2P(ds, ps) 
+        servers = [PM(ds, ps) 
                    for (ds, ps) in zip(servers, percentiles)]
 
     print "Creating model object"
