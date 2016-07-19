@@ -5,11 +5,14 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{times}
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{natbib}
 \usepackage{bbm}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+
+\newtheorem{thm}{Theorem}
 
 \begin{document}
 
@@ -215,6 +218,24 @@ In the following notes, $\mbX_i \in \mbbR^{n \times p_i}$ will refer to the obse
 	
 \section{Probabilistic Models} \label{sec:probabilisticmodels}
 Eventually, I would like to develop rigorous probabilistic models for each of the objective functions in section~\ref{subsec:objective}. The place to start is probably \cite{bach2005probabilistic}, which develops such a model for the optimization problem in section~\ref{subsubsec:classicalcca}. It is important to note that the resulting graphical models are not identical to the dependency graphs discussed in section~\ref{subsec:problemformulation}.
+
+	\subsection{Classical Two-View CCA} \label{sec:classicalprob}
+	
+	\begin{thm}
+	The maximum likelihood estimates of the parameters $W$, $\mu$ and $\sigma^2$ of the following model:
+	\begin{align*}
+	z\ &\sim\ \mcN \fitp{0, I_d}\\
+	x|z\ &\sim\ \mcN \fitp{Wz + \mu, \sigma^2 I_m},\ \ \sigma > 0,\ \ W \in \mbbR^{m_d}
+	\end{align*}
+	
+	\noindent are
+	
+	\begin{align*}
+		\hat{\mu} = \tilde{\mu},\ \ \hat{W} = U_d \fitp{\Lambda_d - \sigma^2 I}^{\frac{1}{2}}R,\ \ \hat{\sigma}^2 = \frac{1}{m-d} \sum_{i=d+1}^m \lambda_i \tn{,}
+	\end{align*}
+	
+	\noindent where the d column
+	\end{thm}
 	
 	\bibliographystyle{apalike}
 	\bibliography{../../hosinger/tex/citations.bib}
