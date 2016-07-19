@@ -6,6 +6,7 @@ from drrobert.arithmetic import int_ceil_log as icl
 def run_n_view_online_periodic_appgrad_e4_data_experiment(
     hdf5_path, subject, k, seconds, num_periods,
     exp=None, window=None, 
+    max_iter=10,
     verbose=False):
 
     bs = k + icl(k)
@@ -29,4 +30,5 @@ def run_n_view_online_periodic_appgrad_e4_data_experiment(
 
     return emu.run_online_n_view_periodic_metalearner_experiment(
             ds_list, k, get_learner, period_length, num_periods,
+            max_iter=max_iter,
             get_gs=get_gs, verbose=verbose)

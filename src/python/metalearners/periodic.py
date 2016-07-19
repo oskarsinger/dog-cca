@@ -30,7 +30,7 @@ class PeriodicMetaLearner:
         self.num_views = len(ds_list)
         self.learners = []
 
-    def fit(self):
+    def fit(self, max_iter=10):
 
         for i in xrange(self.num_periods):
 
@@ -44,7 +44,7 @@ class PeriodicMetaLearner:
             learner = self.get_learner(
                 self.k, periodic_dss, gs_list, self.verbose)
 
-            learner.fit()
+            learner.fit(max_iter=max_iter)
             self.learners.append(learner)
 
     def get_status(self):

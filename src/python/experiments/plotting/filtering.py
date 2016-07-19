@@ -6,7 +6,7 @@ import global_utils as gu
 from lazyprojector import plot_lines
 from drrobert.file_io import get_timestamped as get_ts
 
-from bokeh.plotting import figure, show, output_file, vplot
+from bokeh.plotting import figure, output_file
 from bokeh.palettes import Spectral11
 
 def plot_grouped_by_component(
@@ -14,6 +14,7 @@ def plot_grouped_by_component(
     historical=False,
     width=1200,
     height=400,
+    time_scale=24*3600,
     plot_path='.'):
 
     model_info = model.get_status()
@@ -31,7 +32,8 @@ def plot_grouped_by_component(
     name_and_data = zip(names, filtered_Xs)
     k = model_info['k']
     num_rounds = model_info['num_rounds']
-    X_axis = _get_X_axis(model_info, filtered_Xs[0].shape[0])
+    X_axis = _get_X_axis(
+        model_info, filtered_Xs[0].shape[0], time_scale)
     component_plots = []
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Point for Component '
@@ -59,13 +61,15 @@ def plot_grouped_by_component(
     output_file(
         filepath, 
         'component-grouped CCA-filtered data points vs time step observed')
-    show(vplot(*component_plots))
+
+    return component_plots
 
 def plot_grouped_by_view(
     model,
     historical=False,
     width=1200,
     height=400,
+    time_scale=24*3600,
     plot_path='.'):
 
     model_info = model.get_status()
@@ -84,7 +88,8 @@ def plot_grouped_by_view(
     k = model_info['k']
     num_rounds = model_info['num_rounds']
     X_plots = []
-    X_axis = _get_X_axis(model_info, filtered_Xs[0].shape[0])
+    X_axis = _get_X_axis(
+        model_info, filtered_Xs[0].shape[0], time_scale)
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Points for View '
 
@@ -113,9 +118,9 @@ def plot_grouped_by_view(
         'view-grouped CCA-filtered data points vs time step observed')
 
     print 'Displaying plots'
-    show(vplot(*X_plots))
+    return X_plots
 
-def _get_X_axis(model_info, length):
+def _get_X_axis(model_info, length, time_scale):
 
 
     ds = model_info['ds_list'][0]
@@ -124,7 +129,7 @@ def _get_X_axis(model_info, length):
     scale = 1
 
     if 'seconds' in dl_info:
-        scale = float(dl_info['seconds']) / (3600.0 * 24.0)
+        scale = float(dl_info['seconds']) / float(time_scale)
 
     return scale * np.arange(length).astype(float)
 

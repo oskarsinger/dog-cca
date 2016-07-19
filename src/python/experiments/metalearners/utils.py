@@ -10,6 +10,7 @@ def run_online_n_view_periodic_metalearner_experiment(
     period_length,
     num_periods,
     get_gs=None,
+    max_iter=10,
     verbose=False):
 
     model = PeriodicMetaLearner(
@@ -20,7 +21,7 @@ def run_online_n_view_periodic_metalearner_experiment(
         get_gs=get_gs,
         verbose=verbose)
 
-    model.fit()
+    model.fit(max_iter=max_iter)
 
     return model
 
