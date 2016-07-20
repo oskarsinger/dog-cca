@@ -1,7 +1,8 @@
 import os
-import numpy as np
 
+import numpy as np
 import global_utils as gu
+import utils as epu
 
 from lazyprojector import plot_lines
 from drrobert.file_io import get_timestamped as get_ts
@@ -21,10 +22,11 @@ def plot_grouped_by_component(
     filtered_Xs = None
 
     print 'Getting filtered data'
+
     if historical:
         filtered_Xs = model_info['filtering_history']
     else:
-        filtered_Xs = _get_refiltered_Xs(model_info)
+        filtered_Xs = epu.get_refiltered_Xs(model_info)
 
     ds2name = lambda ds: ds.get_status()['data_loader'].name()
     names = [ds2name(ds) + ' (' + str(i) + ')'
@@ -32,14 +34,13 @@ def plot_grouped_by_component(
     name_and_data = zip(names, filtered_Xs)
     k = model_info['k']
     num_rounds = model_info['num_rounds']
-    X_axis = _get_X_axis(
+    X_axis = epu.get_X_axis(
         model_info, filtered_Xs[0].shape[0], time_scale)
     component_plots = []
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Point for Component '
 
     for i in xrange(k):
-        # This needs to be able to deal with non-unique data server names
         comp_map = {'Filtered ' + name + '\'s component ' :
                     (X_axis, X[:,i])
                     for (name, X) in name_and_data}
@@ -79,7 +80,7 @@ def plot_grouped_by_view(
     if historical:
         filtered_Xs = model_info['filtering_history']
     else:
-        filtered_Xs = _get_refiltered_Xs(model_info)
+        filtered_Xs = epu.get_refiltered_Xs(model_info)
 
     ds2name = lambda ds: ds.get_status()['data_loader'].name()
     names = [ds2name(ds) + ' (' + str(i) + ')'
@@ -88,13 +89,12 @@ def plot_grouped_by_view(
     k = model_info['k']
     num_rounds = model_info['num_rounds']
     X_plots = []
-    X_axis = _get_X_axis(
+    X_axis = epu.get_X_axis(
         model_info, filtered_Xs[0].shape[0], time_scale)
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Points for View '
 
     for (name, X) in name_and_data:
-        # This needs to be able to deal with non-unique data server names
         X_map = {'Filtered ' + name + ' dimension ' + str(j) : 
                  (X_axis, X[:,j])
                  for j in xrange(k)}
@@ -119,48 +119,3 @@ def plot_grouped_by_view(
 
     print 'Displaying plots'
     return X_plots
-
-def _get_X_axis(model_info, length, time_scale):
-
-
-    ds = model_info['ds_list'][0]
-    dl = ds.get_status()['data_loader']
-    dl_info = dl.get_status()
-    scale = 1
-
-    if 'seconds' in dl_info:
-        scale = float(dl_info['seconds']) / float(time_scale)
-
-    return scale * np.arange(length).astype(float)
-
-def _get_refiltered_Xs(model_info):
-
-    dss = model_info['ds_list']
-    num_rounds = model_info['num_rounds']
-    num_views = model_info['num_views']
-    Phis = model_info['bases']
-    filtered_Xs = None
-
-    if num_rounds > 1:
-        for ds in dss:
-            ds.refresh()
-    
-        for i in range(num_rounds):
-            Xs = [ds.get_data() for ds in dss]
-
-            if filtered_Xs is None:
-                filtered_Xs = [np.dot(X[-1,:], Phi)
-                               for (X, Phi) in zip(Xs, Phis)]
-            else:
-                for j in xrange(num_views):
-                    current = filtered_Xs[j]
-                    new = np.dot(Xs[j][-1,:], Phis[j])
-                    filtered_Xs[j] = np.vstack([current, new])
-
-    else:
-        gss = model_info['gs_list']
-        Xs = gu.server_tools.init_data(dss, gss)[0]
-        filtered_Xs = [np.dot(X, Phi)
-                       for (X, Phi) in zip(Xs, Phis)]
-
-    return filtered_Xs
