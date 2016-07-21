@@ -34,7 +34,6 @@ def plot_grouped_by_component(
              for (i, ds) in enumerate(model_info['ds_list'])]
     name_and_data = zip(names, filtered_Xs)
     k = model_info['k']
-    num_rounds = model_info['num_rounds']
     X_axis = epu.get_X_axis(
         model_info, filtered_Xs[0].shape[0], time_scale, absolute_time)
     component_plots = []
@@ -89,7 +88,6 @@ def plot_grouped_by_view(
              for (i, ds) in enumerate(model_info['ds_list'])]
     name_and_data = zip(names,filtered_Xs)
     k = model_info['k']
-    num_rounds = model_info['num_rounds']
     X_plots = []
     X_axis = epu.get_X_axis(
         model_info, filtered_Xs[0].shape[0], time_scale, absolute_time)
@@ -108,6 +106,14 @@ def plot_grouped_by_view(
             colors=Spectral11[:4]+Spectral11[-4:],
             width=width,
             height=height))
+
+    if absolute_time:
+        for plot in X_plots:
+            plot.xaxis.formatter=DateTimeTickFormatter(formats=dict(
+                hours=['%d %B'],
+                days=['%d %B'],
+                months=['%d %B'],
+                years=['%d %B']))
 
     filename = get_ts(
         'historical_' + str(historical) +

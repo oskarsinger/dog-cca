@@ -38,6 +38,7 @@ def get_X_axis(model_info, length, time_scale, absolute_time):
     ds = model_info['ds_list'][0]
     dl = ds.get_status()['data_loader']
     dl_info = dl.get_status()
+    time_scale = 1.0 / float(time_scale)
 
     if 'seconds' in dl_info:
         time_scale *= float(dl_info['seconds'])
