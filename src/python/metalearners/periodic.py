@@ -48,8 +48,8 @@ class PeriodicMetaLearner:
             learner.fit(max_iter=max_iter)
             self.learners.append(learner)
 
-            # Merge the periodic filtering histories correctly
-            self._set_merged_filtered_Xs()
+        # Merge the periodic filtering histories correctly
+        self._set_merged_filtered_Xs()
 
     def _set_merged_filtered_Xs(self):
 
@@ -85,7 +85,12 @@ class PeriodicMetaLearner:
                     current = self.filtering_history[i]
                     new = fX[i][begin:end]
 
+                    print 'Current', current.shape
+                    print 'New', new.shape
+
                     self.filtering_history[i] = np.vstack([current, new])
+
+                    print 'Total', self.filtering_history[i].shape
                 else:
                     finished[i] = True
 
@@ -102,4 +107,5 @@ class PeriodicMetaLearner:
             'verbose': self.verbose,
             'get_gs': self.get_gs,
             'num_views': self.num_views,
-            'learners': self.learners}
+            'learners': self.learners,
+            'filtering_history': self.filtering_history}
