@@ -33,15 +33,14 @@ def get_refiltered_Xs(model_info):
 
     return filtered_Xs
 
-def get_X_axis(model_info, length, time_scale):
+def get_X_axis(model_info, length, time_scale, absolute_time):
 
     ds = model_info['ds_list'][0]
     dl = ds.get_status()['data_loader']
     dl_info = dl.get_status()
-    scale = 1
 
     if 'seconds' in dl_info:
-        scale = float(dl_info['seconds']) / float(time_scale)
+        time_scale *= float(dl_info['seconds'])
 
-    return scale * np.arange(length).astype(float)
+    return time_scale * np.arange(length).astype(float)
 

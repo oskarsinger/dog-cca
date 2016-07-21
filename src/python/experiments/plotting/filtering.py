@@ -16,6 +16,7 @@ def plot_grouped_by_component(
     width=1200,
     height=400,
     time_scale=24*3600,
+    absolute_time=False,
     plot_path='.'):
 
     model_info = model.get_status()
@@ -35,7 +36,7 @@ def plot_grouped_by_component(
     k = model_info['k']
     num_rounds = model_info['num_rounds']
     X_axis = epu.get_X_axis(
-        model_info, filtered_Xs[0].shape[0], time_scale)
+        model_info, filtered_Xs[0].shape[0], time_scale, absolute_time)
     component_plots = []
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Point for Component '
@@ -71,6 +72,7 @@ def plot_grouped_by_view(
     width=1200,
     height=400,
     time_scale=24*3600,
+    absolute_time=False,
     plot_path='.'):
 
     model_info = model.get_status()
@@ -90,7 +92,7 @@ def plot_grouped_by_view(
     num_rounds = model_info['num_rounds']
     X_plots = []
     X_axis = epu.get_X_axis(
-        model_info, filtered_Xs[0].shape[0], time_scale)
+        model_info, filtered_Xs[0].shape[0], time_scale, absolute_time)
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Points for View '
 
