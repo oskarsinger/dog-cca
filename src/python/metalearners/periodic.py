@@ -1,3 +1,4 @@
+import numpy as np
 import global_utils as gu
 
 from data.servers.masks import PeriodicMask as PM
@@ -59,6 +60,7 @@ class PeriodicMetaLearner:
         period_count = 0
         
         while not all(finished):
+
             if self.filtering_history is None:
                 self.filtering_history = [filtered_X_list[0][i][:self.pl,:]
                                           for i in xrange(self.num_views)]
@@ -81,16 +83,11 @@ class PeriodicMetaLearner:
                 begin = self.pl * period_count
                 end = begin + self.pl
 
-                if end > fX[i].shape[0]:
+                if end < fX[i].shape[0]:
                     current = self.filtering_history[i]
                     new = fX[i][begin:end]
 
-                    print 'Current', current.shape
-                    print 'New', new.shape
-
                     self.filtering_history[i] = np.vstack([current, new])
-
-                    print 'Total', self.filtering_history[i].shape
                 else:
                     finished[i] = True
 
