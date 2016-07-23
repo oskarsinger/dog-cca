@@ -34,7 +34,6 @@ def plot_grouped_by_component(
              for (i, ds) in enumerate(model_info['ds_list'])]
     k = model_info['k']
     num_views = model_info['num_views']
-    num_rounds = model_info['num_rounds']
     X_axis = epu.get_X_axis(
         model_info, filtered_Xs[0].shape[0], time_scale, absolute_time)
     component_plots = []
