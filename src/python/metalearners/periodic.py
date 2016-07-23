@@ -87,7 +87,7 @@ class PeriodicMetaLearner:
                     current = self.filtering_history[i]
                     new = fX[i][begin:end]
 
-                    self.filtering_history[i] = np.vstack([current, new])
+                    self.filtering_history[i] = np.vstack([current, np.copy(new)])
                 else:
                     finished[i] = True
 
