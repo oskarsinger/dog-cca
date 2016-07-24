@@ -1,6 +1,8 @@
 import numpy as np
 import global_utils as gu
 
+from time import mktime
+
 def get_refiltered_Xs(model_info):
 
     dss = model_info['ds_list']
@@ -33,15 +35,21 @@ def get_refiltered_Xs(model_info):
 
     return filtered_Xs
 
-def get_X_axis(model_info, length, time_scale, absolute_time):
+def get_filtering_X_axis(model_info, length, absolute_time=False, time_scale=None):
 
     ds = model_info['ds_list'][0]
     dl = ds.get_status()['data_loader']
     dl_info = dl.get_status()
-    time_scale = 1.0 / float(time_scale)
+    X_axis = np.arange(length).astype(float)
 
     if 'seconds' in dl_info:
-        time_scale *= float(dl_info['seconds'])
+        X_axis *= dl_info['seconds']
 
-    return time_scale * np.arange(length).astype(float)
+    if absolute_time:
+        start_time = mktime(dl_info['start_times'][0].timetuple())
+        X_axis += start_time
+    elif time_scale is not None:
+        time_scale = 1.0 / float(time_scale)
+        X_axis *= time_scale
 
+    return X_axis
