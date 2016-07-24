@@ -9,6 +9,7 @@ from drrobert.file_io import get_timestamped as get_ts
 
 from bokeh.plotting import figure, output_file
 from bokeh.palettes import Spectral11
+from bokeh.models import DatetimeTickFormatter
 
 def plot_grouped_by_component(
     model,
@@ -34,8 +35,9 @@ def plot_grouped_by_component(
              for (i, ds) in enumerate(model_info['ds_list'])]
     k = model_info['k']
     num_views = model_info['num_views']
-    X_axis = epu.get_X_axis(
-        model_info, filtered_Xs[0].shape[0], time_scale, absolute_time)
+    X_axis = epu.get_filtering_X_axis(
+        model_info, filtered_Xs[0].shape[0], 
+        time_scale=time_scale, absolute_time=absolute_time)
     component_plots = []
     X_label = 'Time Step Observed (days)'
     Y_label = 'Canonical Correlation for Component '
@@ -56,6 +58,15 @@ def plot_grouped_by_component(
             colors=Spectral11[:4]+Spectral11[-4:],
             width=width,
             height=height))
+
+    if absolute_time:
+        for plot in component_plots:
+            plot.xaxis.formatter=DatetimeTickFormatter(
+                formats=dict(
+                    hours=['%d %b %T'],
+                    days=['%d %b %T'],
+                    months=['%d %b %T'],
+                    years=['%d %b %T']))
 
     filename = get_ts(
         'historical_' + str(historical) +

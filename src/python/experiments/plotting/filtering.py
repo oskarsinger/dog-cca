@@ -9,6 +9,7 @@ from drrobert.file_io import get_timestamped as get_ts
 
 from bokeh.plotting import figure, output_file
 from bokeh.palettes import Spectral11
+from bokeh.models import DatetimeTickFormatter
 
 def plot_grouped_by_component(
     model,
@@ -34,8 +35,9 @@ def plot_grouped_by_component(
              for (i, ds) in enumerate(model_info['ds_list'])]
     name_and_data = zip(names, filtered_Xs)
     k = model_info['k']
-    X_axis = epu.get_X_axis(
-        model_info, filtered_Xs[0].shape[0], time_scale, absolute_time)
+    X_axis = epu.get_filtering_X_axis(
+        model_info, filtered_Xs[0].shape[0], 
+        time_scale=time_scale, absolute_time=absolute_time)
     component_plots = []
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Point for Component '
@@ -89,8 +91,9 @@ def plot_grouped_by_view(
     name_and_data = zip(names,filtered_Xs)
     k = model_info['k']
     X_plots = []
-    X_axis = epu.get_X_axis(
-        model_info, filtered_Xs[0].shape[0], time_scale, absolute_time)
+    X_axis = epu.get_filtering_X_axis(
+        model_info, filtered_Xs[0].shape[0], 
+        time_scale=time_scale, absolute_time=absolute_time)
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Points for View '
 
@@ -109,11 +112,12 @@ def plot_grouped_by_view(
 
     if absolute_time:
         for plot in X_plots:
-            plot.xaxis.formatter=DateTimeTickFormatter(formats=dict(
-                hours=['%d %B'],
-                days=['%d %B'],
-                months=['%d %B'],
-                years=['%d %B']))
+            plot.xaxis.formatter=DatetimeTickFormatter(
+                formats=dict(
+                    hours=['%d %b %T'],
+                    days=['%d %b %T'],
+                    months=['%d %b %T'],
+                    years=['%d %b %T']))
 
     filename = get_ts(
         'historical_' + str(historical) +
