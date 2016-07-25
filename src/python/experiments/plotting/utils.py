@@ -35,7 +35,15 @@ def get_refiltered_Xs(model_info):
 
     return filtered_Xs
 
-def get_filtering_X_axis(model_info, length, absolute_time=False, time_scale=None):
+def get_loader_names(model_info):
+
+    ds2name = lambda ds: ds.get_status()['data_loader'].name()
+
+    return [ds2name(ds) + ' (' + str(i) + ') '
+            for (i, ds) in enumerate(model_info['ds_list'])]
+
+def get_filtering_X_axis(model_info, length, 
+    absolute_time=False, time_scale=None):
 
     ds = model_info['ds_list'][0]
     dl = ds.get_status()['data_loader']
