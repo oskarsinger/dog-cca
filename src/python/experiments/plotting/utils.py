@@ -2,6 +2,7 @@ import numpy as np
 import global_utils as gu
 
 from time import mktime
+from datetime import datetime as DT
 
 def get_refiltered_Xs(model_info):
 
@@ -35,6 +36,16 @@ def get_refiltered_Xs(model_info):
 
     return filtered_Xs
 
+def set_datetime_xaxis(plot):
+
+    plot.xaxis.formatter=DatetimeTickFormatter(
+        formats=dict(
+            hours=['%d %b %T'],
+            days=['%d %b %T'],
+            months=['%d %b %T'],
+            years=['%d %b %T']))
+    plot.xaxis.major_label_orientation = pi/4
+
 def get_loader_names(model_info):
 
     ds2name = lambda ds: ds.get_status()['data_loader'].name()
@@ -43,7 +54,7 @@ def get_loader_names(model_info):
             for (i, ds) in enumerate(model_info['ds_list'])]
 
 def get_filtering_X_axis(model_info, length, 
-    absolute_time=False, time_scale=None):
+    datetime_axis=False, time_scale=None):
 
     ds = model_info['ds_list'][0]
     dl = ds.get_status()['data_loader']
@@ -53,9 +64,10 @@ def get_filtering_X_axis(model_info, length,
     if 'seconds' in dl_info:
         X_axis *= dl_info['seconds']
 
-    if absolute_time:
+    if datetime_axis:
         start_time = mktime(dl_info['start_times'][0].timetuple())
         X_axis += start_time
+        X_axis = [DT.fromtimestamp(ts) for ts in X_axis.tolist()]
     elif time_scale is not None:
         time_scale = 1.0 / float(time_scale)
         X_axis *= time_scale

@@ -19,7 +19,7 @@ def plot_grouped_by_component(
     height=400,
     time_scale=24*3600,
     upper=1.0, lower=-1.0,
-    absolute_time=False,
+    datetime_axis=False,
     plot_path='.'):
 
     model_info = model.get_status()
@@ -38,7 +38,7 @@ def plot_grouped_by_component(
     k = model_info['k']
     X_axis = epu.get_filtering_X_axis(
         model_info, filtered_Xs[0].shape[0], 
-        time_scale=time_scale, absolute_time=absolute_time)
+        time_scale=time_scale, datetime_axis=datetime_axis)
     component_plots = []
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Point for Component '
@@ -56,14 +56,9 @@ def plot_grouped_by_component(
             width=width,
             height=height))
 
-    if absolute_time:
+    if datetime_axis:
         for plot in component_plots:
-            plot.xaxis.formatter=DatetimeTickFormatter(
-                formats=dict(
-                    hours=['%d %b %T'],
-                    days=['%d %b %T'],
-                    months=['%d %b %T'],
-                    years=['%d %b %T']))
+            epu.set_datetime_xaxis(plot)
 
     filename = get_ts(
         'historical_' + str(historical) +
@@ -84,7 +79,7 @@ def plot_grouped_by_view(
     height=400,
     time_scale=24*3600,
     upper=1.0, lower=-1.0,
-    absolute_time=False,
+    datetime_axis=False,
     plot_path='.'):
 
     model_info = model.get_status()
@@ -103,7 +98,7 @@ def plot_grouped_by_view(
     X_plots = []
     X_axis = epu.get_filtering_X_axis(
         model_info, filtered_Xs[0].shape[0], 
-        time_scale=time_scale, absolute_time=absolute_time)
+        time_scale=time_scale, datetime_axis=datetime_axis)
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Points for View '
 
@@ -120,14 +115,9 @@ def plot_grouped_by_view(
             width=width,
             height=height))
 
-    if absolute_time:
+    if datetime_axis:
         for plot in X_plots:
-            plot.xaxis.formatter=DatetimeTickFormatter(
-                formats=dict(
-                    hours=['%d %b %T'],
-                    days=['%d %b %T'],
-                    months=['%d %b %T'],
-                    years=['%d %b %T']))
+            epu.set_datetime_xaxis(plot)
 
     filename = get_ts(
         'historical_' + str(historical) +
