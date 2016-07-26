@@ -3,6 +3,9 @@ import global_utils as gu
 
 from time import mktime
 from datetime import datetime as DT
+from bokeh.models import DatetimeTickFormatter
+from bokeh.models import DatetimeTicker
+from math import pi
 
 def get_refiltered_Xs(model_info):
 
@@ -38,7 +41,8 @@ def get_refiltered_Xs(model_info):
 
 def set_datetime_xaxis(plot):
 
-    plot.xaxis.formatter=DatetimeTickFormatter(
+    plot.xaxis.ticker = DatetimeTicker()
+    plot.xaxis.formatter = DatetimeTickFormatter(
         formats=dict(
             hours=['%d %b %T'],
             days=['%d %b %T'],
