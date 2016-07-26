@@ -40,19 +40,19 @@ def plot_grouped_by_component(
         model_info, filtered_Xs[0].shape[0], 
         time_scale=time_scale, datetime_axis=datetime_axis)
     component_plots = []
-    X_label = 'Time Step Observed (days)'
-    Y_label = 'Filtered Data Point for Component '
+    X_label = 'Time (days)'
+    Y_label = 'Component'
     gos = lambda j: _get_offset(j, upper, lower)
 
     for i in xrange(k):
-        comp_map = {'Filtered ' + name + '\'s component ' :
+        comp_map = {name + '\'s component ' :
                     (X_axis, X[:,i] + gos(j))
                     for j, (name, X) in enumerate(ns_and_Xs)}
         component_plots.append(plot_lines(
             comp_map,
             X_label,
-            Y_label + str(i),
-            Y_label + str(i) + ' vs ' + X_label,
+            Y_label + ' ' + str(i),
+            Y_label + ' ' + str(i) + ' vs ' + X_label,
             colors=Spectral11[:4]+Spectral11[-4:],
             width=width,
             height=height))
@@ -100,12 +100,12 @@ def plot_grouped_by_view(
     X_axis = epu.get_filtering_X_axis(
         model_info, filtered_Xs[0].shape[0], 
         time_scale=time_scale, datetime_axis=datetime_axis)
-    X_label = 'Time Step Observed (days)'
-    Y_label = 'Filtered Data Points for View '
+    X_label = 'Time (days)'
+    Y_label = 'Components of '
     gos = lambda j: _get_offset(j, upper, lower)
 
     for (name, X) in zip(names,filtered_Xs):
-        X_map = {'Filtered ' + name + ' dimension ' + str(j) : 
+        X_map = {name + ' component ' + str(j) : 
                  (X_axis, X[:,j] + gos(j))
                  for j in xrange(k)}
         X_plots.append(plot_lines(
