@@ -10,7 +10,6 @@ from linal.utils import get_thresholded as get_thresh
 
 from bokeh.plotting import figure, output_file
 from bokeh.palettes import Spectral11
-from bokeh.models import DatetimeTickFormatter
 
 def plot_grouped_by_component(
     model,
@@ -43,12 +42,14 @@ def plot_grouped_by_component(
     component_plots = []
     X_label = 'Time Step Observed (days)'
     Y_label = 'Canonical Correlation for Component '
+    goc = lambda i, j, l: _get_offset_correlation(
+        filtered_Xs, num_views, i, j, l, upper, lower)
 
     for i in xrange(k):
         comp_map = {'Canonical correlation of ' + \
                         names[j] + ' vs ' + \
                         names[l] :
-                    (X_axis, filtered_Xs[j][:,i] * filtered_Xs[l][:,i])
+                    (X_axis, goc(i, j, l))
                     for j in xrange(num_views)
                     for l in xrange(j+1, num_views)} 
 
@@ -63,7 +64,7 @@ def plot_grouped_by_component(
 
     if datetime_axis:
         for plot in component_plots:
-            epu.set_datetime_axis(plot)
+            epu.set_datetime_xaxis(plot)
 
     filename = get_ts(
         'historical_' + str(historical) +
@@ -76,3 +77,12 @@ def plot_grouped_by_component(
         'component-grouped Canonical correlations vs time step observed')
 
     return component_plots
+
+def _get_offset_correlation(fXs, num_views, i, j, l, upper, lower):
+
+    correlation = fXs[j][:,i] * fXs[l][:,i]
+    cushion = 0.05 * (upper - lower)
+    count = j * num_views + l - (j * (j - 1) / 2 + j)
+    offset = (cushion + upper - lower) * (count - 1)
+
+    return correlation + offset

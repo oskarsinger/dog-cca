@@ -10,7 +10,6 @@ from linal.utils import get_thresholded as get_thresh
 
 from bokeh.plotting import figure, output_file
 from bokeh.palettes import Spectral11
-from bokeh.models import DatetimeTickFormatter
 
 def plot_grouped_by_component(
     model,
@@ -35,6 +34,7 @@ def plot_grouped_by_component(
     filtered_Xs = [get_thresh(fX, upper=upper, lower=lower)
                    for fX in filtered_Xs]
     names = epu.get_loader_names(model_info)
+    ns_and_Xs = zip(names, filtered_Xs)
     k = model_info['k']
     X_axis = epu.get_filtering_X_axis(
         model_info, filtered_Xs[0].shape[0], 
@@ -42,11 +42,12 @@ def plot_grouped_by_component(
     component_plots = []
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Point for Component '
+    gos = lambda j: _get_offset(j, upper, lower)
 
     for i in xrange(k):
         comp_map = {'Filtered ' + name + '\'s component ' :
-                    (X_axis, X[:,i])
-                    for (name, X) in zip(names, filtered_Xs)}
+                    (X_axis, X[:,i] + gos(j))
+                    for j, (name, X) in enumerate(ns_and_Xs)}
         component_plots.append(plot_lines(
             comp_map,
             X_label,
@@ -101,10 +102,11 @@ def plot_grouped_by_view(
         time_scale=time_scale, datetime_axis=datetime_axis)
     X_label = 'Time Step Observed (days)'
     Y_label = 'Filtered Data Points for View '
+    gos = lambda j: _get_offset(j, upper, lower)
 
     for (name, X) in zip(names,filtered_Xs):
         X_map = {'Filtered ' + name + ' dimension ' + str(j) : 
-                 (X_axis, X[:,j])
+                 (X_axis, X[:,j] + gos(j))
                  for j in xrange(k)}
         X_plots.append(plot_lines(
             X_map,
@@ -131,3 +133,10 @@ def plot_grouped_by_view(
 
     print 'Displaying plots'
     return X_plots
+
+def _get_offset(count, upper, lower):
+
+    cushion = 0.05 * (upper - lower)
+    offset = (cushion + upper - lower) * (count - 1)
+
+    return offset
