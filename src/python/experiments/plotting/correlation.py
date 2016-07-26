@@ -40,14 +40,14 @@ def plot_grouped_by_component(
         model_info, filtered_Xs[0].shape[0], 
         time_scale=time_scale, datetime_axis=datetime_axis)
     component_plots = []
-    X_label = 'Time Step Observed (days)'
-    Y_label = 'Canonical Correlation for Component '
+    X_label = 'Time (days)'
+    Y_label = 'Correlation'
     goc = lambda i, j, l: _get_offset_correlation(
         filtered_Xs, num_views, i, j, l, upper, lower)
 
     for i in xrange(k):
-        comp_map = {'Canonical correlation of ' + \
-                        names[j] + ' vs ' + \
+        comp_map = {'Correlation of ' + \
+                        names[j] + ' and ' + \
                         names[l] :
                     (X_axis, goc(i, j, l))
                     for j in xrange(num_views)
@@ -56,8 +56,8 @@ def plot_grouped_by_component(
         component_plots.append(plot_lines(
             comp_map,
             X_label,
-            Y_label + str(i),
-            Y_label + str(i) + ' vs ' + X_label,
+            Y_label + ' ' + str(i),
+            Y_label + ' ' + str(i) + ' and ' + X_label,
             colors=Spectral11[:4]+Spectral11[-4:],
             width=width,
             height=height))

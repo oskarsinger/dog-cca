@@ -42,10 +42,11 @@ def get_refiltered_Xs(model_info):
 def set_datetime_xaxis(plot):
 
     plot.xaxis.ticker = DatetimeTicker()
+    plot.xaxis[0].ticker.desired_num_ticks = 28
     plot.xaxis.formatter = DatetimeTickFormatter(
         formats=dict(
-            hours=['%d %b %T'],
-            days=['%d %b %T'],
+            hours=['%T'],
+            days=['%d %b'],
             months=['%d %b %T'],
             years=['%d %b %T']))
     plot.xaxis.major_label_orientation = pi/4
