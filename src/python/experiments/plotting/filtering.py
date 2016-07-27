@@ -136,7 +136,10 @@ def plot_grouped_by_view(
 
 def _get_offset(count, upper, lower):
 
-    cushion = 0.05 * (upper - lower)
-    offset = (cushion + upper - lower) * (count - 1)
+    offset = 0
+
+    if upper is not None and lower is not None:
+        cushion = 0.05 * (upper - lower)
+        offset = (cushion + upper - lower) * (count - 1)
 
     return offset
