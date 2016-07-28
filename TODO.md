@@ -1,28 +1,27 @@
 #Online CCA Todo List
 
+##Presentation
+* Introduce notation for optimization problem formulation, pseudocode, etc.
+
+* Think of ways to clarify what exactly the plots are showing (e.g. clarify that the filtering plots are showing X times Phi).
+
 ##Experiments
-
-###Random
-* Figure out why your objective is bouncing all over for the experiment you tried with non-zero column means.
-
-###E4
-* Clean up the data to get more 'regular' parts of the time series.
+* Run on some synthetic data to figure out why the AppGrad filter takes so long to stabilize.
 
 ##Plots
-* Simple line plots of the different data streams. Just time step and value.
+* Plot the application of the basis for each of the periods in the periodic metalearner to the full dataset.
 
-* Plots of the canonical bases under certain arrangements of tuning parameters and optional add-ons.
+* Zoom in on the filtering plots to make the subtleties and periodicity more apparent.
 
 ##Implementation
 
 ###Gram Variations
-* Is it problematic that my cross-Gram matrices are not stateful like the Gram matrices? Maybe I should implement the algorithms to run the stateful updates on the cross Grams too. Should brainstorm with Sijia or John about this at some point.
+* FOR CCALin ONLY: is it problematic that my cross-Gram matrices are not stateful like the Gram matrices? Maybe I should implement the algorithms to run the stateful updates on the cross Grams too. Should brainstorm with Sijia or John about this at some point.
 
-###Features
-* Histograms for fixed time intervals. Add a data transformer for this.
+###Feature Representations
 
-###Corrections and Regularization
-* Try the cubic regularization technique maybe.
+###Optimization
+* Try the cubic regularization technique from Rong Ge's paper maybe.
 
 ###Numerical Linear Algebra
 * See if block-diagonal structure can be leveraged in CCALin (and GenELinK) implementation(s).
