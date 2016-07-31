@@ -16,7 +16,7 @@ def run_n_view_online_periodic_appgrad_e4_data_experiment(
         subject, 
         seconds, 
         True)
-    ds_list = [M2M(dl, batch_size=bs) for dl in dl_list]
+    ds_list = [M2M(dl, bs, center=True) for dl in dl_list]
     get_learner = emu.get_appgrad_factory()
     get_gs = None
     
@@ -28,7 +28,7 @@ def run_n_view_online_periodic_appgrad_e4_data_experiment(
     elif window is not None:
         get_gs = emu.get_boxcar_gs_factory(window)
 
-    return emu.run_online_n_view_periodic_metalearner_experiment(
+    return emu.run_n_view_periodic_metalearner_experiment(
             ds_list, k, get_learner, period_length, num_periods,
             max_iter=max_iter,
             get_gs=get_gs, verbose=verbose)

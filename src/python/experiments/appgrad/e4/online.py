@@ -20,7 +20,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
     print "Creating data loaders"
     dls = eu.get_e4_loaders(hdf5_path, subject, seconds, True)
     print "Creating data servers"
-    dss = [M2M(dl, bs, num_coords=nc)
+    dss = [M2M(dl, bs, center=True, num_coords=nc)
            for (dl, nc) in zip(dls, num_coords)]
 
     print "Training model"
