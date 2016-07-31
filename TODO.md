@@ -5,6 +5,8 @@
 
 * Think of ways to clarify what exactly the plots are showing (e.g. clarify that the filtering plots are showing X times Phi).
 
+* Think of best way to juxtapose filter with random noise input to filter with E4 input to emphasize patterns in the E4.
+
 ##Experiments
 * Run some experiments to figure out why AppGrad filter takes so long to stabilize.
     * Use synthesized data for sanity check on an easy case.
