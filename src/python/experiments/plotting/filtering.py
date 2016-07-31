@@ -11,6 +11,17 @@ from linal.utils import get_thresholded as get_thresh
 from bokeh.plotting import figure, output_file
 from bokeh.palettes import Spectral11
 
+def plot_every_basis_all_data(
+    model,
+    width=1200,
+    height=400,
+    time_scale=24*3600,
+    upper=1.0, lower=-1.0,
+    datetime_axis=False,
+    plot_path='.'):
+
+    print 'Some stuff'
+
 def plot_grouped_by_component(
     model,
     historical=False,

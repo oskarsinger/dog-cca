@@ -22,6 +22,7 @@ class NViewAppGradCCA:
 
         self.k = k
         self.ds_list = ds_list
+        self.online = online
         self.num_views = len(self.ds_list)
         self.verbose = verbose
         
@@ -81,14 +82,10 @@ class NViewAppGradCCA:
         # Iteration variables
         converged = [False] * self.num_views
 
-        # Data loaders 
-        dls = [ds.get_status()['data_loader']
-               for ds in self.ds_list]
-
         print "Starting optimization"
 
         while not all(converged) and self.num_iters < max_iter:
-            while not any([dl.finished() for dl in dls]):
+            while not any([ds.finished() for ds in self.ds_list]):
                 self.num_rounds += 1
 
                 if self.verbose:

@@ -17,7 +17,7 @@ def run_n_view_online_ccalin_shifting_mean_gaussian_data_experiment(
     bs = cca_k + icl(cca_k)
     loaders = [SMGL(p, mean, rate)
                for (p, mean, rate) in zip(ps, means, rates)]
-    servers = [M2M(loader, bs) for loader in loaders]
+    servers = [M2M(loader, bs, center=True) for loader in loaders]
 
     return ecu.run_online_n_view_ccalin_experiment(
         servers, cca_k,

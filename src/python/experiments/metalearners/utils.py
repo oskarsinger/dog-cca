@@ -4,7 +4,7 @@ from appgrad import NViewAppGradCCA
 from data.servers.gram.online import BoxcarGramServer as BCGS
 from data.servers.gram.online import ExpGramServer as EGS
 
-def run_online_n_view_periodic_metalearner_experiment(
+def run_n_view_periodic_metalearner_experiment(
     ds_list, k,
     get_learner,
     period_length,
@@ -26,7 +26,7 @@ def run_online_n_view_periodic_metalearner_experiment(
     return model
 
 #TODO: include other args for an n-view AppGrad model
-def get_appgrad_factory():
+def get_appgrad_factory(etas):
 
     def get_learner(k, ds_list, gs_list, verbose):
 
