@@ -1,7 +1,8 @@
 from data.servers.batch import BatchServer as BS
 from drrobert.arithmetic import int_ceil_log as icl
 from .. import utils as ecu
-from ... import utils as eu
+
+import data.loaders.e4.shortcuts as dles
 
 import h5py
 
@@ -20,7 +21,7 @@ def run_batch_n_view_ccalin_e4_data_experiment(
         num_coords = [None] * 4
 
     print "Creating data loaders"
-    dls = eu.get_e4_loaders(hdf5_path, subject, seconds, False)
+    dls = dles.get_e4_loaders(hdf5_path, subject, seconds, False)
     print "Creating data servers"
     dss = [BS(dl, num_coords=nc) 
            for (dl, nc) in zip(dls, num_coords)]

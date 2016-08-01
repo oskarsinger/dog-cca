@@ -5,7 +5,8 @@ from data.loaders.e4 import IBILoader as IBI
 from data.loaders.readers import from_num as fn
 from data.servers.batch import BatchServer as BS
 from linal.utils import quadratic as quad
-from ... import utils as eu
+
+import data.loaders.e4.shortcuts as dles
 
 import numpy as np
 
@@ -51,7 +52,7 @@ def test_n_fixed_rate_scalar(
     hdf5_path, subject, cca_k,
     seconds=10):
 
-    dls = eu.get_e4_loaders(hdf5_path, subject, seconds, False)
+    dls = dles.get_e4_loaders(hdf5_path, subject, seconds, False)
     dss = [BS(dl) for dl in dls]
 
     return test_batch_n_view_appgrad(

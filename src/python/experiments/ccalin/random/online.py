@@ -1,6 +1,6 @@
 import numpy as np
 
-from data.loaders.random import ShiftingMeanGaussianLoader as SMGL
+from data.loaders.synthetic import ShiftingMeanGaussianLoader as SMGL
 from data.servers.minibatch import Minibatch2Minibatch as M2M
 from drrobert.arithmetic import int_ceil_log as icl
 from .. import utils as ecu

@@ -1,7 +1,7 @@
 import numpy as np
 
-from data.loaders.random import ShiftingMeanGaussianLoader as SMGL
-from data.loaders.random import GaussianLoader as GL
+from data.loaders.synthetic import ShiftingMeanGaussianLoader as SMGL
+from data.loaders.synthetic import GaussianLoader as GL
 from data.servers.minibatch import Minibatch2Minibatch as M2M
 from data.servers.minibatch import Batch2Minibatch as B2M
 from drrobert.arithmetic import int_ceil_log as icl
@@ -10,6 +10,7 @@ from .. import utils as eau
 
 def run_n_view_online_appgrad_gaussian_data_experiment(
     n, ps, cca_k,
+    max_iter=10,
     percentiles=None,
     exps=None, windows=None,
     etas=None, lowers=None,
@@ -21,6 +22,7 @@ def run_n_view_online_appgrad_gaussian_data_experiment(
 
     return eau.run_online_n_view_appgrad_experiment(
         servers, cca_k,
+        max_iter=max_iter,
         percentiles=percentiles,
         exps=exps, windows=windows,
         lowers=lowers, etas=etas,
@@ -28,6 +30,7 @@ def run_n_view_online_appgrad_gaussian_data_experiment(
 
 def run_n_view_online_appgrad_shifting_mean_gaussian_data_experiment(
     ps, cca_k, means, rates,
+    max_iter=10,
     percentiles=None,
     exps=None, windows=None,
     etas=None, lowers=None,
@@ -40,6 +43,7 @@ def run_n_view_online_appgrad_shifting_mean_gaussian_data_experiment(
 
     return eau.run_online_n_view_appgrad_experiment(
         servers, cca_k,
+        max_iter=max_iter,
         percentiles=percentiles,
         exps=exps, windows=windows,
         lowers=lowers, etas=etas,
