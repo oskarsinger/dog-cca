@@ -4,7 +4,8 @@ from appgrad import NViewAppGradCCA as NVAGCCA
 from data.servers.minibatch import Minibatch2Minibatch as M2M
 from drrobert.arithmetic import int_ceil_log as icl
 from .. import utils as eau
-from ... import utils as eu
+
+import data.loaders.e4.shortcuts as dles 
 
 import h5py
 
@@ -18,7 +19,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
 
     bs = cca_k + icl(cca_k)
     print "Creating data loaders"
-    dls = eu.get_e4_loaders(hdf5_path, subject, seconds, True)
+    dls = dles.get_e4_loaders(hdf5_path, subject, seconds, True)
     print "Creating data servers"
     dss = [M2M(dl, bs, center=True, num_coords=nc)
            for (dl, nc) in zip(dls, num_coords)]

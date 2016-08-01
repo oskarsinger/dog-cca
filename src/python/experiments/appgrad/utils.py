@@ -6,6 +6,7 @@ from data.servers.masks import PercentileMask as PM
 
 def run_online_n_view_appgrad_experiment(
     servers, k, 
+    max_iter=10,
     percentiles=None,
     exps=None, windows=None,
     etas=None, lowers=None,
@@ -42,6 +43,7 @@ def run_online_n_view_appgrad_experiment(
 
     print "Fitting model"
     model.fit(
+        max_iter=max_iter,
         optimizers=optims,
         etas=etas)
 
