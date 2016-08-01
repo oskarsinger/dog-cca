@@ -12,7 +12,7 @@ def run_n_view_online_periodic_appgrad_e4_data_experiment(
 
     bs = k + icl(k)
     period_length = (24 * 3600) / (num_periods * seconds)
-    dl_list = dles.get_hr_and_acc(
+    dl_list = dles.get_e4_loaders(
         hdf5_path, 
         subject, 
         seconds, 
