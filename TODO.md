@@ -12,6 +12,8 @@
     * Use synthesized data for sanity check on an easy case.
     * Try different step sizes. This will take some software engineering, so get the easier one out of the way first.
 
+* Run some experiments on the new periodic data loader you created.
+
 ##Plots
 * Plot the application of the basis for each of the periods in the periodic metalearner to the full dataset.
 

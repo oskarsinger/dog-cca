@@ -1,3 +1,3 @@
-import random
+import synthetic
 import e4
 import utils
