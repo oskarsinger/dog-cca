@@ -12,7 +12,16 @@
     * Use synthesized data for sanity check on an easy case.
     * Try different step sizes. This will take some software engineering, so get the easier one out of the way first.
 
-* Run some experiments on the new periodic data loader you created.
+* Try both periodic link functions.
+
+* Try different step-size schemes on AppGrad since we don't care about global convergence any more. 
+    * Constant step size and just let the Bregman divergence figure out the rest.
+    * More interesting adaptive ones like 'No More Pesky Learning Rates' and the probabilistic one.
+
+##Research Questions
+* Do we care about convexity any more since we are approximately solving a new problem at each round in a non-stationary environment? What properties in our objective function are conducive to accomplishing our goal of being pretty close to some tracking target at ever time step?
+
+* Now our step size routine has a different quality criterion. What should it even accomplish?
 
 ##Plots
 * Plot the application of the basis for each of the periods in the periodic metalearner to the full dataset.

@@ -26,7 +26,7 @@ def run_n_view_periodic_metalearner_experiment(
     return model
 
 #TODO: include other args for an n-view AppGrad model
-def get_appgrad_factory(etas):
+def get_appgrad_factory():
 
     def get_learner(k, ds_list, gs_list, verbose):
 

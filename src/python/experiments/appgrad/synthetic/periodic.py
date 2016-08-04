@@ -11,6 +11,7 @@ def run_n_view_online_appgrad_cosine_data_experiment(
     max_iter=10,
     exps=None, windows=None,
     etas=None, lowers=None,
+    cs=None,
     verbose=False):
 
     lens = set([
@@ -40,4 +41,5 @@ def run_n_view_online_appgrad_cosine_data_experiment(
         max_iter=max_iter,
         exps=exps, windows=windows,
         lowers=lowers, etas=etas,
+        periods=periods, cs=cs,
         verbose=verbose)

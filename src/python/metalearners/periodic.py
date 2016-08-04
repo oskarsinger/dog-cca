@@ -105,4 +105,5 @@ class PeriodicMetaLearner:
             'get_gs': self.get_gs,
             'num_views': self.num_views,
             'learners': self.learners,
+            'num_rounds': self.filtering_history[0].shape[0],
             'filtering_history': self.filtering_history}
