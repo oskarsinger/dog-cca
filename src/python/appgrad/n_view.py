@@ -94,13 +94,13 @@ class NViewAppGradCCA:
 
                 # TODO: determine if this needs to be paused for views with missing data
                 # Update step sizes
-                etas_i = [eta / self.num_rounds**0.5 
+                etas_t = [eta / self.num_rounds**0.5 
                           for eta in etas]
                 
                 if self.verbose:
                     print "Iteration:", self.num_rounds
                     print "\t".join(["eta" + str(j) + " " + str(eta)
-                                     for j, eta in enumerate(etas_i)])
+                                     for j, eta in enumerate(etas_t)])
                     if self.online:
                         print "\tGetting updated minibatches and grams"
 
@@ -117,7 +117,7 @@ class NViewAppGradCCA:
 
                 # Get updated canonical bases
                 basis_pairs_t1 = self._get_basis_updates(
-                    Xs, Sxs, missing, basis_pairs_t, etas_i, optimizers)
+                    Xs, Sxs, missing, basis_pairs_t, etas_t, optimizers)
 
                 if self.verbose:
                     print "\tGetting updated auxiliary variable estimate"
@@ -129,7 +129,7 @@ class NViewAppGradCCA:
 
                 # This is because bases are unchanged for missing data and will of course result in zero different between iterations
                 converged = [False if missing[i] else c 
-                             for c in converged]
+                             for (i, c) in enumerate(converged)]
 
                 # Update iterates
                 basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))

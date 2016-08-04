@@ -11,20 +11,8 @@ from linal.utils import get_thresholded as get_thresh
 from bokeh.plotting import figure, output_file
 from bokeh.palettes import Spectral11
 
-def plot_every_basis_all_data(
+def plot_every_basis_all_data_grouped_by_component(
     model,
-    width=1200,
-    height=400,
-    time_scale=24*3600,
-    upper=1.0, lower=-1.0,
-    datetime_axis=False,
-    plot_path='.'):
-
-    print 'Some stuff'
-
-def plot_grouped_by_component(
-    model,
-    historical=False,
     width=1200,
     height=400,
     time_scale=24*3600,
@@ -33,6 +21,33 @@ def plot_grouped_by_component(
     plot_path='.'):
 
     model_info = model.get_status()
+    plots = []
+
+    for learner in model_info['learners']:
+        submodel_info = learner.get_status()
+        model_info['bases'] = submodel_info['bases']
+        plots.extend(
+            plot_grouped_by_component(
+                model_info,
+                width=width,
+                height=height,
+                time_scale=time_scale,
+                upper=upper, lower=lower,
+                datetime_axis=datetime_axis,
+                plot_path=plot_path))
+
+    return plots
+
+def plot_grouped_by_component(
+    model_info,
+    historical=False,
+    width=1200,
+    height=400,
+    time_scale=24*3600,
+    upper=1.0, lower=-1.0,
+    datetime_axis=False,
+    plot_path='.'):
+
     filtered_Xs = None
 
     print 'Getting filtered data'

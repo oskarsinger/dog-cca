@@ -1,5 +1,6 @@
 from appgrad import AppGradCCA, NViewAppGradCCA
 from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
+from optimization.optimizers.ftprl import PeriodicParameterMirrorDescent as PPMD
 from data.servers.gram import ExpGramServer as EGS
 from data.servers.gram import BoxcarGramServer as BGS
 from data.servers.masks import PercentileMask as PM
@@ -10,6 +11,7 @@ def run_online_n_view_appgrad_experiment(
     percentiles=None,
     exps=None, windows=None,
     etas=None, lowers=None,
+    periods=None, cs=None,
     verbose=True):
 
     gram_servers = None
@@ -37,9 +39,13 @@ def run_online_n_view_appgrad_experiment(
     optims = None
 
     print "Creating optimizers"
-    if (lowers is not None) and (len(lowers) == len(servers)):
+    if cs is not None:
+        optims = [PPMD(period, c, verbose=verbose) 
+                  for (period, c) in zip(periods, cs)]
+    elif (lowers is not None) and (len(lowers) == len(servers)):
         optims = [MAG(lower=lower, verbose=verbose)
                   for lower in lowers]
+
 
     print "Fitting model"
     model.fit(

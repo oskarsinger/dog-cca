@@ -1,11 +1,12 @@
 import numpy as np
 import global_utils as gu
 
+from math import pi
 from time import mktime
 from datetime import datetime as DT
 from bokeh.models import DatetimeTickFormatter
 from bokeh.models import DatetimeTicker
-from math import pi
+from data.pseudodata import MissingData
 
 def get_refiltered_Xs(model_info):
 
@@ -28,7 +29,12 @@ def get_refiltered_Xs(model_info):
             else:
                 for j in xrange(num_views):
                     current = filtered_Xs[j]
-                    new = np.dot(Xs[j][-1,:], Phis[j])
+
+                    new = np.zeros((1, model_info['k']))
+
+                    if not isinstance(Xs[j], MissingData):
+                        new = np.dot(Xs[j][-1,:], Phis[j])
+
                     filtered_Xs[j] = np.vstack([current, new])
 
     else:
