@@ -41,6 +41,7 @@ def plot_every_basis_all_data_grouped_by_component(
 def plot_grouped_by_component(
     model_info,
     historical=False,
+    absval=False,
     width=1200,
     height=400,
     time_scale=24*3600,
@@ -56,6 +57,9 @@ def plot_grouped_by_component(
         filtered_Xs = model_info['filtering_history']
     else:
         filtered_Xs = epu.get_refiltered_Xs(model_info)
+
+    if absval:
+        filtered_Xs = [np.abs(fX) for fX in filtered_Xs]
 
     filtered_Xs = [get_thresh(fX, upper=upper, lower=lower)
                    for fX in filtered_Xs]
