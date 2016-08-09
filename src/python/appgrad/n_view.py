@@ -94,8 +94,7 @@ class NViewAppGradCCA:
 
                 # TODO: determine if this needs to be paused for views with missing data
                 # Update step sizes
-                etas_t = [eta / self.num_rounds**0.5 
-                          for eta in etas]
+                etas_t = etas #[eta / self.num_rounds**0.5 for eta in etas]
                 
                 if self.verbose:
                     print "Iteration:", self.num_rounds
