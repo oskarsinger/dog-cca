@@ -12,7 +12,7 @@ from bokeh.plotting import figure, output_file
 from bokeh.palettes import Spectral11
 
 def plot_every_basis_all_data_grouped_by_component(
-    model,
+    model_info,
     width=1200,
     height=400,
     time_scale=24*3600,
@@ -20,7 +20,6 @@ def plot_every_basis_all_data_grouped_by_component(
     datetime_axis=False,
     plot_path='.'):
 
-    model_info = model.get_status()
     plots = []
 
     for learner in model_info['learners']:
@@ -104,7 +103,7 @@ def plot_grouped_by_component(
     return component_plots
 
 def plot_grouped_by_view(
-    model,
+    model_info,
     historical=False,
     width=1200,
     height=400,
@@ -113,7 +112,6 @@ def plot_grouped_by_view(
     datetime_axis=False,
     plot_path='.'):
 
-    model_info = model.get_status()
     filtered_Xs = None
 
     print 'Getting filtered data'
