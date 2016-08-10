@@ -6,7 +6,7 @@ import global_utils.server_tools as gust
 
 from drrobert.misc import unzip
 from optimization.utils import get_gram
-from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
+from optimization.optimizers import GradientOptimizer as GO
 from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 
 class NViewAppGradCCA:
@@ -59,14 +59,13 @@ class NViewAppGradCCA:
         max_iter=10):
 
         if etas is None:
-            etas = [0.00001] * self.num_views
+            etas = [0.01] * self.num_views
 
         if optimizers is None:
-            optimizers = [MAG(verbose=self.verbose) 
-                          for i in range(self.num_views)]
+            optimizers = [GO() for i in range(self.num_views)]
         elif not len(optimizers) == self.num_views:
             raise ValueError(
-                'Parameter optimizers must be of length num_views+1.')
+                'Parameter optimizers must be of length num_views.')
 
         print "Getting initial (mini)batches and Gram matrices"
 
