@@ -14,12 +14,13 @@ def run_n_view_online_appgrad_e4_data_experiment(
     seconds=10, 
     exps=None, windows=None,
     num_coords=[None]*6,
+    cs=None, periods=None,
     verbose=False,
     etas=None, lowers=None):
 
     bs = cca_k + icl(cca_k)
     print "Creating data loaders"
-    dls = dles.get_e4_loaders(hdf5_path, subject, seconds, True)
+    dls = dles.get_hr_and_acc(hdf5_path, subject, seconds, True)
     print "Creating data servers"
     dss = [M2M(dl, bs, center=True, num_coords=nc)
            for (dl, nc) in zip(dls, num_coords)]
@@ -28,6 +29,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
     return eau.run_online_n_view_appgrad_experiment(
         dss, cca_k,
         exps=exps, windows=windows,
+        cs=cs, periods=periods,
         lowers=lowers, etas=etas, 
         verbose=verbose)
 

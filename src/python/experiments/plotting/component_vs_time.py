@@ -34,6 +34,14 @@ def plot_components_over_time(
 
     if not datetime_axis:
         x_labels = [str(i) for i in x_labels]
+    else:
+        print 'Do something'
+
+    inc = x_labels / 50
+
+    for i in range(len(x_labels)):
+        if i % inc > 0:
+            x_labels[i] = ''
 
     x_name = 'Timestep'
     y_name = 'Ambient Coordinate'
