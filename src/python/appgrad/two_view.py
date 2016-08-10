@@ -3,7 +3,7 @@ import numpy as np
 import utils as agu
 import global_utils as gu
 
-from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
+from optimization.optimizers import GradientOptimizer as GO
 from optimization.utils import get_gram
 from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 
@@ -35,10 +35,10 @@ class AppGradCCA:
         max_iter=10000):
 
         if X_optimizer is None:
-            X_optimizer = MAG(verbose=verbose)
+            X_optimizer = GO(verbose=verbose)
 
         if Y_optimizer is None:
-            Y_optimizer = MAG(verbose=verbose)
+            Y_optimizer = GO(verbose=verbose)
 
         if X_gs is None:
             X_gs = BCGS() if self.online else BGS()

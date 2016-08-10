@@ -5,7 +5,7 @@ import global_utils as gu
 from linal.utils import multi_dot, quadratic as quad
 from linal.svd_funcs import get_svd_power
 from optimization.utils import is_converged
-from optimization.optimizers.ftprl import MatrixAdaGrad as MAG
+from optimization.optimizers.ftprl import AdaGradOptimizer as AGO
 
 class GenELinKSubroutine:
 
@@ -25,7 +25,7 @@ class GenELinKSubroutine:
 
         # Verify and set the optimizer factory
         if get_optimizer is None:
-            get_optimizer = MAG
+            get_optimizer = AGO
 
         self.get_optimizer = get_optimizer
 
