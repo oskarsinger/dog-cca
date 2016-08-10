@@ -51,6 +51,7 @@ class NViewAppGradCCA:
 
         if self.online:
             self.filtering_history = None
+            self.basis_history = None
 
     def fit(self,
         optimizers=None,
@@ -108,7 +109,7 @@ class NViewAppGradCCA:
                     (Xs, Sxs, missing) = gust.get_batch_and_gram_lists(
                         self.ds_list, self.gs_list, Xs=Xs, Sxs=Sxs)
 
-                    self._update_filtering_history(
+                    self._update_history(
                         Xs, basis_pairs_t, missing)
                     
                 if self.verbose:
@@ -171,15 +172,19 @@ class NViewAppGradCCA:
 
         return normed_pairs
 
-    def _update_filtering_history(self, Xs, basis_pairs, missing):
+    def _update_history(self, Xs, basis_pairs, missing):
+
+        normed = unzip(basis_pairs)[1]
+
+        # TODO: consider storing basis history as list of 3 mode tensors
 
         if self.filtering_history is None:
-            normed = unzip(basis_pairs)[1]
             self.filtering_history = [np.dot(X[-1,:], Phi)
                                       for (X, Phi) in zip(Xs, normed)]
+            self.basis_history = [[Phi[:,i][:,np.newaxis].T 
+                                   for i in xrange(self.k)]
+                                  for Phi in normed]
         else:
-            normed = unzip(basis_pairs)[1]
-
             for i in xrange(self.num_views):
                 current = self.filtering_history[i]
 
@@ -190,6 +195,16 @@ class NViewAppGradCCA:
                     new = np.dot(Xs[i][-1,:], normed[i])
 
                 self.filtering_history[i] = np.vstack([current, new])
+
+                # Update basis history
+                for j in xrange(self.k):
+                    current = self.basis_history[i][j]
+                    new = np.copy(current[-1,:])
+
+                    if not missing[i]:
+                        new = normed[i][:,j]
+
+                    self.basis_history[i][j] = np.vstack([current, new])
 
     def get_status(self):
 
@@ -205,4 +220,5 @@ class NViewAppGradCCA:
             'num_iters': self.num_iters,
             'has_been_fit': self.has_been_fit,
             'basis_pairs': self.basis_pairs,
+            'basis_history': self.basis_history,
             'filtering_history': self.filtering_history}
