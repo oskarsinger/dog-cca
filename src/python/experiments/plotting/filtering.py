@@ -66,8 +66,10 @@ def plot_grouped_by_component(
     ns_and_Xs = zip(names, filtered_Xs)
     k = model_info['k']
     X_axis = epu.get_filtering_X_axis(
-        model_info, filtered_Xs[0].shape[0], 
-        time_scale=time_scale, datetime_axis=datetime_axis)
+        model_info, 
+        filtered_Xs[0].shape[0], 
+        time_scale=time_scale, 
+        datetime_axis=datetime_axis)
     component_plots = []
     X_label = 'Time (days)'
     Y_label = 'Component'
