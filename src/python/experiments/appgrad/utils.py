@@ -12,6 +12,7 @@ def run_online_n_view_appgrad_experiment(
     exps=None, windows=None,
     etas=None, lowers=None,
     periods=None, cs=None,
+    keep_basis_history=False,
     verbose=True):
 
     gram_servers = None
@@ -34,6 +35,7 @@ def run_online_n_view_appgrad_experiment(
         k, servers, 
         gs_list=gram_servers, 
         online=True,
+        keep_basis_history=keep_basis_history,
         verbose=verbose)
 
     optims = None
