@@ -4,7 +4,6 @@ import global_utils as gu
 
 from data.servers.gram import BatchGramServer as BGS
 from genelink import BatchGenELinKSolver as GLK
-from linal.utils import multi_dot
 
 class CCALin:
 
