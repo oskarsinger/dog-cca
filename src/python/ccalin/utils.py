@@ -2,8 +2,6 @@ import numpy as np
 
 import global_utils as gu
 
-from linal.utils import multi_dot
-
 def get_A(Xs):
 
     dims = [X.shape[1] for X in Xs]
