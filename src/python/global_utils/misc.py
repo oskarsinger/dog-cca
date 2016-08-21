@@ -1,7 +1,7 @@
 import numpy as np
 
 from optimization.utils import is_converged as is_conv
-from linal.utils import quadratic as quad
+from linal.utils import get_quadratic as get_quad
 from linal.svd_funcs import get_svd_power
 
 def is_converged(
@@ -43,7 +43,7 @@ def get_objective(Xs, Phis):
 
 def get_gram_normed(unnormed, S):
 
-    basis_quad = quad(unnormed, S)
+    basis_quad = get_quad(unnormed, S)
     normalizer = get_svd_power(basis_quad, -0.5)
 
     return np.dot(unnormed, normalizer)
