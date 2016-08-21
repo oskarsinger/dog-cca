@@ -15,6 +15,7 @@ class NViewAppGradCCA:
         k, ds_list, 
         gs_list=None,
         online=False,
+        keep_basis_history=False,
         verbose=False,
         epsilons=None):
 
@@ -23,6 +24,7 @@ class NViewAppGradCCA:
         self.k = k
         self.ds_list = ds_list
         self.online = online
+        self.keep_basis_history = keep_basis_history
         self.num_views = len(self.ds_list)
         self.verbose = verbose
         
@@ -180,9 +182,10 @@ class NViewAppGradCCA:
         if self.filtering_history is None:
             self.filtering_history = [np.dot(X[-1,:], Phi)
                                       for (X, Phi) in zip(Xs, normed)]
-            self.basis_history = [[Phi[:,i][:,np.newaxis].T 
-                                   for i in xrange(self.k)]
-                                  for Phi in normed]
+            if self.keep_basis_history:
+                self.basis_history = [[Phi[:,i][:,np.newaxis].T 
+                                       for i in xrange(self.k)]
+                                      for Phi in normed]
         else:
             for i in xrange(self.num_views):
                 current = self.filtering_history[i]
@@ -196,14 +199,15 @@ class NViewAppGradCCA:
                 self.filtering_history[i] = np.vstack([current, new])
 
                 # Update basis history
-                for j in xrange(self.k):
-                    current = self.basis_history[i][j]
-                    new = np.copy(current[-1,:])
+                if self.keep_basis_history:
+                    for j in xrange(self.k):
+                        current = self.basis_history[i][j]
+                        new = np.copy(current[-1,:])
 
-                    if not missing[i]:
-                        new = normed[i][:,j]
+                        if not missing[i]:
+                            new = normed[i][:,j]
 
-                    self.basis_history[i][j] = np.vstack([current, new])
+                        self.basis_history[i][j] = np.vstack([current, new])
 
     def get_status(self):
 
