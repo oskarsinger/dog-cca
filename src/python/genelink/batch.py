@@ -1,6 +1,6 @@
 import numpy as np
 
-from linal.utils import multi_dot, quadratic as quad
+from linal.utils import get_quadratic as get_quad
 from linal.svd_funcs import get_svd_power
 from optimization.utils import is_converged
 from genelink import GenELinKSubroutine
@@ -88,6 +88,6 @@ class BatchGenELinKSolver:
 
     def _get_objective(self, W):
 
-        inner = quad(W, 0.5*self.B - self.A)
+        inner = get_quad(W, 0.5*self.B - self.A)
 
         return np.trace(inner)
