@@ -15,6 +15,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
     exps=None, windows=None,
     num_coords=[None]*6,
     cs=None, periods=None,
+    keep_basis_history=False,
     verbose=False,
     etas=None, lowers=None):
 
@@ -31,6 +32,7 @@ def run_n_view_online_appgrad_e4_data_experiment(
         exps=exps, windows=windows,
         cs=cs, periods=periods,
         lowers=lowers, etas=etas, 
+        keep_basis_history=keep_basis_history,
         verbose=verbose)
 
 def run_all_subject_n_view_online_appgrad_e4_data_experiment(
