@@ -2,7 +2,7 @@ import numpy as np
 
 import global_utils as gu
 
-from linal.utils import multi_dot, quadratic as quad
+from linal.utils import get_multi_dot, get_quadratic as get_quad
 from linal.svd_funcs import get_svd_power
 from optimization.utils import is_converged
 from optimization.optimizers.ftprl import AdaGradOptimizer as AGO
@@ -58,9 +58,9 @@ class GenELinKSubroutine:
             print 'GenELinKSubroutine computing optimization initialization.'
 
         # Initialize iteration variables
-        B_term = get_svd_power(quad(self.W, B), power=-1)
-        A_term = quad(self.W, A)
-        W_i = multi_dot([self.W, B_term, A_term])
+        B_term = get_svd_power(get_quad(self.W, B), power=-1)
+        A_term = get_quad(self.W, A)
+        W_i = get_multi_dot([self.W, B_term, A_term])
         W_i1 = None
         converged = [False]
         i = 0
