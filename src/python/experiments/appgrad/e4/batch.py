@@ -4,7 +4,6 @@ from data.loaders.e4 import FixedRateLoader as FRL
 from data.loaders.e4 import IBILoader as IBI
 from data.loaders.readers import from_num as fn
 from data.servers.batch import BatchServer as BS
-from linal.utils import quadratic as quad
 
 import data.loaders.e4.shortcuts as dles
 
