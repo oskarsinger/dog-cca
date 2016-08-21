@@ -1,7 +1,6 @@
 import numpy as np
 
 from numpy.random import choice
-from linal.utils import quadratic as quad
 from linal.svd_funcs import get_svd_power
 from drrobert.random import normal
 from drrobert.misc import unzip
