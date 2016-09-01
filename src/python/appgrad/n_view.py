@@ -14,6 +14,7 @@ class NViewAppGradCCA:
     def __init__(self,
         k, ds_list, 
         gs_list=None,
+        optimizers=None,
         online=False,
         keep_basis_history=False,
         verbose=False,
@@ -46,103 +47,65 @@ class NViewAppGradCCA:
         self.epsilons = epsilons
         self.online = online
 
-        self.num_rounds = 0
-        self.num_iters = 0
-        self.has_been_fit = False
-        self.basis_pairs = None
-
-        if self.online:
-            self.filtering_history = None
-            self.basis_history = None
-
-    def fit(self,
-        optimizers=None,
-        etas=None,
-        max_iter=10):
-
-        if etas is None:
-            etas = [0.01] * self.num_views
-
         if optimizers is None:
             optimizers = [GO() for i in range(self.num_views)]
         elif not len(optimizers) == self.num_views:
             raise ValueError(
                 'Parameter optimizers must be of length num_views.')
 
-        print "Getting initial (mini)batches and Gram matrices"
+        self.optimizers = optimizers
 
-        (Xs, Sxs, missing) = gust.init_data(
-            self.ds_list, self.gs_list, 
-            online=self.online)
+        self.num_rounds = 0
+        self.has_been_fit = False
+        self.basis_pairs_t = None
+        self.basis_pairs_t1 = None
+        self.loss_history = []
 
-        print "Getting initial basis estimates"
+        if self.online:
+            self.filtering_history = None
+            self.basis_history = None
 
-        # Initialization of optimization variables
-        basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
-        basis_pairs_t1 = None
+    def get_update(self, Xs, Sxs, missing, etas):
 
-        # Iteration variables
-        converged = [False] * self.num_views
+        if self.basis_pairs_t is None:
+            # Initialization of optimization variables
+            self.basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
 
-        print "Starting optimization"
+        self.num_rounds += 1
 
-        while not all(converged) and self.num_iters < max_iter:
-            while not any([ds.finished() for ds in self.ds_list]):
-                self.num_rounds += 1
+        if self.verbose:
+            (unn, normed) = unzip(basis_pairs_t)
+            loss = gu.misc.get_objective(Xs, normed)
 
-                if self.verbose:
-                    (unn, normed) = unzip(basis_pairs_t)
-                    print "\tObjective:", gu.misc.get_objective(Xs, normed)
+            self.loss_history.append(loss)
 
-                # TODO: determine if this needs to be paused for views with missing data
-                # Update step sizes
-                etas_t = etas #[eta / self.num_rounds**0.5 for eta in etas]
-                
-                if self.verbose:
-                    print "Iteration:", self.num_rounds
-                    print "\t".join(["eta" + str(j) + " " + str(eta)
-                                     for j, eta in enumerate(etas_t)])
-                    if self.online:
-                        print "\tGetting updated minibatches and grams"
+            print "\tObjective:", loss
 
-                if self.online:
-                    # Get new minibatches and Gram matrices
-                    (Xs, Sxs, missing) = gust.get_batch_and_gram_lists(
-                        self.ds_list, self.gs_list, Xs=Xs, Sxs=Sxs)
+        if self.online:
+            self._update_history(Xs, missing)
+            
+        if self.verbose:
+            print "\tGetting updated basis estimates"
 
-                    self._update_history(
-                        Xs, basis_pairs_t, missing)
-                    
-                if self.verbose:
-                    print "\tGetting updated basis estimates"
+        # Get updated canonical bases
+        self.basis_pairs_t1 = self._get_basis_updates(
+            Xs, Sxs, missing, etas)
 
-                # Get updated canonical bases
-                basis_pairs_t1 = self._get_basis_updates(
-                    Xs, Sxs, missing, basis_pairs_t, etas_t, optimizers)
+        if self.verbose:
+            print "\tGetting updated auxiliary variable estimate"
 
-                if self.verbose:
-                    print "\tGetting updated auxiliary variable estimate"
+        # Check for convergence
+        pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
+        pre_converged = gu.misc.is_converged(
+            pairs, self.epsilons, self.verbose)
 
-                # Check for convergence
-                pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
-                pre_converged = gu.misc.is_converged(
-                    pairs, self.epsilons, self.verbose)
+        # This is because bases are unchanged for missing data and will of course result in zero difference between iterations
+        self.converged = [False if missing[i] else c 
+                          for (i, c) in enumerate(converged)]
 
-                # This is because bases are unchanged for missing data and will of course result in zero different between iterations
-                converged = [False if missing[i] else c 
-                             for (i, c) in enumerate(converged)]
-
-                # Update iterates
-                basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
-                                 for unn_Phi, Phi in basis_pairs_t1]
-
-            self.num_iters += 1
-
-            for ds in self.ds_list:
-                ds.refresh()
-
-        self.has_been_fit = True
-        self.basis_pairs = basis_pairs_t
+        # Update iterates
+        self.basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
+                              for unn_Phi, Phi in basis_pairs_t1]
 
     def get_bases(self):
 
@@ -150,20 +113,19 @@ class NViewAppGradCCA:
             raise Exception(
                 'Model has not yet been fit.')
 
-        return unzip(self.basis_pairs)[1]
+        return unzip(self.basis_pairs_t)[1]
 
-    def _get_basis_updates(self, 
-        Xs, Sxs, missing, basis_pairs, etas, optimizers):
+    def _get_basis_updates(self, Xs, Sxs, missing, etas):
 
         # Get gradients
         gradients = agu.get_gradients(Xs, basis_pairs)
 
         # Get basis update for i-th basis 
-        get_new_b = lambda i: optimizers[i].get_update(
-            basis_pairs[i][0], gradients[i], etas[i])
+        get_new_b = lambda i: self.optimizers[i].get_update(
+            self.basis_pairs_t[i][0], gradients[i], etas[i])
 
         # Get unnormalized updates
-        updated_unn = [basis_pairs[i][0] if missing[i] else get_new_b(i)
+        updated_unn = [self.basis_pairs_t[i][0] if missing[i] else get_new_b(i)
                        for i in range(self.num_views)]
 
         # TODO: rewrite this to avoid redundant computation on unchanged bases
@@ -173,9 +135,9 @@ class NViewAppGradCCA:
 
         return normed_pairs
 
-    def _update_history(self, Xs, basis_pairs, missing):
+    def _update_history(self, Xs, missing):
 
-        normed = unzip(basis_pairs)[1]
+        normed = unzip(self.basis_pairs_t)[1]
 
         # TODO: consider storing basis history as list of 3 mode tensors
 
@@ -212,10 +174,8 @@ class NViewAppGradCCA:
     def get_status(self):
 
         return {
-            'ds_list': self.ds_list,
-            'gs_list': self.gs_list,
             'k': self.k,
-            'bases': unzip(self.basis_pairs)[1],
+            'bases': unzip(self.basis_pairs_t)[1],
             'num_views': self.num_views,
             'online': self.online,
             'epsilons': self.epsilons,
@@ -224,4 +184,5 @@ class NViewAppGradCCA:
             'has_been_fit': self.has_been_fit,
             'basis_pairs': self.basis_pairs,
             'basis_history': self.basis_history,
+            'loss_history': self.loss_history,
             'filtering_history': self.filtering_history}
