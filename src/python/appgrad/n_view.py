@@ -7,15 +7,12 @@ import global_utils.server_tools as gust
 from drrobert.misc import unzip
 from optimization.utils import get_gram
 from optimization.optimizers import GradientOptimizer as GO
-from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 
 class NViewAppGradCCA:
 
     def __init__(self,
-        k, ds_list, 
-        gs_list=None,
+        k,
         optimizers=None,
-        online=False,
         keep_basis_history=False,
         verbose=False,
         epsilons=None):
@@ -24,20 +21,10 @@ class NViewAppGradCCA:
 
         self.k = k
         self.ds_list = ds_list
-        self.online = online
         self.keep_basis_history = keep_basis_history
-        self.num_views = len(self.ds_list)
+        self.num_views = len(self.optimizers)
         self.verbose = verbose
         
-        if gs_list is None:
-            gs_list = [BCGS() if self.online else BGS()
-                       for i in range(self.num_views)]
-        elif not len(gs_list) == self.num_views:
-            raise ValueError(
-                'Parameter gs_list must have length of ds_list.')
-
-        self.gs_list = gs_list    
-
         if epsilons is None:
             epsilons = [10**(-4)] * (self.num_views + 1)
         elif not len(epsilons) == self.num_views:
@@ -45,7 +32,6 @@ class NViewAppGradCCA:
                 'Parameter epsilons must have length of ds_list.')
 
         self.epsilons = epsilons
-        self.online = online
 
         if optimizers is None:
             optimizers = [GO() for i in range(self.num_views)]
@@ -60,29 +46,17 @@ class NViewAppGradCCA:
         self.basis_pairs_t = None
         self.basis_pairs_t1 = None
         self.loss_history = []
+        self.filtering_history = None
+        self.basis_history = None
 
-        if self.online:
-            self.filtering_history = None
-            self.basis_history = None
-
-    def get_update(self, Xs, Sxs, missing, etas):
+    def update(self, Xs, Sxs, missing, etas):
 
         if self.basis_pairs_t is None:
             # Initialization of optimization variables
             self.basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
 
         self.num_rounds += 1
-
-        if self.verbose:
-            (unn, normed) = unzip(basis_pairs_t)
-            loss = gu.misc.get_objective(Xs, normed)
-
-            self.loss_history.append(loss)
-
-            print "\tObjective:", loss
-
-        if self.online:
-            self._update_history(Xs, missing)
+        self._update_history(Xs, missing)
             
         if self.verbose:
             print "\tGetting updated basis estimates"
@@ -91,15 +65,20 @@ class NViewAppGradCCA:
         self.basis_pairs_t1 = self._get_basis_updates(
             Xs, Sxs, missing, etas)
 
+        (unn, normed) = unzip(self.basis_pairs_t1)
+        loss = gu.misc.get_objective(Xs, normed)
+
         if self.verbose:
-            print "\tGetting updated auxiliary variable estimate"
+            print "\tObjective:", loss
+
+        self.loss_history.append(loss)
 
         # Check for convergence
         pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
         pre_converged = gu.misc.is_converged(
             pairs, self.epsilons, self.verbose)
 
-        # This is because bases are unchanged for missing data and will of course result in zero difference between iterations
+        # This is because bases are unchanged for missing data
         self.converged = [False if missing[i] else c 
                           for (i, c) in enumerate(converged)]
 
@@ -118,7 +97,7 @@ class NViewAppGradCCA:
     def _get_basis_updates(self, Xs, Sxs, missing, etas):
 
         # Get gradients
-        gradients = agu.get_gradients(Xs, basis_pairs)
+        gradients = agu.get_gradients(Xs, self.basis_pairs_t)
 
         # Get basis update for i-th basis 
         get_new_b = lambda i: self.optimizers[i].get_update(
@@ -138,8 +117,6 @@ class NViewAppGradCCA:
     def _update_history(self, Xs, missing):
 
         normed = unzip(self.basis_pairs_t)[1]
-
-        # TODO: consider storing basis history as list of 3 mode tensors
 
         if self.filtering_history is None:
             self.filtering_history = [np.dot(X[-1,:], Phi)
@@ -175,9 +152,9 @@ class NViewAppGradCCA:
 
         return {
             'k': self.k,
+            'converged': self.converged,
             'bases': unzip(self.basis_pairs_t)[1],
             'num_views': self.num_views,
-            'online': self.online,
             'epsilons': self.epsilons,
             'num_rounds': self.num_rounds,
             'num_iters': self.num_iters,
