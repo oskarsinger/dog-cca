@@ -1,0 +1,31 @@
+\input{../../hosinger/tex/oskar_macros.tex}
+
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{bbm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newtheorem{thm}{Theorem}
+
+\begin{document}
+
+\section{Intro} \label{sec:intro}
+
+\subsection{Notation} \label{subsec:notation}
+
+In the following notes, $\mbX_i \in \mbbR^{n \times p_i}$ will refer to the observation matrix for the $i$-th 'view' of some assumed underlying phenomenon, where $n$ is the number of observations and $p_i$ is the ambient dimension of the $i$-th view. $\mbPhi_i \in \mbbR^{p_i \times k}$ will refer to some linear transform of $\mbX_i$ into a $k$-dimensional vector space. The $k \times k$ identity matrix is denoted $\mbI_k$.
+
+\subsection{Bregman CCA} \label{subsec:bregmancca}
+
+Basic idea is replace the Frob norm in the CCA objective with a Bregman divergence.
+	
+	\bibliographystyle{apalike}
+	\bibliography{../../hosinger/tex/citations.bib}
+\end{document}
