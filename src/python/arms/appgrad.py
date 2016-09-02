@@ -1,3 +1,5 @@
+import numpy as np
+
 from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 from optimization.stepsize import InverseSquareRootScheduler as ISRS
 from data.pseudodata import MissingData
@@ -17,6 +19,9 @@ class NViewAppGradCCAArmGenerator:
         self.k = k
         self.get_optimizer = get_optimizer
         self.get_gram_server = get_gram_server
+        self.get_stepsize_scheduler = get_stepsize_scheduler
+        self.batch_size = batch_size
+        self.dimensions = dimensions
 
     def get_arm(self,
         exp,
@@ -41,7 +46,7 @@ class NViewAppGradCCAArmGenerator:
             self.num_views,
             self.batch_size,
             self.dimensions,
-            eta_schedulers=sss_list,
+            stepsize_schedulers=sss_list,
             gs_list=gs_list,
             verbose=verbose)
 
@@ -52,7 +57,7 @@ class NViewAppGradCCAArm:
         num_views,
         batch_size
         dimensions,
-        eta_schedulers=None,
+        stepsize_schedulers=None,
         gs_list=None,
         verbose=False):
 
@@ -61,14 +66,14 @@ class NViewAppGradCCAArm:
         self.batch_size = batch_size
         self.dimensions = dimensions
 
-        if eta_schedulers is None:
-            eta_schedulers = [ISRS(0.1) 
+        if stepsize_schedulers is None:
+            stepsize_schedulers = [ISRS(0.1) 
                               for i in xrange(self.num_views)]
-        elif not len(eta_schedulers) == self.num_views:
+        elif not len(stepsize_schedulers) == self.num_views:
             raise ValueError(
-                'Parameter eta_schedulers must have length of num_views.')
+                'Parameter stepsize_schedulers must have length of num_views.')
 
-        self.eta_schedulers = eta_schedulers
+        self.stepsize_schedulers = stepsize_schedulers
 
         if gs_list is None:
             gs_list = [BCGS() if self.online else BGS()
@@ -103,7 +108,7 @@ class NViewAppGradCCAArm:
         self.Sxs = [self.Sxs[i] if missing[i] else get_Sx(i)
                     for i in xrange(self.num_views)]
         etas = [es.get_stepsize(self.num_rounds)
-                for es in self.eta_schedulers]
+                for es in self.stepsize_schedulers]
     
         self.model.update(
             self.Xs, self.Sxs, self.missing, etas)
@@ -112,4 +117,12 @@ class NViewAppGradCCAArm:
         
     def get_status(self):
 
-        return {}
+        return {
+            'gs_list': self.gs_list,
+            'Xs': self.Xs,
+            'Sxs': self.Sxs,
+            'missing': self.missing,
+            'num_rounds': self.num_rounds,
+            'batch_size': self.batch_size,
+            'model': self.model,
+            'stepsize_schedulers': self.stepsize_schedulers}

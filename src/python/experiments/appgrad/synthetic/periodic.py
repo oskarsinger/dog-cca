@@ -3,12 +3,11 @@ import numpy as np
 from data.loaders.synthetic import CosineLoader as CL
 from data.servers.minibatch import Minibatch2Minibatch as M2M
 from drrobert.arithmetic import int_ceil_log as icl
-
 from .. import utils as eau
 
 def run_n_view_online_appgrad_cosine_data_experiment(
     n, ps, periods, amplitudes, phases, indexes,
-    max_iter=10,
+    max_iter=1,
     exps=None, windows=None,
     etas=None, lowers=None,
     cs=None,
