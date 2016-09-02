@@ -5,12 +5,18 @@ from data.pseudodata import MissingData
 class NViewAppGradCCAArm:
 
     def __init__(self,
-        model, num_views,
+        model, 
+        num_views,
+        batch_size
+        dimensions,
         eta_schedulers=None,
         gs_list=None,
         verbose=False):
 
         self.model = model
+        self.num_views = num_views
+        self.batch_size = batch_size
+        self.dimensions = dimensions
 
         if eta_schedulers is None:
             eta_schedulers = [ISRS(0.1) 
@@ -32,16 +38,32 @@ class NViewAppGradCCAArm:
         self.Xs = None
         self.Sxs = None
         self.missing = None
+        self.num_rounds = 0
 
     def update(self, batch_list):
 
+        if self.Xs is None:
+            self.Xs = [np.zeros((d, self.batch_size))
+                       for d in self.dimensions]
+
+        if self.Sxs is None:
+            self.Sxs = [np.zeros((d,d))
+                        for d in self.dimensions]
+
         self.missing = [isinstance(batch, MissingData)
                         for batch in batch_list]
-
-        if self.Xs is None:
-            self.Xs = [None if self.missing[i] else np.zeros_like(b) 
-                       for (i, b) in enumerate(batch_list)]
-
         self.Xs = [self.Xs[i] if self.missing[i] else batch_list[i]
-                   for i in xrange(len(batch_list))]
-        self.Sxs = 
+                   for i in xrange(self.num_views)]
+        get_gram_update = lambda i: gs_list[i].get_gram(batch_list[i])
+        self.Sxs = [self.Sxs[i] if missing[i] else get_gram_update(i)
+                    for i in xrange(self.num_views)]
+        etas = [es.get_stepsize(self.num_rounds)
+                for es in self.eta_schedulers]
+    
+        self.model.update(self.Xs, self.Sxs, self.missing, etas)
+
+        self.num_rounds += 1
+        
+    def get_status(self):
+
+        return {}
