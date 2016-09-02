@@ -2,6 +2,49 @@ from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 from optimization.stepsize import InverseSquareRootScheduler as ISRS
 from data.pseudodata import MissingData
 
+from appgrad import NViewAppGradCCA as NVAGCCA
+
+class NViewAppGradCCAArmGenerator:
+
+    def __init__(self, 
+        k, 
+        get_optimizer,
+        get_gram_server,
+        get_stepsize_scheduler,
+        batch_size,
+        dimensions):
+
+        self.k = k
+        self.get_optimizer = get_optimizer
+        self.get_gram_server = get_gram_server
+
+    def get_arm(self,
+        exp,
+        window,
+        forget_factor,
+        stepsize):
+
+        get_opt = lambda ss, ff: self.get_optimizer(forget_factor=ff)
+        optimizers = [self.get_optimizer(forget_factor=forget_factor) 
+                      for i in xrange(self.num_views)]
+        gs_list = [self.get_gram_server(exp=exp, window=window)
+                   for i in xrange(self.num_views)]
+        sss_list = [self.get_stepsize_scheduler(initial=stepsize)
+                    for i in xrange(self.num_views)]
+
+        model = NVAGCCA(
+            self.k,
+            optimizers=optimizers)
+
+        return NViewAppGradCCAArm(
+            model,
+            self.num_views,
+            self.batch_size,
+            self.dimensions,
+            eta_schedulers=sss_list,
+            gs_list=gs_list,
+            verbose=verbose)
+
 class NViewAppGradCCAArm:
 
     def __init__(self,
@@ -40,7 +83,7 @@ class NViewAppGradCCAArm:
         self.missing = None
         self.num_rounds = 0
 
-    def update(self, batch_list):
+    def update(self, batches):
 
         if self.Xs is None:
             self.Xs = [np.zeros((d, self.batch_size))
@@ -51,16 +94,19 @@ class NViewAppGradCCAArm:
                         for d in self.dimensions]
 
         self.missing = [isinstance(batch, MissingData)
-                        for batch in batch_list]
-        self.Xs = [self.Xs[i] if self.missing[i] else batch_list[i]
+                        for batch in batches]
+        self.Xs = [self.Xs[i] \
+                    if self.missing[i] else \
+                    np.copy(batches[i])
                    for i in xrange(self.num_views)]
-        get_gram_update = lambda i: gs_list[i].get_gram(batch_list[i])
-        self.Sxs = [self.Sxs[i] if missing[i] else get_gram_update(i)
+        get_Sx = lambda i: self.gs_list[i].get_gram(batches[i])
+        self.Sxs = [self.Sxs[i] if missing[i] else get_Sx(i)
                     for i in xrange(self.num_views)]
         etas = [es.get_stepsize(self.num_rounds)
                 for es in self.eta_schedulers]
     
-        self.model.update(self.Xs, self.Sxs, self.missing, etas)
+        self.model.update(
+            self.Xs, self.Sxs, self.missing, etas)
 
         self.num_rounds += 1
         

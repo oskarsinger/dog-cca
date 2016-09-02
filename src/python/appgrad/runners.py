@@ -2,6 +2,7 @@ from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 from optimization.stepsize import InverseSquareRootScheduler as ISRS
 
 import global_utils.server_tools as gust
+import global_utils as gu
 
 class NViewAppGradCCARunner:
 
@@ -11,6 +12,8 @@ class NViewAppGradCCARunner:
         gs_list=None,
         max_iter=1,
         verbose=False):
+
+        gu.misc.check_k(ds_list, model.get_status()['k'])
 
         self.model = model
         self.ds_list = ds_list
