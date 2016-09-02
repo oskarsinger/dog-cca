@@ -17,19 +17,16 @@ class NViewAppGradCCA:
         verbose=False,
         epsilons=None):
 
-        gu.misc.check_k(ds_list, k)
-
         self.k = k
-        self.ds_list = ds_list
         self.keep_basis_history = keep_basis_history
         self.num_views = len(self.optimizers)
         self.verbose = verbose
         
         if epsilons is None:
-            epsilons = [10**(-4)] * (self.num_views + 1)
+            epsilons = [10**(-4)] * self.num_views
         elif not len(epsilons) == self.num_views:
             raise ValueError(
-                'Parameter epsilons must have length of ds_list.')
+                'Parameter epsilons must be of length num_views.')
 
         self.epsilons = epsilons
 
