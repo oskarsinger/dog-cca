@@ -5,7 +5,7 @@ import global_utils as gu
 from linal.utils import get_multi_dot, get_quadratic as get_quad
 from linal.svd_funcs import get_svd_power
 from optimization.utils import is_converged
-from optimization.optimizers.ftprl import FullAdaGradOptimizer as FAGO
+from optimization.optimizers.quasinewton import FullAdamOptimizer as FAO
 
 class GenELinKSubroutine:
 
