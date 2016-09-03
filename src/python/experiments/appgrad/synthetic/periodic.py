@@ -30,25 +30,3 @@ def run_n_view_online_appgrad_cosine_data_experiment(
         lowers=lowers, etas=etas,
         periods=periods, cs=cs,
         verbose=verbose)
-
-def _get_CL(
-    p,
-    max_rounds,
-    period,
-    amplitude,
-    phase,
-    index,
-    period_noise,
-    phase_noise,
-    amplitude_noise):
-
-    return CL(
-        p,
-        max_rounds=max_rounds,
-        period=period,
-        amplitude=amplitude,
-        phase=phase,
-        index=index,
-        period_noise=period_noise,
-        phase_noise=phase_noise,
-        amplitude_noise=amplitude_noise)

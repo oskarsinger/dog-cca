@@ -5,50 +5,6 @@ from optimization.stepsize import InverseSquareRootScheduler as ISRS
 from data.pseudodata import MissingData
 from appgrad import NViewAppGradCCA as NVAGCCA
 
-class NViewAppGradCCAArmGenerator:
-
-    def __init__(self, 
-        k, 
-        get_optimizer,
-        get_gram_server,
-        get_stepsize_scheduler,
-        batch_size,
-        dimensions):
-
-        self.k = k
-        self.get_optimizer = get_optimizer
-        self.get_gram_server = get_gram_server
-        self.get_stepsize_scheduler = get_stepsize_scheduler
-        self.batch_size = batch_size
-        self.dimensions = dimensions
-
-    def get_arm(self,
-        exp,
-        window,
-        forget_factor,
-        stepsize):
-
-        get_opt = lambda ss, ff: self.get_optimizer(forget_factor=ff)
-        optimizers = [self.get_optimizer(forget_factor=forget_factor) 
-                      for i in xrange(self.num_views)]
-        gs_list = [self.get_gram_server(exp=exp, window=window)
-                   for i in xrange(self.num_views)]
-        sss_list = [self.get_stepsize_scheduler(initial=stepsize)
-                    for i in xrange(self.num_views)]
-
-        model = NVAGCCA(
-            self.k,
-            optimizers=optimizers)
-
-        return NViewAppGradCCAArm(
-            model,
-            self.num_views,
-            self.batch_size,
-            self.dimensions,
-            stepsize_schedulers=sss_list,
-            gs_list=gs_list,
-            verbose=verbose)
-
 class NViewAppGradCCAArm:
 
     def __init__(self,
