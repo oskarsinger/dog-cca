@@ -59,3 +59,73 @@ def run_online_n_view_appgrad_experiment(
         etas=etas)
 
     return model
+
+class RandomArmSampler:
+
+    def __init__(self, 
+        dimensions, k, batch_size, 
+        verbose=False):
+
+        self.num_views = len(dimensions)
+        self.dimensions = dimensions
+        self.k = k
+        self.batch_size = batch_size
+
+    def get_arm(self):
+
+        # TODO: make sure I sample all the right parameters
+        beta1 = None
+        beta2 = None
+        stepsize = None
+        window = None
+        exp = None
+        gram_reg = None
+        delta = None
+        lower = None
+        
+        (beta1, beta2) = list(npr.uniform(size=2))
+        stepsize = lu(10**(-5), 10**(5))
+        gram_reg = lu(10**(-5), 10**(5))
+        delta = lu(10**(-5), 10**(5))
+        lower = npr.uniform(upper=0.3)
+
+        if np.random_integers(1,2) == 1:
+            window = npr.random_integers(1, 100)
+            exp = None
+        else:
+            window = None
+            exp = npr.uniform()
+
+        gs_list = None
+
+        if window is None:
+            gs_list = [EGS(weight=exp, reg=gram_reg) 
+                       for i in xrange(num_views)]
+        else:
+            gs_list = [BCGS(window=window, reg=gram_reg)
+                       for i in xrange(num_views)]
+
+        optimizers = [FADO(
+                        delta=delta, 
+                        beta1=beta1, 
+                        beta2=beta2, 
+                        lower=lower)
+                      for i in xrange(num_views)]
+        stepsize_schedulers = [ISRS(stepsize) 
+                               for i in xrange(num_views)]
+        model = NVAGCCA(
+            self.k,
+            optimizers)
+
+        return NVAGCCAA(
+            model,
+            self.num_views,
+            self.batch_size,
+            self.dimensions,
+            stepsize_schedulers=stepsize_schedulers,
+            gs_list=gs_list,
+            verbose=verbose)
+
+    def get_status(self):
+
+        return {}

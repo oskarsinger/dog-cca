@@ -13,7 +13,6 @@ def run_n_view_online_appgrad_e4_data_experiment(
     hdf5_path, cca_k, subject,
     seconds=10, 
     exps=None, windows=None,
-    num_coords=[None]*6,
     cs=None, periods=None,
     keep_basis_history=False,
     verbose=False,
@@ -21,10 +20,10 @@ def run_n_view_online_appgrad_e4_data_experiment(
 
     bs = cca_k + icl(cca_k)
     print "Creating data loaders"
-    dls = dles.get_hr_and_acc(hdf5_path, subject, seconds, True)
+    dls = dles.get_hr_and_acc(
+        hdf5_path, subject, seconds, True)
     print "Creating data servers"
-    dss = [M2M(dl, bs, center=True, num_coords=nc)
-           for (dl, nc) in zip(dls, num_coords)]
+    dss = [M2M(dl, bs, center=True) for dl in dls]
 
     print "Training model"
     return eau.run_online_n_view_appgrad_experiment(
