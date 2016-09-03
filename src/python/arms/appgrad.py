@@ -3,7 +3,6 @@ import numpy as np
 from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 from optimization.stepsize import InverseSquareRootScheduler as ISRS
 from data.pseudodata import MissingData
-
 from appgrad import NViewAppGradCCA as NVAGCCA
 
 class NViewAppGradCCAArmGenerator:
