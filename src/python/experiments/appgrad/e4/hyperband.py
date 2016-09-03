@@ -15,11 +15,27 @@ from drrobert.arithmetic import int_ceil_log as icl
 from drrobert.random import log_uniform as lu
 from optimization.optimizers.quasinewton import FullAdamOptimizer as FADO
 from optimization.stepsize import InverseSquareRootScheduler as ISRS
+from .. import utils as eau
 
 def run_n_view_online_appgrad_e4_data_hyperband_experiment(
-    hdf5_path, subject, k,
-    max_rounds,
-    max_size,
-    min_size):
+    hdf5_path, cca_k, subject,
+    seconds=1,
+    max_rounds=10):
 
-    return 'poop'
+    max_size = int(5 * 24 * 3600 / seconds)
+    min_size = int(24 * 3600 / seconds)
+    bs = cca_k + icl(cca_k) + 1
+    dl_list = dles.get_changing_e4_loaders(
+        hdf5_path, subject, seconds, True)
+    ds_list = [M2M(dl, bs, center=True) for dl in dls]
+    dimensions = [ds.cols() for ds in ds_list]
+    runner = FHBR(
+        eau.RandomArmSampler(dimensions, k, bs).get_arm,
+        ds_list,
+        max_rounds,
+        max_size,
+        min_size)
+
+    runner.run()
+
+    return runner
