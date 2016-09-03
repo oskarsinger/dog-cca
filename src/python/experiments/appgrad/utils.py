@@ -70,6 +70,7 @@ class RandomArmSampler:
         self.dimensions = dimensions
         self.k = k
         self.batch_size = batch_size
+        self.verbose = verbose
 
     def get_arm(self):
 
@@ -96,6 +97,16 @@ class RandomArmSampler:
             window = None
             exp = npr.uniform()
 
+        parameters = {
+            'beta1': beta1,
+            'beta2': beta2,
+            'stepsize': stepsize,
+            'window': window,
+            'exp': exp,
+            'gram_reg': gram_reg,
+            'delta': delta,
+            'lower': lower}
+
         gs_list = None
 
         if window is None:
@@ -117,15 +128,21 @@ class RandomArmSampler:
             self.k,
             optimizers)
 
-        return NVAGCCAA(
+        arm = NVAGCCAA(
             model,
             self.num_views,
             self.batch_size,
             self.dimensions,
             stepsize_schedulers=stepsize_schedulers,
             gs_list=gs_list,
-            verbose=verbose)
+            verbose=self.verbose)
+
+        return (arm, parameters)
 
     def get_status(self):
 
-        return {}
+        return {
+            'dimensions': self.dimensions,
+            'num_views': self.num_views,
+            'batch_size': self.batch_size,
+            'k': self.k}
