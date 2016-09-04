@@ -1,7 +1,8 @@
 import numpy as np
 import numpy.random as npr
 
-from appgrad import AppGradCCA, NViewAppGradCCA
+from appgrad import NViewAppGradCCA as NVAGCCA
+from arms.nappgrad import NViewAppGradCCAArm as NVAGCCAA
 from optimization.optimizers.ftprl import SchattenPCOMIDOptimizer as SPCOMIDO
 from optimization.optimizers.ftprl import PeriodicParameterProximalGradientOptimizer as PPPGO
 from optimization.optimizers.quasinewton import FullAdamOptimizer as FADO
@@ -37,7 +38,7 @@ def run_online_n_view_appgrad_experiment(
                    for (ds, ps) in zip(servers, percentiles)]
 
     print "Creating model object"
-    model = NViewAppGradCCA(
+    model = NVAGCCA(
         k, servers, 
         gs_list=gram_servers, 
         online=True,
@@ -126,7 +127,8 @@ class RandomArmSampler:
                         delta=delta, 
                         beta1=beta1, 
                         beta2=beta2, 
-                        lower=lower)
+                        lower=lower,
+                        dual_avg=False)
                       for i in xrange(self.num_views)]
         stepsize_schedulers = [ISRS(stepsize) 
                                for i in xrange(self.num_views)]

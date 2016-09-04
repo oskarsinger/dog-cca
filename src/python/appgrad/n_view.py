@@ -19,7 +19,7 @@ class NViewAppGradCCA:
 
         self.k = k
         self.keep_basis_history = keep_basis_history
-        self.num_views = len(self.optimizers)
+        self.num_views = len(optimizers)
         self.verbose = verbose
         
         if epsilons is None:
