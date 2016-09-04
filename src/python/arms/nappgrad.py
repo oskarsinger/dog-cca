@@ -10,7 +10,7 @@ class NViewAppGradCCAArm:
     def __init__(self,
         model, 
         num_views,
-        batch_size
+        batch_size,
         dimensions,
         stepsize_schedulers=None,
         gs_list=None,
