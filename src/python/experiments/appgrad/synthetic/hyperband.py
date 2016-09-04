@@ -4,7 +4,7 @@ import data.loaders.synthetic.shortcuts as dlss
 
 from runners.bandit import FiniteHyperBandRunner as FHBR
 from appgrad import NViewAppGradCCA as NVAGCCA
-from arms.appgrad import NViewAppGradCCAArm as NVAGCCAA
+from arms.nappgrad import NViewAppGradCCAArm as NVAGCCAA
 from data.servers.minibatch import Minibatch2Minibatch as M2M
 from data.servers.gram import ExpGramServer as EGS
 from data.servers.gram import BoxcarGramServer as BCGS
