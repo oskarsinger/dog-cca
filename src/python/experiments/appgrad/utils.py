@@ -1,9 +1,15 @@
+import numpy as np
+import numpy.random as npr
+
 from appgrad import AppGradCCA, NViewAppGradCCA
 from optimization.optimizers.ftprl import SchattenPCOMIDOptimizer as SPCOMIDO
 from optimization.optimizers.ftprl import PeriodicParameterProximalGradientOptimizer as PPPGO
+from optimization.optimizers.quasinewton import FullAdamOptimizer as FADO
+from optimization.stepsize import InverseSquareRootScheduler as ISRS
 from data.servers.gram import ExpGramServer as EGS
-from data.servers.gram import BoxcarGramServer as BGS
+from data.servers.gram import BoxcarGramServer as BCGS
 from data.servers.masks import PercentileMask as PM
+from drrobert.random import log_uniform as lu
 
 def run_online_n_view_appgrad_experiment(
     servers, k, 
@@ -24,7 +30,7 @@ def run_online_n_view_appgrad_experiment(
     elif exps is not None:
         gram_servers = [EGS(weight=w) for w in exps]
     elif windows is not None:
-        gram_servers = [BGS(window=w) for w in windows]
+        gram_servers = [BCGS(window=w) for w in windows]
 
     if percentiles is not None:
         servers = [PM(ds, ps) 
@@ -88,9 +94,9 @@ class RandomArmSampler:
         stepsize = lu(10**(-5), 10**(5))
         gram_reg = lu(10**(-5), 10**(5))
         delta = lu(10**(-5), 10**(5))
-        lower = npr.uniform(upper=0.3)
+        lower = npr.uniform(high=0.3)
 
-        if np.random_integers(1,2) == 1:
+        if npr.random_integers(1,2) == 1:
             window = npr.random_integers(1, 100)
             exp = None
         else:
@@ -111,19 +117,19 @@ class RandomArmSampler:
 
         if window is None:
             gs_list = [EGS(weight=exp, reg=gram_reg) 
-                       for i in xrange(num_views)]
+                       for i in xrange(self.num_views)]
         else:
             gs_list = [BCGS(window=window, reg=gram_reg)
-                       for i in xrange(num_views)]
+                       for i in xrange(self.num_views)]
 
         optimizers = [FADO(
                         delta=delta, 
                         beta1=beta1, 
                         beta2=beta2, 
                         lower=lower)
-                      for i in xrange(num_views)]
+                      for i in xrange(self.num_views)]
         stepsize_schedulers = [ISRS(stepsize) 
-                               for i in xrange(num_views)]
+                               for i in xrange(self.num_views)]
         model = NVAGCCA(
             self.k,
             optimizers)
