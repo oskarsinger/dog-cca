@@ -73,7 +73,7 @@ class NViewAppGradCCA:
         # Check for convergence
         pairs = zip(
             unzip(self.basis_pairs_t)[0], 
-            unzip(basis_pairs_t1)[0])
+            unzip(self.basis_pairs_t1)[0])
         pre_converged = gu.misc.is_converged(
             pairs, self.epsilons, self.verbose)
 
@@ -158,7 +158,7 @@ class NViewAppGradCCA:
             'num_rounds': self.num_rounds,
             'num_iters': self.num_iters,
             'has_been_fit': self.has_been_fit,
-            'basis_pairs': self.basis_pairs,
+            'basis_pairs': self.basis_pairs_t,
             'basis_history': self.basis_history,
             'loss_history': self.loss_history,
             'filtering_history': self.filtering_history}
