@@ -6,8 +6,7 @@ from arms.nappgrad import NViewAppGradCCAArm as NVAGCCAA
 from optimization.optimizers.ftprl import SchattenPCOMIDOptimizer as SPCOMIDO
 from optimization.optimizers.ftprl import PeriodicParameterProximalGradientOptimizer as PPPGO
 from optimization.optimizers.quasinewton import FullAdamOptimizer as FADO
-from optimization.stepsize import InverseSquareRootScheduler as ISRS
-from data.servers.gram import ExpGramServer as EGS
+from optimization.stepsize import InverseSquareRootScheduler as ISRS from data.servers.gram import ExpGramServer as EGS
 from data.servers.gram import BoxcarGramServer as BCGS
 from data.servers.masks import PercentileMask as PM
 from drrobert.random import log_uniform as lu
@@ -102,7 +101,7 @@ class RandomArmSampler:
             exp = None
         else:
             window = None
-            exp = npr.uniform()
+            exp = npr.uniform()[0]
 
         parameters = {
             'beta1': beta1,
