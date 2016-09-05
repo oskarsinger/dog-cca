@@ -83,7 +83,7 @@ class NViewAppGradCCA:
 
         # Update iterates
         self.basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
-                              for unn_Phi, Phi in basis_pairs_t1]
+                              for unn_Phi, Phi in self.basis_pairs_t1]
 
     def get_bases(self):
 
