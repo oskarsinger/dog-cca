@@ -102,7 +102,7 @@ class RandomArmSampler:
             exp = None
         else:
             window = None
-            exp = npr.uniform()[0]
+            exp = npr.uniform()
 
         parameters = {
             'beta1': beta1,
