@@ -71,7 +71,9 @@ class NViewAppGradCCA:
         self.loss_history.append(loss)
 
         # Check for convergence
-        pairs = zip(unzip(basis_pairs_t)[0], unzip(basis_pairs_t1)[0])
+        pairs = zip(
+            unzip(self.basis_pairs_t)[0], 
+            unzip(basis_pairs_t1)[0])
         pre_converged = gu.misc.is_converged(
             pairs, self.epsilons, self.verbose)
 
