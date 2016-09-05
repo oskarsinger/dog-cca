@@ -65,10 +65,13 @@ class NViewAppGradCCAArm:
         etas = [es.get_stepsize()
                 for es in self.stepsize_schedulers]
     
-        self.model.update(
+        self.num_rounds += 1
+
+        return self.model.update(
             self.Xs, self.Sxs, self.missing, etas)
 
-        self.num_rounds += 1
+
+        return (parameters, loss)
         
     def get_status(self):
 

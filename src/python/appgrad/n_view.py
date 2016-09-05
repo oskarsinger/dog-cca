@@ -85,6 +85,8 @@ class NViewAppGradCCA:
         self.basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
                               for unn_Phi, Phi in self.basis_pairs_t1]
 
+        return (self.basis_pairs_t, loss)
+
     def get_bases(self):
 
         if not self.has_been_fit:
