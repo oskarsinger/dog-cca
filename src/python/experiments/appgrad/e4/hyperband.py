@@ -14,16 +14,27 @@ def run_n_view_online_appgrad_e4_data_hyperband_experiment(
     max_size = int(5 * 24 * 3600 / seconds)
     min_size = int(24 * 3600 / seconds)
     bs = k + icl(k) + 1
+
+    print 'Initializing data loaders'
+
     dl_list = dles.get_changing_e4_loaders(
         hdf5_path, subject, seconds, True)
+
+    print 'Initializing data servers'
+
     ds_list = [M2M(dl, bs, center=True) for dl in dl_list]
     dimensions = [ds.cols() for ds in ds_list]
+
+    print 'Initializing HyperBandRunner'
+
     runner = FHBR(
         eau.RandomArmSampler(dimensions, k, bs).get_arm,
         ds_list,
         max_rounds,
         max_size,
         min_size)
+
+    print 'Running Hyperband runner'
 
     runner.run()
 
