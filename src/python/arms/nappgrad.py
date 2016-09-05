@@ -60,7 +60,7 @@ class NViewAppGradCCAArm:
                     np.copy(batches[i])
                    for i in xrange(self.num_views)]
         get_Sx = lambda i: self.gs_list[i].get_gram(batches[i])
-        self.Sxs = [self.Sxs[i] if missing[i] else get_Sx(i)
+        self.Sxs = [self.Sxs[i] if self.missing[i] else get_Sx(i)
                     for i in xrange(self.num_views)]
         etas = [es.get_stepsize(self.num_rounds)
                 for es in self.stepsize_schedulers]
