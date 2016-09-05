@@ -79,7 +79,7 @@ class NViewAppGradCCA:
 
         # This is because bases are unchanged for missing data
         self.converged = [False if missing[i] else c 
-                          for (i, c) in enumerate(converged)]
+                          for (i, c) in enumerate(pre_converged)]
 
         # Update iterates
         self.basis_pairs_t = [(np.copy(unn_Phi), np.copy(Phi))
