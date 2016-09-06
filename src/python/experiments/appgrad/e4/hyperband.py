@@ -24,12 +24,13 @@ def run_n_view_online_appgrad_e4_data_hyperband_experiment(
 
     ds_list = [M2M(dl, bs, center=True) for dl in dl_list]
     dimensions = [ds.cols() for ds in ds_list]
+    md_server = eau.MultiViewDataServer(ds_list)
 
     print 'Initializing HyperBandRunner'
 
     runner = FHBR(
         eau.RandomArmSampler(dimensions, k, bs).get_arm,
-        ds_list,
+        md_server,
         max_rounds,
         max_size,
         min_size)
