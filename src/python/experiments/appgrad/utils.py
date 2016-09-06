@@ -5,7 +5,7 @@ from appgrad import NViewAppGradCCA as NVAGCCA
 from arms.nappgrad import NViewAppGradCCAArm as NVAGCCAA
 from optimization.optimizers.ftprl import SchattenPCOMIDOptimizer as SPCOMIDO
 from optimization.optimizers.ftprl import PeriodicParameterProximalGradientOptimizer as PPPGO
-from optimization.optimizers.quasinewton import FullAdamOptimizer as FADO
+from optimization.optimizers.quasinewton import DiagonalAdamOptimizer as DADO
 from optimization.stepsize import InverseSquareRootScheduler as ISRS 
 from data.servers.gram import ExpGramServer as EGS
 from data.servers.gram import BoxcarGramServer as BCGS
@@ -123,7 +123,7 @@ class RandomArmSampler:
             gs_list = [BCGS(window=window, reg=gram_reg)
                        for i in xrange(self.num_views)]
 
-        optimizers = [FADO(
+        optimizers = [DADO(
                         delta=delta, 
                         beta1=beta1, 
                         beta2=beta2, 
