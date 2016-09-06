@@ -16,10 +16,11 @@ def run_n_view_online_appgrad_cosine_data_hyperband_experiment(
         period_noise, phase_noise, amplitude_noise)
     ds_list = [M2M(loader, bs, center=True) 
                for loader in loaders]
+    mv_server = eau.MultViewDataServer(ds_list)
     dimensions = [ds.cols() for ds in ds_list]
     runner = FHBR(
         eau.RandomArmSampler(dimensions, k, bs).get_arm,
-        ds_list,
+        md_server,
         max_rounds,
         max_size,
         min_size)

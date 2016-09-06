@@ -67,6 +67,26 @@ def run_online_n_view_appgrad_experiment(
 
     return model
 
+class MultiviewDataServer:
+
+    def __init(self, servers):
+
+        self.servers = servers
+
+    def get_data(self):
+
+        return [ds.get_data() for ds in self.servers]
+
+    def refresh(self):
+
+        for ds in self.servers:
+            ds.refresh()
+
+    def get_status(self):
+
+        return {
+            'servers': self.servers}
+
 class RandomArmSampler:
 
     def __init__(self, 
