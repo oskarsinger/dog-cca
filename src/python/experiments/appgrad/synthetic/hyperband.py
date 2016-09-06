@@ -1,17 +1,6 @@
-import numpy as np
-import numpy.random as npr
-import data.loaders.synthetic.shortcuts as dlss
-
 from runners.bandit import FiniteHyperBandRunner as FHBR
-from appgrad import NViewAppGradCCA as NVAGCCA
-from arms.nappgrad import NViewAppGradCCAArm as NVAGCCAA
 from data.servers.minibatch import Minibatch2Minibatch as M2M
-from data.servers.gram import ExpGramServer as EGS
-from data.servers.gram import BoxcarGramServer as BCGS
 from drrobert.arithmetic import int_ceil_log as icl
-from drrobert.random import log_uniform as lu
-from optimization.optimizers.quasinewton import FullAdamOptimizer as FADO
-from optimization.stepsize import InverseSquareRootScheduler as ISRS
 from .. import utils as eau
 
 def run_n_view_online_appgrad_cosine_data_hyperband_experiment(
