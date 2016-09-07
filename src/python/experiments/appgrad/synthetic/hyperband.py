@@ -6,7 +6,8 @@ from .. import utils as eau
 def run_n_view_online_appgrad_cosine_data_hyperband_experiment(
     k, n, ps, 
     periods, amplitudes, phases, indexes,
-    max_rounds=10):
+    max_rounds=10,
+    num_batches=1):
 
     max_size = n
     min_size = int(min(periods)) * 3
@@ -16,7 +17,8 @@ def run_n_view_online_appgrad_cosine_data_hyperband_experiment(
         period_noise, phase_noise, amplitude_noise)
     ds_list = [M2M(loader, bs, center=True) 
                for loader in loaders]
-    mv_server = eau.MultViewDataServer(ds_list)
+    mv_server = eau.MultViewDataServer(
+        ds_list, num_batches=num_batches)
     dimensions = [ds.cols() for ds in ds_list]
     runner = FHBR(
         eau.RandomArmSampler(dimensions, k, bs).get_arm,
