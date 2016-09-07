@@ -69,7 +69,7 @@ def run_online_n_view_appgrad_experiment(
 
 class MultiViewDataServer:
 
-    def __init(self, servers):
+    def __init__(self, servers):
 
         self.servers = servers
 
