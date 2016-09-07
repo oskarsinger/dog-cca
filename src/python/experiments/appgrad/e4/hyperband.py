@@ -11,8 +11,9 @@ def run_n_view_online_appgrad_e4_data_hyperband_experiment(
     seconds=1,
     max_rounds=10):
 
-    max_size = int(5 * 24 * 3600 / seconds)
-    min_size = int(24 * 3600 / seconds)
+    max_size = 5 * 24 / 4
+    min_size = 1
+    num_batches = int(4 * 3600 / seconds)
     bs = k + icl(k) + 1
 
     print 'Initializing data loaders'
@@ -24,7 +25,8 @@ def run_n_view_online_appgrad_e4_data_hyperband_experiment(
 
     ds_list = [M2M(dl, bs, center=True) for dl in dl_list]
     dimensions = [ds.cols() for ds in ds_list]
-    md_server = eau.MultiViewDataServer(ds_list)
+    md_server = eau.MultiViewDataServer(
+        ds_list, num_batches=num_batches)
 
     print 'Initializing HyperBandRunner'
 

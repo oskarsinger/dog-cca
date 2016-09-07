@@ -53,25 +53,28 @@ class NViewAppGradCCAArm:
             self.Sxs = [np.zeros((d,d))
                         for d in self.dimensions]
 
-        self.missing = [isinstance(batch, MissingData)
-                        for batch in batches]
-        self.Xs = [self.Xs[i] \
-                    if self.missing[i] else \
-                    np.copy(batches[i])
-                   for i in xrange(self.num_views)]
-        get_Sx = lambda i: self.gs_list[i].get_gram(batches[i])
-        self.Sxs = [self.Sxs[i] if self.missing[i] else get_Sx(i)
-                    for i in xrange(self.num_views)]
-        etas = [es.get_stepsize()
-                for es in self.stepsize_schedulers]
-    
-        self.num_rounds += 1
+        updates = []
 
-        return self.model.update(
-            self.Xs, self.Sxs, self.missing, etas)
+        for batch in batches:
+            self.missing = [isinstance(view, MissingData)
+                            for view in batch]
+            self.Xs = [self.Xs[i] \
+                        if self.missing[i] else \
+                        np.copy(batch[i])
+                       for i in xrange(self.num_views)]
+            get_Sx = lambda i: self.gs_list[i].get_gram(batch[i])
+            self.Sxs = [self.Sxs[i] if self.missing[i] else get_Sx(i)
+                        for i in xrange(self.num_views)]
+            etas = [es.get_stepsize()
+                    for es in self.stepsize_schedulers]
+        
+            self.num_rounds += 1
+
+            updates.append(self.model.update(
+                self.Xs, self.Sxs, self.missing, etas))
 
 
-        return (parameters, loss)
+        return updates
         
     def get_status(self):
 

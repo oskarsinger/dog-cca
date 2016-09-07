@@ -69,13 +69,20 @@ def run_online_n_view_appgrad_experiment(
 
 class MultiViewDataServer:
 
-    def __init__(self, servers):
+    def __init__(self, servers, num_batches=1):
 
         self.servers = servers
+        self.num_batches = num_batches
 
     def get_data(self):
 
-        return [ds.get_data() for ds in self.servers]
+        batches = []
+
+        for i in xrange(self.num_batches):
+            batches.append(
+                [ds.get_data() for ds in self.servers])
+
+        return batches
 
     def refresh(self):
 
