@@ -11,9 +11,9 @@ def run_n_view_online_appgrad_e4_data_hyperband_experiment(
     seconds=1,
     max_rounds=10):
 
-    max_size = 5 * 24 / 4
+    max_size = 5 * 24
     min_size = 1
-    num_batches = int(4 * 3600 / seconds)
+    num_batches = int(3600 / seconds)
     bs = k + icl(k) + 1
 
     print 'Initializing data loaders'
