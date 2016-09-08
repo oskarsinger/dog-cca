@@ -103,6 +103,7 @@ class NViewAppGradCCA:
     def _get_basis_updates(self, Xs, Sxs, missing, etas):
 
         # Get gradients
+        print 'Getting gradients'
         gradients = agu.get_gradients(Xs, self.basis_pairs_t)
 
         # Get basis update for i-th basis 
@@ -110,11 +111,13 @@ class NViewAppGradCCA:
             self.basis_pairs_t[i][0], gradients[i], etas[i])
 
         # Get unnormalized updates
+        print 'Getting new bases'
         updated_unn = [self.basis_pairs_t[i][0] if missing[i] else get_new_b(i)
                        for i in range(self.num_views)]
 
         # TODO: rewrite this to avoid redundant computation on unchanged bases
         # Normalize with Gram-parameterized Mahalanobis
+        print 'Normalizing basis estimates'
         normed_pairs = [(unn, gu.misc.get_gram_normed(unn, Sx))
                         for unn, Sx in zip(updated_unn, Sxs)]
 

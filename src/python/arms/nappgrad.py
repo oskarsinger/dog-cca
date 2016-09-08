@@ -54,12 +54,12 @@ class NViewAppGradCCAArm:
 
         for batch in batches:
 
-            print '\tInside arm.update loop'
+            print 'Inside arm.update loop'
 
             self.missing = [isinstance(view, MissingData)
                             for view in batch]
             
-            print '\tSetting self.Xs'
+            print 'Setting self.Xs'
 
             self.Xs = [self.Xs[i] \
                         if self.missing[i] else \
@@ -72,7 +72,7 @@ class NViewAppGradCCAArm:
                            
             get_Sx = lambda i: self.gs_list[i].get_gram(batch[i])
 
-            print '\tSetting self.Sxs'
+            print 'Setting self.Sxs'
 
             self.Sxs = [self.Sxs[i] if self.missing[i] else get_Sx(i)
                         for i in xrange(self.num_views)]
