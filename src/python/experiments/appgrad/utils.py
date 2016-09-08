@@ -84,7 +84,7 @@ class MultiViewDataServer:
             batch = [ds.get_data() for ds in self.servers]
             
             for view in batch:
-                drdb.check_if_nan_or_inf(
+                drdb.check_for_nan_or_inf(
                     view, 'MVDS get_data', 'view_' + str(i))
 
             batches.append(batch)
