@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.random as npr
+import drrobert.debug as drdb
 
 from appgrad import NViewAppGradCCA as NVAGCCA
 from arms.nappgrad import NViewAppGradCCAArm as NVAGCCAA
@@ -79,8 +80,14 @@ class MultiViewDataServer:
         batches = []
 
         for i in xrange(self.num_batches):
-            batches.append(
-                [ds.get_data() for ds in self.servers])
+
+            batch = [ds.get_data() for ds in self.servers]
+            
+            for view in batch:
+                drdb.check_for_nan_and_inf(
+                    view, 'MVDS get_data', 'view_' + str(i))
+
+            batches.append(batch)
 
         return batches
 

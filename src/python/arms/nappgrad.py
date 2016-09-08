@@ -1,4 +1,5 @@
 import numpy as np
+import drrobert.debug as drdb
 
 from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
 from optimization.stepsize import InverseSquareRootScheduler as ISRS
@@ -38,20 +39,14 @@ class NViewAppGradCCAArm:
                 'Parameter gs_list must have length of num_views.')
 
         self.gs_list = gs_list
-        self.Xs = None
-        self.Sxs = None
+        self.Xs = [np.zeros((d, self.batch_size))
+                   for d in self.dimensions]
+        self.Sxs = [np.zeros((d,d))
+                    for d in self.dimensions]
         self.missing = None
         self.num_rounds = 0
 
     def update(self, batches):
-
-        if self.Xs is None:
-            self.Xs = [np.zeros((d, self.batch_size))
-                       for d in self.dimensions]
-
-        if self.Sxs is None:
-            self.Sxs = [np.zeros((d,d))
-                        for d in self.dimensions]
 
         updates = []
 
@@ -62,9 +57,19 @@ class NViewAppGradCCAArm:
                         if self.missing[i] else \
                         np.copy(batch[i])
                        for i in xrange(self.num_views)]
+
+            for (i, X) in enumerate(self.Xs):
+                drdb.check_for_nan_and_inf(
+                    X, 'NVAGCCAA update', 'X_' + str(i))
+                           
             get_Sx = lambda i: self.gs_list[i].get_gram(batch[i])
             self.Sxs = [self.Sxs[i] if self.missing[i] else get_Sx(i)
                         for i in xrange(self.num_views)]
+
+            for (i, Sx) in enumerate(self.Sxs):
+                drdb.check_for_nan_and_inf(
+                    Sx, 'NVAGCCAA update', 'Sx_' + str(i))
+                           
             etas = [es.get_stepsize()
                     for es in self.stepsize_schedulers]
         
