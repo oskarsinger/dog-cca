@@ -49,24 +49,24 @@ class NViewAppGradCCA:
     def update(self, Xs, Sxs, missing, etas):
 
         if self.basis_pairs_t is None:
-            print 'Initializing basis_pairs_t'
+            #print 'Initializing basis_pairs_t'
             # Initialization of optimization variables
             self.basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
 
         self.num_rounds += 1
-        print 'Updating history'
+        #print 'Updating history'
         self._update_history(Xs, missing)
             
         if self.verbose:
             print "\tGetting updated basis estimates"
 
         # Get updated canonical bases
-        print 'Setting basis_pairs_t1'
+        #print 'Setting basis_pairs_t1'
         self.basis_pairs_t1 = self._get_basis_updates(
             Xs, Sxs, missing, etas)
 
         (unn, normed) = unzip(self.basis_pairs_t1)
-        print 'Computing loss'
+        #print 'Computing loss'
         loss = gu.misc.get_objective(Xs, normed)
 
         if self.verbose:
@@ -78,7 +78,7 @@ class NViewAppGradCCA:
         pairs = zip(
             unzip(self.basis_pairs_t)[0], 
             unzip(self.basis_pairs_t1)[0])
-        print 'Checking for convergence'
+        #print 'Checking for convergence'
         pre_converged = gu.misc.is_converged(
             pairs, self.epsilons, self.verbose)
 
@@ -103,7 +103,7 @@ class NViewAppGradCCA:
     def _get_basis_updates(self, Xs, Sxs, missing, etas):
 
         # Get gradients
-        print 'Getting gradients'
+        #print 'Getting gradients'
         gradients = agu.get_gradients(Xs, self.basis_pairs_t)
 
         # Get basis update for i-th basis 
@@ -111,13 +111,13 @@ class NViewAppGradCCA:
             self.basis_pairs_t[i][0], gradients[i], etas[i])
 
         # Get unnormalized updates
-        print 'Getting new bases'
+        #print 'Getting new bases'
         updated_unn = [self.basis_pairs_t[i][0] if missing[i] else get_new_b(i)
                        for i in range(self.num_views)]
 
         # TODO: rewrite this to avoid redundant computation on unchanged bases
         # Normalize with Gram-parameterized Mahalanobis
-        print 'Normalizing basis estimates'
+        #print 'Normalizing basis estimates'
         normed_pairs = [(unn, gu.misc.get_gram_normed(unn, Sx))
                         for unn, Sx in zip(updated_unn, Sxs)]
 
