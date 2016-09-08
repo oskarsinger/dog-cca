@@ -1,5 +1,5 @@
 from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
-from optimization.stepsize import InverseSquareRootScheduler as ISRS
+from optimization.stepsize import FixedScheduler as FXS
 
 import global_utils.server_tools as gust
 import global_utils as gu
@@ -21,7 +21,7 @@ class NViewAppGradCCARunner:
         self.num_views = len(self.ds_list)
 
         if eta_schedulers is None:
-            eta_schedulers = [ISRS(0.1) 
+            eta_schedulers = [FXS(0.1) 
                               for i in xrange(self.num_views)]
         elif not len(eta_schedulers) == self.num_views:
             raise ValueError(
