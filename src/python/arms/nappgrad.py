@@ -59,7 +59,7 @@ class NViewAppGradCCAArm:
                        for i in xrange(self.num_views)]
 
             for (i, X) in enumerate(self.Xs):
-                drdb.check_if_nan_or_inf(
+                drdb.check_for_nan_or_inf(
                     X, 'NVAGCCAA update', 'X_' + str(i))
                            
             get_Sx = lambda i: self.gs_list[i].get_gram(batch[i])
@@ -67,7 +67,7 @@ class NViewAppGradCCAArm:
                         for i in xrange(self.num_views)]
 
             for (i, Sx) in enumerate(self.Sxs):
-                drdb.check_if_nan_or_inf(
+                drdb.check_for_nan_or_inf(
                     Sx, 'NVAGCCAA update', 'Sx_' + str(i))
                            
             etas = [es.get_stepsize()
