@@ -7,7 +7,7 @@ from arms.nappgrad import NViewAppGradCCAArm as NVAGCCAA
 from optimization.optimizers.ftprl import SchattenPCOMIDOptimizer as SPCOMIDO
 from optimization.optimizers.ftprl import PeriodicParameterProximalGradientOptimizer as PPPGO
 from optimization.optimizers.quasinewton import DiagonalAdamOptimizer as DADO
-from optimization.stepsize import InverseSquareRootScheduler as ISRS 
+from optimization.stepsize import FixedScheduler as FXS
 from data.servers.gram import ExpGramServer as EGS
 from data.servers.gram import BoxcarGramServer as BCGS
 from data.servers.masks import PercentileMask as PM
@@ -169,7 +169,7 @@ class RandomArmSampler:
                         lower=lower,
                         dual_avg=False)
                       for i in xrange(self.num_views)]
-        stepsize_schedulers = [ISRS(stepsize) 
+        stepsize_schedulers = [FXS(stepsize) 
                                for i in xrange(self.num_views)]
         model = NVAGCCA(
             self.k,

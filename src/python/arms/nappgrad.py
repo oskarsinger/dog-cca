@@ -2,7 +2,7 @@ import numpy as np
 import drrobert.debug as drdb
 
 from data.servers.gram import BoxcarGramServer as BCGS, BatchGramServer as BGS
-from optimization.stepsize import InverseSquareRootScheduler as ISRS
+from optimization.stepsize import FixedScheduler as FXS
 from data.pseudodata import MissingData
 from appgrad import NViewAppGradCCA as NVAGCCA
 
@@ -23,7 +23,7 @@ class NViewAppGradCCAArm:
         self.dimensions = dimensions
 
         if stepsize_schedulers is None:
-            stepsize_schedulers = [ISRS(0.1) 
+            stepsize_schedulers = [FXS(0.1) 
                               for i in xrange(self.num_views)]
         elif not len(stepsize_schedulers) == self.num_views:
             raise ValueError(
