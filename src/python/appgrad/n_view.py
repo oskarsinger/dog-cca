@@ -1,8 +1,8 @@
 import numpy as np
-
 import utils as agu
 import global_utils as gu
 import global_utils.server_tools as gust
+import drrobert.debug as drdb
 
 from drrobert.misc import unzip
 from optimization.utils import get_gram
@@ -49,20 +49,24 @@ class NViewAppGradCCA:
     def update(self, Xs, Sxs, missing, etas):
 
         if self.basis_pairs_t is None:
+            print 'Initializing basis_pairs_t'
             # Initialization of optimization variables
             self.basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
 
         self.num_rounds += 1
+        print 'Updating history'
         self._update_history(Xs, missing)
             
         if self.verbose:
             print "\tGetting updated basis estimates"
 
         # Get updated canonical bases
+        print 'Setting basis_pairs_t1'
         self.basis_pairs_t1 = self._get_basis_updates(
             Xs, Sxs, missing, etas)
 
         (unn, normed) = unzip(self.basis_pairs_t1)
+        print 'Computing loss'
         loss = gu.misc.get_objective(Xs, normed)
 
         if self.verbose:
@@ -74,6 +78,7 @@ class NViewAppGradCCA:
         pairs = zip(
             unzip(self.basis_pairs_t)[0], 
             unzip(self.basis_pairs_t1)[0])
+        print 'Checking for convergence'
         pre_converged = gu.misc.is_converged(
             pairs, self.epsilons, self.verbose)
 

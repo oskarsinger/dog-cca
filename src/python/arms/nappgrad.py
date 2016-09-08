@@ -59,7 +59,7 @@ class NViewAppGradCCAArm:
             self.missing = [isinstance(view, MissingData)
                             for view in batch]
             
-            print '\t Setting self.Xs'
+            print '\tSetting self.Xs'
 
             self.Xs = [self.Xs[i] \
                         if self.missing[i] else \
@@ -72,7 +72,7 @@ class NViewAppGradCCAArm:
                            
             get_Sx = lambda i: self.gs_list[i].get_gram(batch[i])
 
-            print '\t Setting self.Sxs'
+            print '\tSetting self.Sxs'
 
             self.Sxs = [self.Sxs[i] if self.missing[i] else get_Sx(i)
                         for i in xrange(self.num_views)]
@@ -85,6 +85,8 @@ class NViewAppGradCCAArm:
                     for es in self.stepsize_schedulers]
         
             self.num_rounds += 1
+
+            print 'Updating model'
 
             update = self.model.update(
                 self.Xs, self.Sxs, self.missing, etas)
