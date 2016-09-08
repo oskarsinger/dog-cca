@@ -92,7 +92,7 @@ class MultiViewDataServer:
 
             batches.append(batch)
 
-        print 'Inside MVDS.get_Data with batches length', len(batches)
+        #print 'Inside MVDS.get_Data with batches length', len(batches)
 
         return batches
 
