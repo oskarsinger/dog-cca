@@ -75,19 +75,24 @@ class MultiViewDataServer:
         self.servers = servers
         self.num_batches = num_batches
 
+        print 'Inside MVDS constructor with num_batches', self.num_batches
+
     def get_data(self):
 
         batches = []
 
         for i in xrange(self.num_batches):
 
-            batch = [ds.get_data() for ds in self.servers]
+            batch = [np.copy(ds.get_data()) 
+                     for ds in self.servers]
             
             for view in batch:
                 drdb.check_for_nan_or_inf(
                     view, 'MVDS get_data', 'view_' + str(i))
 
             batches.append(batch)
+
+        print 'Inside MVDS.get_Data with batches length', len(batches)
 
         return batches
 
