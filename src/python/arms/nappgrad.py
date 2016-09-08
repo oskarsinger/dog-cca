@@ -50,7 +50,7 @@ class NViewAppGradCCAArm:
 
         updates = []
 
-        print 'Inside arm.update'
+        print 'Inside arm.update with batches length', len(batches)
 
         for batch in batches:
 
