@@ -1,5 +1,3 @@
-import click
-
 import numpy as np
 import data.loaders.e4.shortcuts as dles
 
@@ -8,12 +6,6 @@ from data.servers.minibatch import Minibatch2Minibatch as M2M
 from drrobert.arithmetic import int_ceil_log as icl
 from .. import utils as eau
 
-@click.command()
-@click.option('--hdf5-path')
-@click.option('--k', default=1)
-@click.option('--subject')
-@click.option('--seconds', default=1)
-@click.option('--max-rounds', default=10)
 def run_n_view_online_appgrad_e4_data_hyperband_experiment(
     hdf5_path, k, subject,
     seconds=1,
