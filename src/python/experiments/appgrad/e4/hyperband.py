@@ -10,7 +10,7 @@ from .. import utils as eau
 
 @click.command()
 @click.option('--hdf5-path')
-@click.option('--k')
+@click.option('--k', default=1)
 @click.option('--subject')
 @click.option('--seconds', default=1)
 @click.option('--max-rounds', default=10)
