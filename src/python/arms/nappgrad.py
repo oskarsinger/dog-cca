@@ -50,9 +50,17 @@ class NViewAppGradCCAArm:
 
         updates = []
 
+        print 'Inside arm.update'
+
         for batch in batches:
+
+            print '\tInside arm.update loop'
+
             self.missing = [isinstance(view, MissingData)
                             for view in batch]
+            
+            print '\t Setting self.Xs'
+
             self.Xs = [self.Xs[i] \
                         if self.missing[i] else \
                         np.copy(batch[i])
@@ -63,6 +71,9 @@ class NViewAppGradCCAArm:
                     X, 'NVAGCCAA update', 'X_' + str(i))
                            
             get_Sx = lambda i: self.gs_list[i].get_gram(batch[i])
+
+            print '\t Setting self.Sxs'
+
             self.Sxs = [self.Sxs[i] if self.missing[i] else get_Sx(i)
                         for i in xrange(self.num_views)]
 
@@ -75,9 +86,14 @@ class NViewAppGradCCAArm:
         
             self.num_rounds += 1
 
-            updates.append(self.model.update(
-                self.Xs, self.Sxs, self.missing, etas))
+            update = self.model.update(
+                self.Xs, self.Sxs, self.missing, etas)
 
+            print 'Update has length', len(update)
+
+            updates.append(update)
+
+            print 'Updates has length', len(updates)
 
         return updates
         
