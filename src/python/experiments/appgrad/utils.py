@@ -89,6 +89,7 @@ class MultiViewDataServer:
             
             for view in batch:
                 if not isinstance(view, MissingData):
+                    print type(view)
                     drdb.check_for_nan_or_inf(
                         view, 'MVDS get_data', 'view_' + str(i))
 
