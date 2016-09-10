@@ -11,6 +11,7 @@ from optimization.stepsize import FixedScheduler as FXS
 from data.servers.gram import ExpGramServer as EGS
 from data.servers.gram import BoxcarGramServer as BCGS
 from data.servers.masks import PercentileMask as PM
+from data.pseudodata import MissingData
 from drrobert.random import log_uniform as lu
 
 def run_online_n_view_appgrad_experiment(
@@ -87,8 +88,9 @@ class MultiViewDataServer:
                      for ds in self.servers]
             
             for view in batch:
-                drdb.check_for_nan_or_inf(
-                    view, 'MVDS get_data', 'view_' + str(i))
+                if not isinstance(view, MissingData):
+                    drdb.check_for_nan_or_inf(
+                        view, 'MVDS get_data', 'view_' + str(i))
 
             batches.append(batch)
 
