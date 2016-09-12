@@ -10,12 +10,12 @@ import experiments.appgrad.e4.hyperband as eaeh
 @click.option('--num-runners', default=1)
 @click.option('--max-rounds', default=10)
 def run_it_all_day(
-        hdf5_path,
-        k,
-        subject,
-        seconds,
-        num_runners,
-        max_rounds):
+    hdf5_path,
+    k,
+    subject,
+    seconds,
+    num_runners,
+    max_rounds):
 
     runners = []
 
