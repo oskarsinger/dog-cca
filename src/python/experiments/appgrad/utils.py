@@ -87,17 +87,6 @@ class MultiViewDataServer:
             batch = [np.copy(ds.get_data()) 
                      for ds in self.servers]
             
-            for view in batch:
-                if not isinstance(view, MissingData):
-
-                    print 'View is of type ' + str(type(view))
-
-                    try:
-                        drdb.check_for_nan_or_inf(
-                            view, 'MVDS get_data', 'view_' + str(i))
-                    except TypeError:
-                        raise Exception(str(view))
-
             batches.append(batch)
 
         #print 'Inside MVDS.get_Data with batches length', len(batches)
