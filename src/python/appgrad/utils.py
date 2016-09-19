@@ -27,10 +27,12 @@ def get_gradients(Xs, basis_pairs):
         print 'unnormed_Phi_X', unnormed_Phi_X
         print 'normed_Phi_X', normed_Phi_X
 
+        """
         drdb.check_for_large_numbers(
             unnormed_Phi_X,
             'appgrad.utils get_gradients',
             'unnormed_Phi_X')
+        """
         drdb.check_for_large_numbers(
             normed_Phi_X,
             'appgrad.utils get_gradients',
