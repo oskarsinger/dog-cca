@@ -53,6 +53,7 @@ class NViewAppGradCCA:
             # Initialization of optimization variables
             self.basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
 
+        print 'Running NViewAppGradCCA for rounds', self.num_rounds
         self.num_rounds += 1
         #print 'Updating history'
         self._update_history(Xs, missing)
