@@ -66,6 +66,7 @@ class NViewAppGradCCA:
             Xs, Sxs, missing, etas)
 
         (unn, normed) = unzip(self.basis_pairs_t1)
+
         #print 'Computing loss'
         loss = gu.misc.get_objective(Xs, normed)
 
@@ -75,12 +76,12 @@ class NViewAppGradCCA:
         self.loss_history.append(loss)
 
         # Check for convergence
-        pairs = zip(
+        unnormed_pairs = zip(
             unzip(self.basis_pairs_t)[0], 
-            unzip(self.basis_pairs_t1)[0])
+            unn)
         #print 'Checking for convergence'
         pre_converged = gu.misc.is_converged(
-            pairs, self.epsilons, self.verbose)
+            unnormed_pairs, self.epsilons, self.verbose)
 
         # This is because bases are unchanged for missing data
         self.converged = [False if missing[i] else c 
@@ -106,6 +107,12 @@ class NViewAppGradCCA:
         #print 'Getting gradients'
         gradients = agu.get_gradients(Xs, self.basis_pairs_t)
 
+        for g in gradients:
+            drdb.check_for_large_numbers(
+                g,
+                'AGNVCCA _get_basis_updates at round ' + str(self.num_rounds),
+                'gradient')
+
         # Get basis update for i-th basis 
         get_new_b = lambda i: self.optimizers[i].get_update(
             self.basis_pairs_t[i][0], gradients[i], etas[i])
@@ -115,11 +122,23 @@ class NViewAppGradCCA:
         updated_unn = [self.basis_pairs_t[i][0] if missing[i] else get_new_b(i)
                        for i in range(self.num_views)]
 
+        for unn_phi in updated_unn:
+            drdb.check_for_large_numbers(
+                unn_phi,
+                'AGNVCCA _get_basis_updates at round ' + str(self.num_rounds),
+                'unn_phi')
+
         # TODO: rewrite this to avoid redundant computation on unchanged bases
         # Normalize with Gram-parameterized Mahalanobis
         #print 'Normalizing basis estimates'
         normed_pairs = [(unn, gu.misc.get_gram_normed(unn, Sx))
                         for unn, Sx in zip(updated_unn, Sxs)]
+
+        for (unn_phi, phi) in normed_pairs:
+            drdb.check_for_large_numbers(
+                phi,
+                'AGNVCCA _get_basis_updates at round ' + str(self.num_rounds),
+                'phi')
 
         return normed_pairs
 
