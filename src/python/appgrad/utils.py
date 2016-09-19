@@ -8,7 +8,6 @@ from drrobert.misc import unzip
 
 import global_utils as gu
 
-# TODO: account for missing data to reduce computation
 def get_gradients(Xs, basis_pairs):
 
     m = len(Xs)
@@ -42,8 +41,16 @@ def get_gradients(Xs, basis_pairs):
             'appgrad.utils get_gradients',
             'diff')
 
-    return [np.dot(X.T, diff) / X.shape[0]
-            for (X, diff) in zip(Xs, diffs)]
+    gradients = [np.dot(X.T, diff) / X.shape[0]
+                 for (X, diff) in zip(Xs, diffs)]
+
+    for g in gradients:
+        drdb.check_for_large_numbers(
+            g,
+            'AGNVCCA _get_basis_updates at round ' + str(self.num_rounds),
+            'gradient')
+
+    return gradients
 
 def get_init_basis_pairs(Sxs, k):
 
@@ -54,8 +61,12 @@ def get_init_basis_pair(Sx, k):
 
     # Initialize unnormalized Gaussian matrix
     unn_Phi = normal(shape=(Sx.shape[0], k))
+    
+    print 'unn_Phi', unn_Phi
 
     # Normalize for initial normalized bases
     Phi = gu.misc.get_gram_normed(unn_Phi, Sx)
 
-    return (Phi, Phi)
+    print 'Phi', Phi
+
+    return (unn_Phi, Phi)

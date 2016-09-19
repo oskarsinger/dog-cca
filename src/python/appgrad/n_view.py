@@ -53,7 +53,6 @@ class NViewAppGradCCA:
             # Initialization of optimization variables
             self.basis_pairs_t = agu.get_init_basis_pairs(Sxs, self.k)
 
-        print 'Running NViewAppGradCCA for rounds', self.num_rounds
         self.num_rounds += 1
         #print 'Updating history'
         self._update_history(Xs, missing)
@@ -107,12 +106,6 @@ class NViewAppGradCCA:
         # Get gradients
         #print 'Getting gradients'
         gradients = agu.get_gradients(Xs, self.basis_pairs_t)
-
-        for g in gradients:
-            drdb.check_for_large_numbers(
-                g,
-                'AGNVCCA _get_basis_updates at round ' + str(self.num_rounds),
-                'gradient')
 
         # Get basis update for i-th basis 
         get_new_b = lambda i: self.optimizers[i].get_update(
