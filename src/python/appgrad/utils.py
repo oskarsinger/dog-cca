@@ -53,7 +53,7 @@ def get_init_basis_pairs(Sxs, k):
 def get_init_basis_pair(Sx, k):
 
     # Initialize unnormalized Gaussian matrix
-    unn_Phi = normal(shape=(Sx.shape[0], k), scale=1000)
+    unn_Phi = normal(shape=(Sx.shape[0], k))
 
     # Normalize for initial normalized bases
     Phi = gu.misc.get_gram_normed(unn_Phi, Sx)
