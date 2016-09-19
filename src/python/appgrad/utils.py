@@ -14,15 +14,27 @@ def get_gradients(Xs, basis_pairs):
     X_transforms = [(np.dot(X, unnormed), np.dot(X, normed))
                     for (X, (unnormed,normed)) in zip(Xs, basis_pairs)]
 
-    for (unnormed, normed) in X_transforms:
+    info = zip(
+        Xs, basis_pairs, X_transforms)
+    for thang in info:
+        X = thang[0]
+        (unnormed_Phi, normed_Phi) = thang[1]
+        (unnormed_Phi_X, normed_Phi_X) = thang[2]
+
+        print 'X', X
+        print 'unnormed_Phi', unnormed_Phi
+        print 'normed_Phi', normed_Phi
+        print 'unnormed_Phi_X', unnormed_Phi_X
+        print 'normed_Phi_X', normed_Phi_X
+
         drdb.check_for_large_numbers(
-            unnormed,
+            unnormed_Phi_X,
             'appgrad.utils get_gradients',
-            'unnormed')
+            'unnormed_Phi_X')
         drdb.check_for_large_numbers(
-            normed,
+            normed_Phi_X,
             'appgrad.utils get_gradients',
-            'normed')
+            'normed_Phi_X')
 
     minus_term = sum(unzip(X_transforms)[1])
 
