@@ -61,11 +61,13 @@ def get_gradients(Xs, basis_pairs):
     gradients = [np.dot(X.T, diff) / X.shape[0]
                  for (X, diff) in zip(Xs, diffs)]
 
+    """
     for g in gradients:
         drdb.check_for_large_numbers(
             g,
             'appgrad.utils get_gradients',
             'gradient')
+    """
 
     return gradients
 
