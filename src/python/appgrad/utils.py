@@ -50,6 +50,7 @@ def get_gradients(Xs, basis_pairs):
              for (unnormed, normed) in X_transforms]
 
     for diff in diffs:
+        print diff
         drdb.check_for_large_numbers(
             diff,
             'appgrad.utils get_gradients',
