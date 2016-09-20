@@ -38,7 +38,7 @@ def get_gradients(Xs, basis_pairs):
             'appgrad.utils get_gradients',
             'normed_Phi_X')
 
-    minus_term = sum(unzip(X_transforms)[0])
+    minus_term = sum(unzip(X_transforms)[1])
 
     """
     drdb.check_for_large_numbers(
@@ -47,8 +47,8 @@ def get_gradients(Xs, basis_pairs):
         'minus_term')
     """
 
-    diffs = [(m-1)*unnormed - \
-             (minus_term - unnormed)
+    diffs = [(m-1)*normed - \
+             (minus_term - normed)
              for (unnormed, normed) in X_transforms]
 
     for diff in diffs:
