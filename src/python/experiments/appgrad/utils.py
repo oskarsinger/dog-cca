@@ -118,8 +118,8 @@ class RandomArmSampler:
     def get_arm(self):
 
         # TODO: make sure I sample all the right parameters
-        beta1 = None
-        beta2 = None
+        beta1 = 0.999
+        beta2 = 0.999
         stepsize = None
         window = None
         exp = None
@@ -127,7 +127,7 @@ class RandomArmSampler:
         delta = None
         lower = None
         
-        (beta1, beta2) = list(npr.uniform(size=2))
+        #(beta1, beta2) = list(npr.uniform(size=2))
         stepsize = lu(10**(-8), 10**(-1))
         gram_reg = lu(10**(-5), 10)
         delta = lu(10**(-5), 10)
