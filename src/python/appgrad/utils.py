@@ -40,14 +40,12 @@ def get_gradients(Xs, basis_pairs):
 
     minus_term = sum(unzip(X_transforms)[1])
 
-    """
     drdb.check_for_large_numbers(
         minus_term,
         'appgrad.utils get_gradients',
         'minus_term')
-    """
 
-    diffs = [(m-1)*normed - \
+    diffs = [(m-1)*unnormed - \
              (minus_term - normed)
              for (unnormed, normed) in X_transforms]
 
@@ -61,13 +59,11 @@ def get_gradients(Xs, basis_pairs):
     gradients = [np.dot(X.T, diff) / X.shape[0]
                  for (X, diff) in zip(Xs, diffs)]
 
-    """
     for g in gradients:
         drdb.check_for_large_numbers(
             g,
             'appgrad.utils get_gradients',
             'gradient')
-    """
 
     return gradients
 
