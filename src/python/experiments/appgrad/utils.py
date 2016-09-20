@@ -128,7 +128,7 @@ class RandomArmSampler:
         lower = None
         
         (beta1, beta2) = list(npr.uniform(size=2))
-        stepsize = lu(10**(-5), 10**(2))
+        stepsize = lu(10**(-8), 10**(-1))
         gram_reg = lu(10**(-5), 10)
         delta = lu(10**(-5), 10)
         lower = npr.uniform(high=0.3)
