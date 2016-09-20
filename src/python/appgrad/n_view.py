@@ -122,7 +122,6 @@ class NViewAppGradCCA:
                 'AGNVCCA _get_basis_updates at round ' + str(self.num_rounds),
                 'unn_phi')
 
-        # TODO: rewrite this to avoid redundant computation on unchanged bases
         # Normalize with Gram-parameterized Mahalanobis
         #print 'Normalizing basis estimates'
         normed_pairs = [(unn, gu.misc.get_gram_normed(unn, Sx))
