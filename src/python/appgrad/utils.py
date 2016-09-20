@@ -52,7 +52,7 @@ def get_gradients(Xs, basis_pairs):
              for (unnormed, normed) in X_transforms]
 
     for diff in diffs:
-        print diff
+        print 'Diff', diff
         drdb.check_for_large_numbers(
             diff,
             'appgrad.utils get_gradients',
@@ -64,7 +64,7 @@ def get_gradients(Xs, basis_pairs):
     for g in gradients:
         drdb.check_for_large_numbers(
             g,
-            'AGNVCCA _get_basis_updates at round ' + str(self.num_rounds),
+            'appgrad.utils get_gradients',
             'gradient')
 
     return gradients
@@ -79,11 +79,7 @@ def get_init_basis_pair(Sx, k):
     # Initialize unnormalized Gaussian matrix
     unn_Phi = normal(shape=(Sx.shape[0], k))
     
-    print 'unn_Phi', unn_Phi
-
     # Normalize for initial normalized bases
     Phi = gu.misc.get_gram_normed(unn_Phi, Sx)
-
-    print 'Phi', Phi
 
     return (unn_Phi, Phi)
