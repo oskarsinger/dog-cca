@@ -40,10 +40,12 @@ def get_gradients(Xs, basis_pairs):
 
     minus_term = sum(unzip(X_transforms)[0])
 
+    """
     drdb.check_for_large_numbers(
         minus_term,
         'appgrad.utils get_gradients',
         'minus_term')
+    """
 
     diffs = [(m-1)*unnormed - \
              (minus_term - unnormed)
