@@ -118,8 +118,8 @@ class RandomArmSampler:
     def get_arm(self):
 
         # TODO: make sure I sample all the right parameters
-        beta1 = 0.999
-        beta2 = 0.999
+        beta1 = 0
+        beta2 = 0
         stepsize = None
         window = None
         exp = None
