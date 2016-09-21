@@ -63,7 +63,8 @@ def get_gradients(Xs, basis_pairs):
         drdb.check_for_large_numbers(
             g,
             'appgrad.utils get_gradients',
-            'gradient')
+            'gradient',
+            exponent=2.5)
 
     return gradients
 
