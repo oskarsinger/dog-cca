@@ -21,18 +21,16 @@ def get_gradients(Xs, basis_pairs):
         (unnormed_Phi, normed_Phi) = thang[1]
         (unnormed_Phi_X, normed_Phi_X) = thang[2]
 
-        print 'X', X
-        print 'unnormed_Phi', unnormed_Phi
-        print 'normed_Phi', normed_Phi
-        print 'unnormed_Phi_X', unnormed_Phi_X
-        print 'normed_Phi_X', normed_Phi_X
+        #print 'X', X
+        #print 'unnormed_Phi', unnormed_Phi
+        #print 'normed_Phi', normed_Phi
+        #print 'unnormed_Phi_X', unnormed_Phi_X
+        #print 'normed_Phi_X', normed_Phi_X
 
-        """
         drdb.check_for_large_numbers(
             unnormed_Phi_X,
             'appgrad.utils get_gradients',
             'unnormed_Phi_X')
-        """
         drdb.check_for_large_numbers(
             normed_Phi_X,
             'appgrad.utils get_gradients',
@@ -50,7 +48,7 @@ def get_gradients(Xs, basis_pairs):
              for (unnormed, normed) in X_transforms]
 
     for diff in diffs:
-        print 'Diff', diff
+        #print 'Diff', diff
         drdb.check_for_large_numbers(
             diff,
             'appgrad.utils get_gradients',
