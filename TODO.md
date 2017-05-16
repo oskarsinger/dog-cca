@@ -1,42 +1,21 @@
 #Online CCA Todo List
 
-##Presentation
-* Introduce notation for optimization problem formulation, pseudocode, etc.
+##Engineering
+* Reimplement old algorithm (or some variation/extension of it?) with current refactoring of my research code
+* Use Adam
+* Implement the paper that Al sent me.
 
-* Think of ways to clarify what exactly the plots are showing (e.g. clarify that the filtering plots are showing X times Phi).
+##Algorithms
+* Think about how to formalize the active learning component. What do I want to accomplish? Probably sensor fusion, so something like a CCA graph across a bunch of sensors.
+    * Would it be helpful to put a probabilistic model on it and turn it into something like a Kalman filter?
+    * Is there any way I can formulate it as a regret minimization problem? I have a loss function, and there's an optimal loss in hind-sight, so yeah. Do I really need to do SGD, or is there a better way? Think decentralized Coh.Lin.
+* Is there any way I can use some tricks from Matrix Cookbook to decrease the operation count?
+* Can I directly address the GEP formulation with SGD or an MDP instead of using the CCALin thing?
 
-* Think of best way to juxtapose filter with random noise input to filter with E4 input to emphasize patterns in the E4.
+##Writing
+* Go back and read and revise the old write-up.
+* Start a conference-style write-up with an outline so I can bring it to Al. This is probably the first thing I should do.
+* Probably go look at other papers submitted to IEEE Big Data for examples of how to structure the paper.
 
 ##Experiments
-* Run some experiments to figure out why AppGrad filter takes so long to stabilize.
-    * Use synthesized data for sanity check on an easy case.
-    * Try different step sizes. This will take some software engineering, so get the easier one out of the way first.
-
-* Try both periodic link functions.
-
-* Try different step-size schemes on AppGrad since we don't care about global convergence any more. 
-    * Constant step size and just let the Bregman divergence figure out the rest.
-    * More interesting adaptive ones like 'No More Pesky Learning Rates' and the probabilistic one.
-
-##Research Questions
-* Do we care about convexity any more since we are approximately solving a new problem at each round in a non-stationary environment? What properties in our objective function are conducive to accomplishing our goal of being pretty close to some tracking target at ever time step?
-
-* Now our step size routine has a different quality criterion. What should it even accomplish?
-
-##Plots
-* Plot the application of the basis for each of the periods in the periodic metalearner to the full dataset.
-
-##Implementation
-
-###Metalearners
-* Make it possible to pass more args to the submodels in the periodic metalearners.
-    * Maybe need to abstract away the call to 'fit' so that I can arbitrarily pass arguments to it. Should pass in a 'trainer' method?
-
-###Gram Variations
-* FOR CCALin ONLY: is it problematic that my cross-Gram matrices are not stateful like the Gram matrices? Maybe I should implement the algorithms to run the stateful updates on the cross Grams too. Should brainstorm with Sijia or John about this at some point.
-
-###Numerical Linear Algebra
-* See if block-diagonal structure can be leveraged in CCALin (and GenELinK) implementation(s). Judging from what I have read so far in the Matrix Computations book, it probably can.
-
-##Model Serialization
-* Need to implement save and load functions for the CCA objects.
+* Is this even comparable to the paper that Al sent me? Are we trying to do the same thing? Seems like they might just be trying to scale up.
