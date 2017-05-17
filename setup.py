@@ -9,6 +9,6 @@ packages = [
     'utils']
 
 setup(
-    name='ogcca',
+    name='dogcca',
     version='0.01',
-    packages=['ogcca.' + p for p in packages])
+    packages=['dogcca.' + p for p in packages])
