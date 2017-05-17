@@ -11,6 +11,7 @@
     * Is there any way I can formulate it as a regret minimization problem? I have a loss function, and there's an optimal loss in hind-sight, so yeah. Do I really need to do SGD, or is there a better way? Think decentralized Coh.Lin.
 * Is there any way I can use some tricks from Matrix Cookbook to decrease the operation count?
 * Can I directly address the GEP formulation with SGD or an MDP instead of using the CCALin thing?
+* Try doing the exponential increase aggregation schedule with the Matrix Cookbook linear system solver updates for genelink/ccalin. First, I will have to derive a decentralized genelink/ccalin. Convergence on that might be kinda tricky.
 
 ##Writing
 * Go back and read and revise the old write-up.
