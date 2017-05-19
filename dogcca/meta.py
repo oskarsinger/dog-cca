@@ -102,6 +102,7 @@ class DecentralizedOnlineGraphCCANode:
     def set_neighbors(self, neighbors):
 
         self.neighbors = neighbors
+        self.nPhis = [None] * len(self.neighbors)
 
     def communicate(self):
 
@@ -115,4 +116,7 @@ class DecentralizedOnlineGraphCCANode:
 
         datum = self.ds.get_data()
         
-        self.Phi = self.model.get_update(datum, self.nPhis)
+        self.Phi = self.model.get_parameters(
+            datum, 
+            self.Phi,
+            self.nPhis)
