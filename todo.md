@@ -2,7 +2,7 @@
 
 ##Engineering
 * Reimplement old algorithm (or some variation/extension of it?) with current refactoring of my research code
-* Use Adam
+* Use Adam; how can I empirically check that Adam is accounting for sample imbalance?
 * Implement the paper that Al sent me.
 
 ##Algorithms
