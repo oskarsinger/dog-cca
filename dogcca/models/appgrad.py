@@ -46,7 +46,7 @@ class LocalAppGradView:
             self.num_rounds)
 
         centered_X = X - self.data_mean
-        # TODO: consider some reweighting of terms here
+        # TODO: consider adaptive reweighting of each neighbor term
         neighbor_term = np.dot(
             centered_X,
             sum(neighbor_XPhis))
@@ -65,5 +65,3 @@ class LocalAppGradView:
         normed = np.dot(self.unnPhi, normalizer)
 
         return normed
-        # Project new estimate
-        # Return projected estimate
