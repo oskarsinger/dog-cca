@@ -3,7 +3,7 @@
 ##Engineering
 * Reimplement old algorithm (or some variation/extension of it?) with current refactoring of my research code
 * Use Adam; how can I empirically check that Adam is accounting for sample imbalance?
-* Implement the paper that Al sent me.
+* Finish implementing LasGCCA (including the conjugate gradient subroutine), DisCCA, and Distributed H_Compute
 
 ##Algorithms
 * Think about how to formalize the active learning component. What do I want to accomplish? Probably sensor fusion, so something like a CCA graph across a bunch of sensors.
