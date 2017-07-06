@@ -4,14 +4,35 @@ from fitterhappier import LinearConjugateGradientOptimizer as LCGO
 
 class DistributedHComputer:
 
-    def __init__(self, X_server, K=1): 
+    def __init__(self, X_server, K=1, G_init=None):
 
         self.X = self.X_server.get_data()
         self.K = K
-        
-    def get_C_or_H(self, G_or_P):
 
-        return get_C_or_H(self.X, G_or_P)
+        if G_init is None:
+            G_init = np.random.randn(
+                self.X.shape[0], self.K)
+
+        self.G = G_init
+        self.H = None
+        
+    def get_C(self):
+
+        return get_C_or_H(self.X, self.G)
+
+    def get_v(self, P):
+
+        self.H = get_C_or_H(self.X, P)
+        (U, s, VT) = np.linalg.svd(
+            self.H, full_matrices=False)
+        self.new_G = np.dot(U, VT)
+        GH = np.dot(self.new_G.T, self.H)
+
+        return np.trace(GH)
+
+    def update_G(self):
+
+        self.G = np.copy(self.new_G)
 
 def get_H(Xs, Gs, v):
 
