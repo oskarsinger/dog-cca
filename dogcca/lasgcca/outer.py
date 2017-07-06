@@ -1,6 +1,12 @@
 import numpy as np
 
 from .hcompute import get_H
+from .hcompute import DistributedHComputer
+
+class DisGCCA:
+
+    def __init__(self):
+        pass
 
 class LasGCCA:
 

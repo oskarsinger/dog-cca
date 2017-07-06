@@ -1,21 +1,36 @@
 import numpy as np
 
+from fitterhappier import LinearConjugateGradientOptimizer as LCGO
+
+class DistributedHComputer:
+
+    def __init__(self, X_server, K=1): 
+
+        self.X = self.X_server.get_data()
+        self.K = K
+        
+    def get_C_or_H(self, G_or_P):
+
+        return get_C_or_H(self.X, G_or_P)
+
 def get_H(Xs, Gs, v):
 
     Xvs = [X for (w, X) in enumerate(Xs)
            if not w == v]
     Gvs = [G for (w, G) in enumerate(Gs)
            if not w == v]
-    zipped = zip(Xvs, Gvs)
-    enumed = enumerate(zipped)
-    Rvs = [get_CG(Xw, Gw)
-           for (w, (Xw, Gw)) in enumed]
-    Cvs = [np.dot(Xw, Rw)
-           for (Xw, Rw) in zip(Xvs, Rvs)]
+    Cvs = [get_C_or_H(Xw, Gw)
+           for (Xw, Gw) in zip(Xvs, Gvs)]
     Pv = sum(Cvs)
-    Ev = get_CG(Xs[v], Pv)
 
-    return np.dot(Xs[v], Ev)
+    return get_C_or_H(Xs[v], Pv)
 
-def get_CG(X, G):
-    pass
+def get_C_or_H(X, G_or_P):
+
+    lcgo = LCGO(X, G_or_P)
+
+    lcgo.run()
+
+    R_or_E = lcgo.get_parameters()
+
+    return np.dot(X, R_or_E)
