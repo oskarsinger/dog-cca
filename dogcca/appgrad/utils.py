@@ -2,7 +2,7 @@ import numpy as np
 import drrobert.debug as drdb
 
 from numpy.random import choice
-from linal.svd_funcs import get_svd_power
+from linal.svd import get_svd_power
 from drrobert.random import normal
 from drrobert.misc import unzip
 

@@ -2,7 +2,7 @@ import numpy as np
 
 from optimization.utils import is_converged as is_conv
 from linal.utils import get_quadratic as get_quad
-from linal.svd_funcs import get_svd_power
+from linal.svd import get_svd_power
 
 def is_converged(
     unn_Phi_pairs,

@@ -5,7 +5,7 @@ from fitterhappier.stepsize import InversePowerScheduler as IPS
 from whitehorses.gram.online import SumGramServer as SGS
 from drrobert.arithmetic import get_running_avg as get_ra
 from linal.utils import get_quadratic as get_q
-from linal.svd_funcs import get_svd_power as get_svdp
+from linal.svd import get_svd_power as get_svdp
 
 class LocalAppGradView:
 

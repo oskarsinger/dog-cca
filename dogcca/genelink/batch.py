@@ -1,7 +1,7 @@
 import numpy as np
 
 from linal.utils import get_quadratic as get_quad
-from linal.svd_funcs import get_svd_power
+from linal.svd import get_svd_power
 from optimization.utils import is_converged
 from genelink import GenELinKSubroutine
 
