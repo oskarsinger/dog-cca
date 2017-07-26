@@ -1,20 +1,23 @@
 import numpy as np
 
+from drrobert.misc import unzip
 from whitehorses.loaders.multiview.cca import get_easy_SCCAPMLs
 from whitehorses.servers.minibatch import Batch2Minibatch as B2M
 from dogcca.appgrad import get_ag_views
 
 class CCAProbabilisticModelAppGradTester:
 
-    def __init__(self, num_views, ds, k=2, num_rounds=1000):
+    def __init__(self, ds, k=2, num_data=1000):
 
-        self.num_views = num_views
         self.ds = ds
         self.k = k
-        self.num_rounds = num_rounds
+        self.num_data = data
 
-        # TODO: fill in args for loaders
-        self.loaders = get_easy_SCCAPMLs()
+        self.num_views = len(ds)
+        self.loaders = get_easy_SCCAPMLs(
+            self.num_data,
+            self.k,
+            self.ds)
         self.servers = [B2M(1, data_loader=dl)
                         for dl in self.loaders]
 
@@ -23,11 +26,17 @@ class CCAProbabilisticModelAppGradTester:
             self.num_views,
             self.k)
         self.Phis = None
-        self.tccs = None
+        self.tccs = []
+
+    def get_parameters(self):
+
+        return self.Phis
 
     def run(self):
 
-        for t in range(self.num_rounds):
+        interval = t / 10
+
+        for t in range(self.num_data):
 
             zipped = zip(self.agvs, self.servers)
 
@@ -41,6 +50,10 @@ class CCAProbabilisticModelAppGradTester:
                 for (n, XPhi) in enumerate(XPhis):
                     agv.update_neighbor_state(n, XPhi)
 
-            (self.Phis, self.tccs) = unzip(
+            (self.Phis, new_tccs) = unzip(
                 [agv.get_update() 
                  for agv in self.agvs])
+            self.tccs.append(new_tccs)
+
+            if t % interval == 0:
+                print('tccs', new_tccs)

@@ -1,6 +1,6 @@
 import numpy as np
 
-from optimization.utils import is_converged as is_conv
+from fitterhappier.utils import is_converged as is_conv
 from linal.utils import get_quadratic as get_quad
 from linal.svd import get_svd_power
 

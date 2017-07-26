@@ -3,7 +3,8 @@ import numpy as np
 from drrobert.stats import get_zm_uv
 from linal.utils import get_quadratic, get_multi_dot
 from whitehorses.servers.gram import BatchGramServer as BGS
-from fitterhappier.stepsize import FixedServer as FS
+from whitehorses.servers.queue import PlainQueue as PQ
+from fitterhappier.stepsize import FixedScheduler as FS
 
 def get_ag_views(num_views, k, bss=None, pss=None, ess=None):
 
@@ -35,7 +36,7 @@ def get_ag_views(num_views, k, bss=None, pss=None, ess=None):
 class AppGradView:
 
     def __init__(self, 
-        num_views
+        num_views,
         k, 
         idn, 
         batch_server=None,
@@ -48,7 +49,7 @@ class AppGradView:
 
         # TODO: consider making it bigger than k for conditioning purposes
         if batch_server is None:
-            batch_server = B2Q(k)
+            batch_server = PQ(k)
 
         self.batch_server = batch_server
 
@@ -71,7 +72,7 @@ class AppGradView:
         self.tcc_history = []
         self.num_rounds = 0
 
-    def set_data(self, data);
+    def set_data(self, data):
 
         self.batch_server.add_data(data)
         self.batch = self.batch_server.get_batch()
@@ -81,10 +82,7 @@ class AppGradView:
             self.d = data.shape[1]
             self.unn_Phi = np.random.randn(self.d, self.k)
 
-            pre_sqrt = get_quadratic(self.unn_Phi, self.gram)
-            normalizer = get_svd_power(pre_sqrt, -0.5)
-            
-            self.Phi = np.dot(self.unn_Phi, normalizer)
+            self._update_unn_Phi()
 
     def get_projected(self):
 
@@ -98,7 +96,7 @@ class AppGradView:
 
         self.num_rounds += 1
 
-        return (self.Phi, self.tcc[-1])
+        return (self.Phi, self.tcc_history[-1])
 
     def _update_TCC(self):
 
