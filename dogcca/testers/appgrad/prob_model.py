@@ -3,6 +3,7 @@ import numpy as np
 from drrobert.misc import unzip
 from whitehorses.loaders.multiview.cca import get_easy_SCCAPMLs
 from whitehorses.servers.minibatch import Batch2Minibatch as B2M
+from whitehorses.servers.queue import ExponentialDownWeightedQueue as EDWQ
 from dogcca.appgrad import get_ag_views
 
 class CCAProbabilisticModelAppGradTester:
@@ -18,13 +19,15 @@ class CCAProbabilisticModelAppGradTester:
             self.num_data,
             self.k,
             self.ds)
+        bss = [EDWQ(4*k, alpha=0.99) for _ in range(self.num_views)]
         self.servers = [B2M(1, data_loader=dl)
                         for dl in self.loaders]
 
         # TODO: pass in custom pss and ess
         self.agvs = get_ag_views(
             self.num_views,
-            self.k)
+            self.k,
+            bss=bss)
         self.Phis = None
         self.tccs = []
 

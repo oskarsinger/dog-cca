@@ -66,7 +66,7 @@ class AppGradView:
         self.eta_server = eta_server
 
         self.neighbor_state = [None] * self.num_views
-        self.gram_server = BGS(reg=10**(-5))
+        self.gram_server = BGS(reg=10**(-12))
         self.unn_Phi = None
         self.Phi = None
         self.d = None
@@ -102,14 +102,13 @@ class AppGradView:
 
     def _update_TCC(self):
 
-        neighbor_sum = sum(self.neighbor_state)
-        tcc_matrix = get_multi_dot([
-            self.Phi.T, 
-            self.batch.T, 
-            neighbor_sum])
-        tcc = np.trace(tcc_matrix) / self.k
+        self_term = np.dot(self.Phi.T, self.batch.T)
+        tcc_matrices = [np.dot(self_term, ns)
+                        for ns in self.neighbor_state]
+        tccs = [np.trace(tccm) / self.k
+                for tccm in tcc_matrices]
 
-        self.tcc_history.append(tcc)
+        self.tcc_history.append(tccs)
 
     def _update_unn_Phi(self):
 
@@ -128,6 +127,7 @@ class AppGradView:
     def _update_Phi(self):
 
         pre_sqrt = get_quadratic(self.unn_Phi, self.gram)
+        pre_sqrt_norm = np.linalg.norm(pre_sqrt)
         normalizer = get_svd_power(pre_sqrt, -0.5)
         
         self.Phi = np.dot(self.unn_Phi, normalizer)
