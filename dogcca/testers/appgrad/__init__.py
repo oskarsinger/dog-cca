@@ -1,3 +1,1 @@
-import utils
-import synthetic
-import e4
+from .prob_model import CCAProbabilisticModelAppGradTester
