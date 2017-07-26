@@ -2,9 +2,11 @@ import numpy as np
 
 from drrobert.stats import get_zm_uv
 from linal.utils import get_quadratic, get_multi_dot
+from linal.svd import get_svd_power
 from whitehorses.servers.gram import BatchGramServer as BGS
 from whitehorses.servers.queue import PlainQueue as PQ
 from fitterhappier.stepsize import FixedScheduler as FS
+from fitterhappier.qn import DiagonalAdaGradServer as DAGS
 
 def get_ag_views(num_views, k, bss=None, pss=None, ess=None):
 
@@ -40,31 +42,31 @@ class AppGradView:
         k, 
         idn, 
         batch_server=None,
-        prox_server=None,
+        qn_server=None,
         eta_server=None):
 
-        self.num_views
+        self.num_views = num_views
         self.k = k
         self.idk = idn
 
         # TODO: consider making it bigger than k for conditioning purposes
         if batch_server is None:
-            batch_server = PQ(k)
+            batch_server = PQ(2*self.k)
 
         self.batch_server = batch_server
 
-        if prox_server is None:
-            prox_server = DAS()
+        if qn_server is None:
+            qn_server = DAGS()
 
-        self.prox_server = prox_server
+        self.qns = qn_server
 
         if eta_server is None:
-            eta_server = FS()
+            eta_server = FS(10**(-3))
 
-        sefl.eta_server = eta_server
+        self.eta_server = eta_server
 
         self.neighbor_state = [None] * self.num_views
-        self.gram_server = BGS()
+        self.gram_server = BGS(reg=10**(-5))
         self.unn_Phi = None
         self.Phi = None
         self.d = None
@@ -82,11 +84,11 @@ class AppGradView:
             self.d = data.shape[1]
             self.unn_Phi = np.random.randn(self.d, self.k)
 
-            self._update_unn_Phi()
+            self._update_Phi()
 
     def get_projected(self):
 
-        return np.dot(self.data, self.Phi)
+        return np.dot(self.batch, self.Phi)
 
     def get_update(self):
 
@@ -100,11 +102,12 @@ class AppGradView:
 
     def _update_TCC(self):
 
-        neighbor_sum = sum(self.neighbor_states)
-        tcc = get_multi_dot([
+        neighbor_sum = sum(self.neighbor_state)
+        tcc_matrix = get_multi_dot([
             self.Phi.T, 
             self.batch.T, 
-            neighbor_sum]) / self.k
+            neighbor_sum])
+        tcc = np.trace(tcc_matrix) / self.k
 
         self.tcc_history.append(tcc)
 
@@ -117,10 +120,10 @@ class AppGradView:
         self_term = self.num_views * np.dot(
             self.gram, self.unn_Phi)
         gradient = self_term - neighbor_term
+        qn_transd = self.qns.get_transform(gradient)
         eta = self.eta_server.get_stepsize()
 
-        self.unn_Phi = self.prox_server.get_update(
-            self.unn_Phi, gradient, eta)
+        self.unn_Phi -= eta * qn_transd
             
     def _update_Phi(self):
 
