@@ -22,8 +22,6 @@ class CCAProbabilisticModelAppGradTester:
         bss = [EDWQ(4*k, alpha=0.99) for _ in range(self.num_views)]
         self.servers = [B2M(1, data_loader=dl)
                         for dl in self.loaders]
-
-        # TODO: pass in custom pss and ess
         self.agvs = get_ag_views(
             self.num_views,
             self.k,
