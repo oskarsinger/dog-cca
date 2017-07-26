@@ -11,7 +11,7 @@ class CCAProbabilisticModelAppGradTester:
 
         self.ds = ds
         self.k = k
-        self.num_data = data
+        self.num_data = num_data
 
         self.num_views = len(ds)
         self.loaders = get_easy_SCCAPMLs(
@@ -34,7 +34,7 @@ class CCAProbabilisticModelAppGradTester:
 
     def run(self):
 
-        interval = t / 10
+        interval = self.num_data / 10
 
         for t in range(self.num_data):
 

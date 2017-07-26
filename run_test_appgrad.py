@@ -8,11 +8,9 @@ from dogcca.testers.appgrad import CCAProbabilisticModelAppGradTester as CCAPMAG
 @click.option('--k', default=1)
 @click.option('--ds', default='10 20 30')
 def run_things_all_day_bb(
-    data_dir,
     num_data,
     k,
-    ds,
-    lazy):
+    ds):
 
     ds = [int(d) for d in ds.split()]
     tester = CCAPMAGT(
