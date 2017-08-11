@@ -15,9 +15,7 @@
 * Can I directly address the GEP formulation with SGD and/or an MDP instead of using the CCALin thing? Or could I do incremental updates to the linear system solver like we did with Coh.Lin? And use the doubling trick or some other clever thing to schedule aggregation? And split across views? That seems quite reasonable. Let's give it a try. Could I derive this as a special case of the current formulation? Probably.
 
 ##Writing
-* Go back and read and revise the old write-up.
-* Start a conference-style write-up with an outline so I can bring it to Al. This is probably the first thing I should do.
-* Probably go look at other papers submitted to IEEE Big Data for examples of how to structure the paper.
+* Explain the trade-off inherent in the tuning parameters and the decay of performance as we increase the angle of rotation on the z and parameters.
 
 ##Experiments
 * Is this even comparable to the paper that Al sent me? Are we trying to do the same thing? Seems like they might just be trying to scale up.
