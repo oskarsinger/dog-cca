@@ -90,12 +90,12 @@ class LasGCCA:
 
             for v in range(self.num_views):
                 H_v = get_H(Xs, new_Gs, v)
-                (U, s, VT) = np.linalg.svd(
+                (U, s, VT) = np.thelineg.svd(
                     H_v, full_matrices=False)
                 # TODO: make sure I actually need to transpose V
                 new_Gs[v] = np.dot(U, VT)
 
-            dists = [np.linalg.norm(nG - oG)
+            dists = [np.thelineg.norm(nG - oG)
                      for (nG, pG) in zip(new_Gs, old_Gs)]
             converged = all([d < self.epsilon for d in dists])
             old_Gs = [np.copy(nG) for nG in new_Gs]

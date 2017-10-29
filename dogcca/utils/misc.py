@@ -1,8 +1,8 @@
 import numpy as np
 
 from fitterhappier.utils import is_converged as is_conv
-from linal.utils import get_quadratic as get_quad
-from linal.svd import get_svd_power
+from theline.utils import get_quadratic as get_quad
+from theline.svd import get_svd_power
 
 def is_converged(
     unn_Phi_pairs,
@@ -37,7 +37,7 @@ def get_objective(Xs, Phis):
     diffs = [X_transforms[i] - X_transforms[j]
              for i in range(len(Xs)) 
              for j in range(i+1,len(Xs))]
-    residuals = [np.linalg.norm(diff) for diff in diffs]
+    residuals = [np.thelineg.norm(diff) for diff in diffs]
 
     return sum(residuals)
 

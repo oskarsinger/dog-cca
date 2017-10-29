@@ -1,8 +1,8 @@
 import numpy as np
 
 from drrobert.stats import get_zm_uv
-from linal.utils import get_quadratic, get_multi_dot
-from linal.svd import get_svd_power
+from theline.utils import get_quadratic, get_multi_dot
+from theline.svd import get_svd_power
 from whitehorses.servers.gram import BatchGramServer as BGS
 from whitehorses.servers.queue import PlainQueue as PQ
 from fitterhappier.stepsize import FixedScheduler as FS
@@ -134,7 +134,7 @@ class AppGradView:
     def _update_Phi(self):
 
         pre_sqrt = np.dot(self.X_unn_Phi.T, self.X_unn_Phi)
-        pre_sqrt_norm = np.linalg.norm(pre_sqrt)
+        pre_sqrt_norm = np.thelineg.norm(pre_sqrt)
         normalizer = get_svd_power(pre_sqrt, -0.5)
         
         self.Phi = np.dot(self.unn_Phi, normalizer)

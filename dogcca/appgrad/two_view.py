@@ -100,8 +100,8 @@ class AppGradCCA:
             Psi_t1 = agu.get_gram_normed(unn_Psi_t1, Sy)
 
             if verbose:
-                Phi_dist = np.linalg.norm(unn_Phi_t1 - unn_Phi_t)
-                Psi_dist = np.linalg.norm(unn_Psi_t1 - unn_Psi_t)
+                Phi_dist = np.thelineg.norm(unn_Phi_t1 - unn_Phi_t)
+                Psi_dist = np.thelineg.norm(unn_Psi_t1 - unn_Psi_t)
                 print "\tDistance between unnormed Phi iterates:", Phi_dist
                 print "\tDistance between unnormed Psi iterates:", Psi_dist
                 print "\tObjective:", agu.get_objective(
